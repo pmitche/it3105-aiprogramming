@@ -1,7 +1,7 @@
 __author__ = 'sondredyvik'
 from Tkinter import *
 import sys
-
+import state
 
 
 class astarGui(Frame):
@@ -16,7 +16,7 @@ class astarGui(Frame):
         self.color2 = color2
         canvas_width = columns * size
         canvas_height = rows * size
-        self.nodes = [[Node("ordinary", j, i) for j in range(columns)] for i in range (rows)]
+        self.nodes = [[state.State("ordinary", j, i) for j in range(columns)] for i in range (rows)]
 
         self.left_frame = Frame(self.parent)
         self.right_frame = Frame(self.parent,borderwidth = 5, relief =RIDGE)
@@ -141,28 +141,6 @@ class astarGui(Frame):
                 ##QUICK HACK TO PUT ORIGO IN LOWER LEFT CORNER
                 color = self.color_to_type_map[self.nodes[self.rows-1-row][col].type]
                 self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", fill=color, tags="square")
-
-
-class Node():
-    def __init__(self,type,xpos,ypos):
-        self.f = None
-        self.g = float('inf')
-        self.h = None
-        self.type =type
-        self.xpos = xpos
-        self.ypos = ypos
-        self.parent = None
-    def __repr__(self):
-        return self.type
-    def reparent(self, parent):
-        self.parent = parent
-    def calculateHeuristic(self,goalnode):
-        self.h = abs(self.xpos - goalnode.xpos)+ abs (self.ypos - goalnode.ypos)
-    def calculateNeighbours(self):
-        return
-
-
-
 
 
 class astar():
