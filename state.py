@@ -1,14 +1,16 @@
 __author__ = 'sondredyvik'
 class State():
-    def __init__(self,xpos,ypos,board):
+    def __init__(self,xpos,ypos,board,parent):
         self.dimensions = board.dimensions
         self.xpos = xpos
         self.ypos = ypos
         self.h = float('inf')
-        self.parent = None
+        self.parents = []
         self.g = float('inf')
         self.calculateHeuristic(board)
         self. f = self.g + self.h
+        self.children =[]
+
     def __repr__(self):
         return self.type
     def reparent(self, parent):
@@ -18,14 +20,22 @@ class State():
         self.h = abs(self.xpos - board.goal[0])+ abs (self.ypos - board.goal[1])
     def calculateNeighbours(self,board):
         neighbours = []
+        if self.xpos-1  >=0 and self.ypos+1 < board.dimensions[1] and not board[self.xpos-1][self.ypos+1]=='#':
+            neighbours.append(State(self.xpos-1,self.ypos+1),board,self)
+        if self.xpos +1 < board.dimensions [0] and self.ypos +1 < board.dimensions[1] and not board[self.xpos+1][self.ypos+1]=='#':
+            neighbours.append(State(self.xpos+1,self.ypos+1, board,self))
+        if self.xpos +1 < board.dimensions[0] and self.ypos -1 >=0 and not board[self.xpos+1][self.ypos-1]=='#':
+            neighbours.append(State(self.xpos+1,self.ypos-1, board,self))
+        if self.xpos -1>= 0 and self.ypos-1 >= 0 and not board[self.xpos-1][self.ypos-1] == '#':
+            neighbours.append(State(self.xpos-1,self.ypos-1, board,self))
         if self.xpos -1 >= 0 and not board[self.xpos-1][self.ypos] == '#':
-            neighbours.append(State(self.xpos-1,self.ypos, board))
+            neighbours.append(State(self.xpos-1,self.ypos, board,self))
         if self.xpos +1 < board.dimensions[0] and not board[self.xpos+1][self.ypos] == '#':
-            neighbours.append(State(self.xpos+1,self.ypos,board))
+            neighbours.append(State(self.xpos+1,self.ypos,board,self))
         if self.ypos -1 >= 0 and not board[self.xpos][self.ypos-1] =='#':
-            neighbours.append(State(self.xpos,self.ypos-1,board))
+            neighbours.append(State(self.xpos,self.ypos-1,board,self))
         if self.ypos +1 < board.dimensions[1] and not board[self.xpos][self.ypos+1] =='#':
-            neighbours.append(State(self.xpos,self.ypos+1,board))
+            neighbours.append(State(self.xpos,self.ypos+1,board,self))
         return neighbours
 
     def __eq__(self, other):

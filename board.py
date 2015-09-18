@@ -24,8 +24,8 @@ class Board():
     def generateInitialState(self):
         for i in range (len(self.grid)):
             for j in range(len(self.grid[i])):
-                if self.grid[i][j] == 'G':
-                    return state.State(i, j, self)
+                if self.grid[i][j] == 'S':
+                    return state.State(i, j, self,None)
 
 
 
