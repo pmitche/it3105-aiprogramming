@@ -1,12 +1,15 @@
 import state
 
 class Board():
+    #This class is used to reason about the board.
+    #A board is read from file and converted into a 2d array
+    # 'S' is start 'G' is goal '#' is obstacle
     def __init__(self,filename):
         inputhandler = InputHandler(filename)
-        self.dimensions = inputhandler.getDimensions()
-        self.start = inputhandler.getStart()
-        self.goal = inputhandler.getGoal()
-        self.obstacles = inputhandler.getObstacles()
+        self.dimensions = inputhandler.dimens
+        self.start = inputhandler.start
+        self.goal = inputhandler.goal
+        self.obstacles = inputhandler.obstacles
 
         self.grid =[[' ' for j in range(int(self.dimensions[0]))]for i in range( int(self.dimensions[1]))]
         self.grid[int(self.goal[0])][int(self.goal[1])] = 'G'
@@ -21,6 +24,9 @@ class Board():
                     self.grid[i][j] = '#'
         for line in self.grid:
             print line
+    #This method is used to provide the astar class with an initial search state.
+    #Iterates through textual representation of board and returns a new node
+    #with coordinates of start state
     def generateInitialState(self):
         for i in range (len(self.grid)):
             for j in range(len(self.grid[i])):
@@ -33,7 +39,10 @@ class Board():
 
 
 
-
+#This class is a basic class to handle input from filename
+#First line read is dimensions of grid
+#second line read is start and end coordinates
+#all subsequent lines are obstacles
 
 class InputHandler():
     def __init__(self,filename):
@@ -48,16 +57,6 @@ class InputHandler():
             line = line.rstrip()
             line = line.translate(None,'()')
             self.obstacles.append(line.split(','))
-
-
-    def getDimensions(self):
-        return self.dimens
-    def getStart(self):
-        return self.start
-    def getGoal(self):
-        return self.goal
-    def getObstacles(self):
-        return self.obstacles
 
 
 
