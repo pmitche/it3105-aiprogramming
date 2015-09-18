@@ -1,4 +1,4 @@
-
+import state
 
 class Board():
     def __init__(self,filename):
@@ -21,14 +21,14 @@ class Board():
                     self.grid[i][j] = '#'
         for line in self.grid:
             print line
-    def getBoard(self):
-        return self.grid
-    def getStartpos(self):
-        return self.start
-    def getGoalpos(self):
-        return self.goal
-    def getDimensions(self):
-        return self.dimensions
+    def generateInitialState(self):
+        for i in range (len(self.grid)):
+            for j in range(len(self.grid[i])):
+                if self.grid[i][j] == 'G':
+                    return state.State(i, j, self)
+
+
+
 
 
 
@@ -47,7 +47,6 @@ class InputHandler():
         for line in self.obstaclesHack:
             line = line.rstrip()
             line = line.translate(None,'()')
-
             self.obstacles.append(line.split(','))
 
 
@@ -63,4 +62,3 @@ class InputHandler():
 
 
 
-board = Board("board1.txt")
