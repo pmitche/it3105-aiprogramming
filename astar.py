@@ -1,5 +1,6 @@
 __author__ = 'sondredyvik'
 import board
+import state
 from heapq import heappush, heappop
 
 class Astar:
@@ -8,13 +9,16 @@ class Astar:
         self.board = board.Board('board6.txt')
         #variable used to determined search function
         self.type ="astar"
-
+        self.hashtable = {}
         self.openlist =[]
         self.closedlist=[]
         self.opendict = dict()
         self.closeddict = dict()
         #first node is created
         self.searchstate = self.board.generateInitialState()
+       # self.searchstate = state.State(11,8,self.board,None)
+        #print self.searchstate.calculateNeighbours()
+
         #g is set to zero
         self.searchstate.g = 0
         #the searchnodes heuristic is calculated
@@ -29,16 +33,30 @@ class Astar:
     def do_one_step(self):
         #if openlist is empty, no solution is found, return false
         if len(self.openlist) ==0:
-
+            print "failed"
+            for i in range(20):
+                for j in range(20):
+                    key = hash(str(i)+" "+str(j))
+                    if key in self.hashtable:
+                        self.hashtable[key] +=1
+                        print i,j, self.hashtable[key]
+                    else:
+                        self.hashtable[key] =1
+            print self.hashtable.values()
             return False
+
+
         #pop element with highest F from openlist
         self.searchstate = self.popfromopen(self.type)
 
         #remove from support structure
         del self.opendict[hash(self.searchstate)]
-
         if self.searchstate.h ==0:
             path = self.findpath(self.searchstate)
+            for key in self.opendict:
+                self.board.grid[self.opendict[key].xpos][self.opendict[key].ypos] = "O"
+            for key in self.closeddict:
+                self.board.grid[self.closeddict[key].xpos][self.closeddict[key].ypos] = "C"
             for element in path:
                self.board.grid[element.xpos][element.ypos] = 'X'
             for line in self.board.grid:
@@ -68,6 +86,7 @@ class Astar:
                 self.attach_and_eval(succ,self.searchstate)
                 if hash(succ) in self.closeddict:
                     self.propagate_path_improvement(self.closeddict[hash(succ)])
+
 
 
 
@@ -108,8 +127,10 @@ class Astar:
         if self.type =="astar":
             heappush(self.openlist,state)
 
+
 astar = Astar()
-done = False
-while (not done ==None ):
+done = None
+while ( done == None ):
     done = astar.do_one_step()
+
 

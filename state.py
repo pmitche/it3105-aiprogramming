@@ -73,7 +73,7 @@ class State():
         return self.f == other.f
     #Overrided to so that two nodes with same x y values will be considered the same.
     def __hash__(self):
-        return hash(str(self.xpos)+str(self.ypos))
+        return hash(str(self.xpos)+","+str(self.ypos))
     #Overrided to use in comparisons
     def __lt__(self, other):
         if self == other:
