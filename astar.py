@@ -1,6 +1,6 @@
 __author__ = 'sondredyvik'
 import board
-import state
+from collections import deque
 from heapq import heappush, heappop
 
 class Astar:
@@ -10,10 +10,14 @@ class Astar:
         #variable used to determined search function
         self.type ="astar"
         self.hashtable = {}
-        self.openlist =[]
         self.closedlist=[]
         self.opendict = dict()
         self.closeddict = dict()
+        if self.type =="bfs":
+            self.openlist = deque()
+        else:
+            self.openlist =[]
+
         #first node is created
         self.searchstate = self.board.generateInitialState()
        # self.searchstate = state.State(11,8,self.board,None)
@@ -32,7 +36,7 @@ class Astar:
     #Have to implement this method because gui is main loop
     def do_one_step(self):
         #if openlist is empty, no solution is found, return false
-        if len(self.openlist) ==0:
+        if len(self.openlist)==0:
             print "failed"
             for i in range(20):
                 for j in range(20):
@@ -89,11 +93,6 @@ class Astar:
 
 
 
-
-
-
-
-
     def findpath(self,state):
         path =[state]
         while state.parent is not None:
@@ -101,8 +100,6 @@ class Astar:
             path.append(state)
         path.reverse()
         return path
-
-
 
 
     def attach_and_eval(self,child,parent):
@@ -122,15 +119,22 @@ class Astar:
     def popfromopen(self,type):
         if self.type =="astar":
             return heappop(self.openlist)
+        if self.type =="bfs":
+            return self.openlist.popleft()
+        if self.type =="dfs":
+            return self.openlist.pop()
     #method to append to openlist type decides datastructure
     def appendtoopen(self,state,type):
         if self.type =="astar":
             heappush(self.openlist,state)
+        if self.type =="bfs":
+            self.openlist.append(state)
+        if self.type =="dfs":
+            self.openlist.append(state)
 
 
 astar = Astar()
 done = None
-while ( done == None ):
-    done = astar.do_one_step()
+while (len(astar.openlist)>0):astar.do_one_step()
 
 
