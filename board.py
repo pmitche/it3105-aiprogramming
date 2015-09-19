@@ -24,9 +24,13 @@ class Board():
                     self.grid[i][j] = '#'
         for line in self.grid:
             print line
+
+        print "-------------------------------------------------------------------------------"
     #This method is used to provide the astar class with an initial search state.
     #Iterates through textual representation of board and returns a new node
     #with coordinates of start state
+
+
     def generateInitialState(self):
         for i in range (len(self.grid)):
             for j in range(len(self.grid[i])):

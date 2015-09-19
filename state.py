@@ -12,6 +12,7 @@ class State():
         self.g = float('inf')
         self.calculateHeuristic()
         self.f = self.g + self.h
+        self.status = None
         self.children =[]
 
     def __repr__(self):
@@ -33,23 +34,40 @@ class State():
     def calculateNeighbours(self):
         board = self.board
         neighbours = []
-        if self.xpos-1  >=0 and self.ypos+1 < board.dimensions[1] and not board.grid[self.xpos-1][self.ypos+1]=='#':
-            neighbours.append(State(self.xpos-1,self.ypos+1,board,self))
-        if self.xpos +1 < board.dimensions[0] and self.ypos +1 < board.dimensions[1] and not board.grid[self.xpos+1][self.ypos+1]=='#':
-            neighbours.append(State(self.xpos+1,self.ypos+1, board,self))
-        if self.xpos +1 < board.dimensions[0] and self.ypos -1 >=0 and not  board.grid[self.xpos+1][self.ypos-1]=='#':
-            neighbours.append(State(self.xpos+1,self.ypos-1, board,self))
-        if self.xpos -1>= 0 and self.ypos-1 >= 0 and not  board.grid[self.xpos-1][self.ypos-1] == '#':
-            neighbours.append(State(self.xpos-1,self.ypos-1, board,self))
-        if self.xpos -1 >= 0 and not board.grid[self.xpos-1][self.ypos] == '#':
-            neighbours.append(State(self.xpos-1,self.ypos, board,self))
-        if self.xpos +1 < board.dimensions[0] and not board.grid[self.xpos+1][self.ypos] == '#':
-            neighbours.append(State(self.xpos+1,self.ypos,board,self))
-        if self.ypos -1 >= 0 and not board.grid[self.xpos][self.ypos-1] =='#':
-            neighbours.append(State(self.xpos,self.ypos-1,board,self))
-        if self.ypos +1 < board.dimensions[1] and not board.grid[self.xpos][self.ypos+1] =='#':
-            neighbours.append(State(self.xpos,self.ypos+1,board,self))
+        x = self.xpos
+        y = self.ypos
+        if not self.nodeOutOfBounds(x,y+1) and not self.isWall(x,y+1):
+            neighbours.append(State(x,y+1,board,self))
+
+        if not self.nodeOutOfBounds(x,y-1) and not self.isWall(x,y-1):
+            neighbours.append(State(x,y-1,board,self))
+
+        if not self.nodeOutOfBounds(x-1,y) and not self.isWall(x-1,y):
+            neighbours.append(State(x-1,y,board,self))
+
+        if not self.nodeOutOfBounds(x+1,y)and  not self.isWall(x+1,y):
+            neighbours.append(State(x+1,y,board,self))
+
+        if not self.nodeOutOfBounds(x+1,y-1) and not self.isWall(x+1,y-1):
+            neighbours.append(State(x+1,y-1,board,self))
+
+        if not self.nodeOutOfBounds(x-1,y-1) and not self.isWall(x-1,y-1):
+            neighbours.append(State(x-1,y-1,board,self))
+
+        if not self.nodeOutOfBounds(x+1,y+1) and not self.isWall(x+1,y+1):
+            neighbours.append(State(x+1,y+1,board,self))
+
+        if not self.nodeOutOfBounds(x-1,y+1) and not self.isWall(x-1,y+1):
+            neighbours.append(State(x-1,y+1,board,self))
+
+
         return neighbours
+    def isWall(self,x,y):
+        return self.board.grid[x][y] =='#'
+    def nodeOutOfBounds(self,x, y):
+        if 0 <= x < int(self.board.dimensions[0]) and 0 <= y < int(self.board.dimensions[1]):
+            return False
+        return True
     #Overrided to use in comparisons
     def __eq__(self, other):
         return self.f == other.f
