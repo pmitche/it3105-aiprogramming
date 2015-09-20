@@ -2,7 +2,9 @@ __author__ = 'sondredyvik'
 from Tkinter import *
 import astar
 import board
-import time
+from tkFileDialog import askopenfilename
+from time import sleep
+
 
 class astarGui(Frame):
     def __init__(self, parent,rows,columns,size=32,color1="white",color2="white"):
@@ -42,6 +44,7 @@ class astarGui(Frame):
         editmenu.add_command(label="Board 4", command=lambda:self.setBoard("board4.txt"))
         editmenu.add_command(label="Board 5",command=lambda:self.setBoard("board5.txt"))
         editmenu.add_command(label="Board 6", command= lambda:self.setBoard("board6.txt"))
+        editmenu.add_command(label="Custom", command= lambda:self.openfile())
         menubar.add_cascade(label="Board", menu=editmenu)
 
         helpmenu = Menu(menubar, tearoff=0)
@@ -62,18 +65,18 @@ class astarGui(Frame):
         if (not self.running):
             if self.board is None:
                 self.board = board.Board("board1.txt")
+            self.searchsnake= []
+            self.oldsnake=[]
             self.alg = astar.Astar(type,self.board)
             self.running = True
            # while len(self.alg.openlist)> 0:
-            for i in range(10):
-                self.parent.after(100,self.do_one_step())
-            self.running = False
+            self.do_one_step()
+
 
     def do_one_step(self):
         self.searchsnake = self.alg.do_one_step()
         if not self.oldsnake is None:
             for el in self.oldsnake:
-                print "here"
                 self.canvas.itemconfig(self.rect_dict[(int(el.xpos),int(self.board.dimensions[1])-1-int(el.ypos))],fill="white")
 
         for elem in self.searchsnake:
@@ -81,12 +84,23 @@ class astarGui(Frame):
                  #self.canvas.itemconfig(self.rect_dict[(int(elem.xpos),int (elem.ypos))],fill="red")
             self.canvas.itemconfig(self.rect_dict[(int(elem.xpos),int(self.board.dimensions[1])-1-int(elem.ypos))],fill="red")
             self.oldsnake = self.searchsnake
+        if self.searchsnake[-1].h == 0:
+            self.running=False
+            return True
+
+        if len(self.alg.openlist)==0:
+            self.running=False
+            return False
+        self.parent.after(10,lambda: self.do_one_step())
 
 
 
 
 
 
+
+    def openfile(self):
+        self.setBoard(askopenfilename(parent=self.parent))
 
     def drawBoard(self,board):
         self.rect_dict ={}
