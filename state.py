@@ -12,7 +12,6 @@ class State():
         self.g = float('inf')
         self.calculateHeuristic()
         self.f = self.g + self.h
-        self.status = None
         self.children =[]
 
     def __repr__(self):
@@ -48,17 +47,17 @@ class State():
         if not self.nodeOutOfBounds(x+1,y)and  not self.isWall(x+1,y):
             neighbours.append(State(x+1,y,board,self))
 
-        if not self.nodeOutOfBounds(x+1,y-1) and not self.isWall(x+1,y-1):
-            neighbours.append(State(x+1,y-1,board,self))
+       # if not self.nodeOutOfBounds(x+1,y-1) and not self.isWall(x+1,y-1):
+        #    neighbours.append(State(x+1,y-1,board,self))
 
-        if not self.nodeOutOfBounds(x-1,y-1) and not self.isWall(x-1,y-1):
-            neighbours.append(State(x-1,y-1,board,self))
+       # if not self.nodeOutOfBounds(x-1,y-1) and not self.isWall(x-1,y-1):
+       #     neighbours.append(State(x-1,y-1,board,self))
 
-        if not self.nodeOutOfBounds(x+1,y+1) and not self.isWall(x+1,y+1):
-            neighbours.append(State(x+1,y+1,board,self))
+       # if not self.nodeOutOfBounds(x+1,y+1) and not self.isWall(x+1,y+1):
+        #    neighbours.append(State(x+1,y+1,board,self))
 
-        if not self.nodeOutOfBounds(x-1,y+1) and not self.isWall(x-1,y+1):
-            neighbours.append(State(x-1,y+1,board,self))
+       # if not self.nodeOutOfBounds(x-1,y+1) and not self.isWall(x-1,y+1):
+           # neighbours.append(State(x-1,y+1,board,self))
 
 
         return neighbours

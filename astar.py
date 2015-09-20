@@ -4,11 +4,11 @@ from collections import deque
 from heapq import heappush, heappop
 
 class Astar:
-    def __init__(self):
+    def __init__(self,type,boardobject):
         #creates an instance of the board class
-        self.board = board.Board('board6.txt')
+        self.board = boardobject
         #variable used to determined search function
-        self.type ="astar"
+        self.type =type
         self.hashtable = {}
         self.closedlist=[]
         self.opendict = dict()
@@ -66,7 +66,8 @@ class Astar:
             for line in self.board.grid:
                 print line
             print "---------------------------------------------------------------------------------------------------------"
-            return True
+            self.openlist=[]
+            return self.findpath(self.searchstate)
 
 
         #add to closedlist this node is now about to be expanded
@@ -90,6 +91,7 @@ class Astar:
                 self.attach_and_eval(succ,self.searchstate)
                 if hash(succ) in self.closeddict:
                     self.propagate_path_improvement(self.closeddict[hash(succ)])
+        return self.findpath(self.searchstate)
 
 
 
@@ -133,8 +135,7 @@ class Astar:
             self.openlist.append(state)
 
 
-astar = Astar()
 done = None
-while (len(astar.openlist)>0):astar.do_one_step()
+
 
 
