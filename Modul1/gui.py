@@ -1,6 +1,7 @@
 __author__ = 'sondredyvik'
 from Tkinter import *
 import astar
+import astarmod1
 import board
 from tkFileDialog import askopenfilename
 from time import sleep
@@ -70,7 +71,7 @@ class astarGui(Frame):
                 self.setBoard(self.board.filename)
             self.searchsnake= []
             self.oldsnake=[]
-            self.alg = astar.Astar(type,self.board)
+            self.alg = astarmod1.Astarmod1(type,self.board)
             self.running = True
            # while len(self.alg.openlist)> 0:
             self.do_one_step()

@@ -3,7 +3,7 @@ import board
 from collections import deque
 from heapq import heappush, heappop
 
-class Astar:
+class Astar(object):
     def __init__(self,type,boardobject):
         #creates an instance of the board class
         self.board = boardobject
@@ -86,14 +86,20 @@ class Astar:
 
     def attach_and_eval(self,child,parent):
         child.parent = parent
-        child.g = parent.g +1
+        child.g = parent.g + self.arc_cost(child,parent)
         child.updatef()
+
+
+
+    def arc_cost(self,child,parent):
+        raise NotImplementedError
+
 
     def propagate_path_improvement(self, parent):
         for child in parent.children:
-            if parent.g +1  < child.g:
+            if parent.g + self.arc_cost(parent,child)  < child.g:
                 child.parent = parent
-                child.g = parent.g+1
+                child.g = parent.g+self.arc_cost(parent,child)
                 child.updatef()
                 self.propagate_path_improvement(child)
 
