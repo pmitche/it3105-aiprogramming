@@ -1,4 +1,5 @@
 __author__ = 'sondredyvik'
+from Tkinter import *
 
 import astarmod1
 import board
