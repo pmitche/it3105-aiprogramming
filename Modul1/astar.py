@@ -19,7 +19,7 @@ class Astar(object):
             self.openlist =[]
 
         #first node is created
-        self.searchstate = self.board.generateInitialState()
+        self.searchstate = self.generate_initial_searchstate()
        # self.searchstate = state.State(11,8,self.board,None)
         #print self.searchstate.calculateNeighbours()
 
@@ -74,7 +74,8 @@ class Astar(object):
         return self.findpath(self.searchstate)
 
 
-
+    def generate_initial_searchstate(self):
+        raise NotImplementedError
     def findpath(self,state):
         path =[state]
         while state.parent is not None:

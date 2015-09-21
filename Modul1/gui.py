@@ -1,10 +1,9 @@
 __author__ = 'sondredyvik'
-from Tkinter import *
-import astar
+
 import astarmod1
 import board
 from tkFileDialog import askopenfilename
-from time import sleep
+
 
 
 class astarGui(Frame):
