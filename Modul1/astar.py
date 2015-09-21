@@ -5,9 +5,8 @@ from heapq import heappush, heappop
 
 
 class Astar(object):
-    def __init__(self, boardobject):
-        # creates an instance of the board class
-        self.board = boardobject
+    def __init__(self):
+
         # variable used to determined search function
         self.hashtable = {}
         self.closedlist = []

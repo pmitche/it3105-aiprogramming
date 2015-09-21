@@ -8,7 +8,7 @@ class Astarmod1(astar.Astar):
     def __init__(self, type, boardobject):
         self.type = type
         self.board = boardobject
-        super(Astarmod1, self).__init__(boardobject)
+        super(Astarmod1, self).__init__()
 
 
     def arc_cost(self, child, parent):
