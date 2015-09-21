@@ -3,20 +3,21 @@ import board
 from collections import deque
 from heapq import heappush, heappop
 
+
 class Astar(object):
-    def __init__(self,boardobject):
-        #creates an instance of the board class
+    def __init__(self, boardobject):
+        # creates an instance of the board class
         self.board = boardobject
-        #variable used to determined search function
+        # variable used to determined search function
         self.hashtable = {}
-        self.closedlist=[]
+        self.closedlist = []
         self.opendict = dict()
         self.closeddict = dict()
         self.openlist = self.generate_openlist()
 
-        #first node is created
+        # first node is created
         self.searchstate = self.generate_initial_searchstate()
-       # self.searchstate = state.State(11,8,self.board,None)
+        # self.searchstate = state.State(11,8,self.board,None)
         #print self.searchstate.calculateNeighbours()
 
         #g is set to zero
@@ -29,20 +30,20 @@ class Astar(object):
         self.opendict[hash(self.searchstate)] = self.searchstate
         #While we have not arrived at the goal
 
-    #Have to implement this method because gui is main loop
+    # Have to implement this method because gui is main loop
     def do_one_step(self):
-        #if openlist is empty, no solution is found, return false
-        if len(self.openlist)==0:
+        # if openlist is empty, no solution is found, return false
+        if len(self.openlist) == 0:
             return False
 
 
-        #pop element with highest F from openlist
+        # pop element with highest F from openlist
         self.searchstate = self.popfromopen()
 
         #remove from support structure
         del self.opendict[hash(self.searchstate)]
-        if self.searchstate.h ==0:
-            self.openlist=[]
+        if self.searchstate.h == 0:
+            self.openlist = []
             return self.findpath(self.searchstate)
 
 
@@ -60,11 +61,11 @@ class Astar(object):
                 succ = self.closeddict[hash(succ)]
             self.searchstate.children.append(succ)
             if hash(succ) not in self.opendict and hash(succ) not in self.closeddict:
-                self.attach_and_eval(succ,self.searchstate)
+                self.attach_and_eval(succ, self.searchstate)
                 self.opendict[hash(succ)] = succ
                 self.appendtoopen(succ)
             elif self.searchstate.g + 1 < succ.g:
-                self.attach_and_eval(succ,self.searchstate)
+                self.attach_and_eval(succ, self.searchstate)
                 if hash(succ) in self.closeddict:
                     self.propagate_path_improvement(self.closeddict[hash(succ)])
         return self.findpath(self.searchstate)
@@ -74,8 +75,9 @@ class Astar(object):
 
     def generate_initial_searchstate(self):
         raise NotImplementedError
-    def findpath(self,state):
-        path =[state]
+
+    def findpath(self, state):
+        path = [state]
         while state.parent is not None:
             state = state.parent
             path.append(state)
@@ -83,30 +85,29 @@ class Astar(object):
         return path
 
 
-    def attach_and_eval(self,child,parent):
+    def attach_and_eval(self, child, parent):
         child.parent = parent
-        child.g = parent.g + self.arc_cost(child,parent)
+        child.g = parent.g + self.arc_cost(child, parent)
         child.updatef()
 
 
-
-    def arc_cost(self,child,parent):
+    def arc_cost(self, child, parent):
         raise NotImplementedError
 
 
     def propagate_path_improvement(self, parent):
         for child in parent.children:
-            if parent.g + self.arc_cost(parent,child)  < child.g:
+            if parent.g + self.arc_cost(parent, child) < child.g:
                 child.parent = parent
-                child.g = parent.g+self.arc_cost(parent,child)
+                child.g = parent.g + self.arc_cost(parent, child)
                 child.updatef()
                 self.propagate_path_improvement(child)
 
-    #method to pop from openlist type decides datastructure
+    # method to pop from openlist type decides datastructure
     def popfromopen(self):
         raise NotImplementedError
 
-    #method to append to openlist type decides datastructure
+    # method to append to openlist type decides datastructure
     def appendtoopen(self, state):
         raise NotImplementedError
 
