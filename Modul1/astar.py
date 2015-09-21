@@ -37,16 +37,6 @@ class Astar:
     def do_one_step(self):
         #if openlist is empty, no solution is found, return false
         if len(self.openlist)==0:
-            print "failed"
-            for i in range(20):
-                for j in range(20):
-                    key = hash(str(i)+" "+str(j))
-                    if key in self.hashtable:
-                        self.hashtable[key] +=1
-                        print i,j, self.hashtable[key]
-                    else:
-                        self.hashtable[key] =1
-            print self.hashtable.values()
             return False
 
 
@@ -56,16 +46,6 @@ class Astar:
         #remove from support structure
         del self.opendict[hash(self.searchstate)]
         if self.searchstate.h ==0:
-            path = self.findpath(self.searchstate)
-            for key in self.opendict:
-                self.board.grid[self.opendict[key].xpos][self.opendict[key].ypos] = "O"
-            for key in self.closeddict:
-                self.board.grid[self.closeddict[key].xpos][self.closeddict[key].ypos] = "C"
-            for element in path:
-               self.board.grid[element.xpos][element.ypos] = 'X'
-            for line in self.board.grid:
-                print line
-            print "---------------------------------------------------------------------------------------------------------"
             self.openlist=[]
             return self.findpath(self.searchstate)
 

@@ -7,8 +7,7 @@ from time import sleep
 
 
 class astarGui(Frame):
-    def __init__(self, parent,rows,columns,size=32,color1="white",color2="white"):
-        self.color_to_type_map = {"unknown":"white","stuff":"black","goal":"green","start":"blue"}
+    def __init__(self, parent,rows,columns,size=10,color1="white",color2="white"):
         self.parent = Frame(parent,width =300, height = 300)
         self.parent.pack()
         self.rows = rows
@@ -61,6 +60,8 @@ class astarGui(Frame):
         #Pack GUI
         self.left_frame.pack(side=LEFT)
         self.right_frame.pack(side=RIGHT)
+    def add_canvas(self,board):
+        return
     def run(self,type):
         if (not self.running):
             if self.board is None:
