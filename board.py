@@ -10,6 +10,7 @@ class Board():
         self.start = inputhandler.start
         self.goal = inputhandler.goal
         self.obstacles = inputhandler.obstacles
+        self.filename = filename
 
         self.grid =[[' ' for j in range(int(self.dimensions[0]))]for i in range( int(self.dimensions[1]))]
         self.grid[int(self.goal[0])][int(self.goal[1])] = 'G'

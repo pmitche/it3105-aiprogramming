@@ -65,6 +65,8 @@ class astarGui(Frame):
         if (not self.running):
             if self.board is None:
                 self.board = board.Board("board1.txt")
+            else:
+                self.setBoard(self.board.filename)
             self.searchsnake= []
             self.oldsnake=[]
             self.alg = astar.Astar(type,self.board)
@@ -78,14 +80,17 @@ class astarGui(Frame):
         if not self.oldsnake is None:
             for el in self.oldsnake:
                 self.canvas.itemconfig(self.rect_dict[(int(el.xpos),int(self.board.dimensions[1])-1-int(el.ypos))],fill="white")
+        for state in self.alg.closedlist:
+            self.canvas.itemconfig(self.rect_dict[(int(state.xpos),int(self.board.dimensions[1])-1-(int(state.ypos)))],fill="grey")
+
 
         for elem in self.searchsnake:
-            print "there"
                  #self.canvas.itemconfig(self.rect_dict[(int(elem.xpos),int (elem.ypos))],fill="red")
             self.canvas.itemconfig(self.rect_dict[(int(elem.xpos),int(self.board.dimensions[1])-1-int(elem.ypos))],fill="red")
             self.oldsnake = self.searchsnake
         if self.searchsnake[-1].h == 0:
             self.running=False
+
             return True
 
         if len(self.alg.openlist)==0:
