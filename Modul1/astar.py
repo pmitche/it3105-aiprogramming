@@ -4,19 +4,15 @@ from collections import deque
 from heapq import heappush, heappop
 
 class Astar(object):
-    def __init__(self,type,boardobject):
+    def __init__(self,boardobject):
         #creates an instance of the board class
         self.board = boardobject
         #variable used to determined search function
-        self.type =type
         self.hashtable = {}
         self.closedlist=[]
         self.opendict = dict()
         self.closeddict = dict()
-        if self.type =="bfs":
-            self.openlist = deque()
-        else:
-            self.openlist =[]
+        self.openlist = self.generate_openlist()
 
         #first node is created
         self.searchstate = self.generate_initial_searchstate()
@@ -28,7 +24,7 @@ class Astar(object):
         #the searchnodes heuristic is calculated
         self.searchstate.updatef()
         #separate methods used to append to openlist.
-        self.appendtoopen(self.searchstate,self.type)
+        self.appendtoopen(self.searchstate)
         #Extra structure to see make it faster to check if node in openlist
         self.opendict[hash(self.searchstate)] = self.searchstate
         #While we have not arrived at the goal
@@ -41,7 +37,7 @@ class Astar(object):
 
 
         #pop element with highest F from openlist
-        self.searchstate = self.popfromopen(self.type)
+        self.searchstate = self.popfromopen()
 
         #remove from support structure
         del self.opendict[hash(self.searchstate)]
@@ -66,13 +62,15 @@ class Astar(object):
             if hash(succ) not in self.opendict and hash(succ) not in self.closeddict:
                 self.attach_and_eval(succ,self.searchstate)
                 self.opendict[hash(succ)] = succ
-                self.appendtoopen(succ,self.type)
+                self.appendtoopen(succ)
             elif self.searchstate.g + 1 < succ.g:
                 self.attach_and_eval(succ,self.searchstate)
                 if hash(succ) in self.closeddict:
                     self.propagate_path_improvement(self.closeddict[hash(succ)])
         return self.findpath(self.searchstate)
 
+    def generate_openlist(self):
+        raise NotImplementedError
 
     def generate_initial_searchstate(self):
         raise NotImplementedError
@@ -105,21 +103,12 @@ class Astar(object):
                 self.propagate_path_improvement(child)
 
     #method to pop from openlist type decides datastructure
-    def popfromopen(self,type):
-        if self.type =="astar":
-            return heappop(self.openlist)
-        if self.type =="bfs":
-            return self.openlist.popleft()
-        if self.type =="dfs":
-            return self.openlist.pop()
+    def popfromopen(self):
+        raise NotImplementedError
+
     #method to append to openlist type decides datastructure
-    def appendtoopen(self,state,type):
-        if self.type =="astar":
-            heappush(self.openlist,state)
-        if self.type =="bfs":
-            self.openlist.append(state)
-        if self.type =="dfs":
-            self.openlist.append(state)
+    def appendtoopen(self, state):
+        raise NotImplementedError
 
 
 done = None
