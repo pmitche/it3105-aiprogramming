@@ -68,7 +68,10 @@ def create_csp(graph_file):
         csp.constraints[this_vertex].append(Constraint([this_vertex, other_vertex]))
         csp.constraints[other_vertex].append(Constraint([other_vertex, this_vertex]))
 
+    #TODO: Populate domains dict
+
     f.close()
+    return csp
 
 
 def main():
