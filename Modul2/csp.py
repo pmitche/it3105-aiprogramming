@@ -49,8 +49,9 @@ class CSP:
     def initialize_queue(self):
         raise NotImplementedError
 
+colors = {0: "blue", 1: "red", 2: "green", 3: "yellow", 4: "purple", 5: "orange"}
 
-def create_csp(graph_file):
+def create_csp(graph_file, domain_size):
     csp = CSP()
     f = open(graph_file, 'r')
     number_of_vertices, number_of_edges = [int(x) for x in f.readline().strip().split(' ')]
@@ -68,14 +69,15 @@ def create_csp(graph_file):
         csp.constraints[this_vertex].append(Constraint([this_vertex, other_vertex]))
         csp.constraints[other_vertex].append(Constraint([other_vertex, this_vertex]))
 
-    #TODO: Populate domains dict
+    for k in csp.variables:
+        csp.domains[k] = [colors[x] for x in range(domain_size)]
 
     f.close()
     return csp
 
 
 def main():
-    create_csp("graph-color-1.txt")
+    create_csp("graph-color-1.txt", len(colors))
 
 if __name__ == "__main__":
     main()
