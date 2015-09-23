@@ -49,7 +49,8 @@ class CSP:
     def initialize_queue(self):
         raise NotImplementedError
 
-colors = {0: "blue", 1: "red", 2: "green", 3: "yellow", 4: "purple", 5: "orange"}
+colors = ['red', 'green', 'blue', 'yellow', 'black', 'pink']
+
 
 def create_csp(graph_file, domain_size):
     csp = CSP()
