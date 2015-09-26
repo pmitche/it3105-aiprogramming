@@ -4,7 +4,7 @@ __author__ = 'paulpm'
     Classes Constraint, Vertex and CSP should go into constraint.py, vertex.py and csp.py respectively.
     They are all in this class only during the initial stages of development.
 """
-
+import variable
 
 class Constraint:
 
@@ -37,8 +37,18 @@ class CSP:
             args = args + ',' + n
         return eval('(lambda ' + args[1:] + ': ' + expression + ')', environment)
 
-    def revise(self):
-        raise NotImplementedError
+    def revise(self,variable,constraints):
+        newdomain = []
+        for const in constraints:
+            for focal_color in self.domains[variable]:
+                for other_color in self.domains[const]:
+                    if not focal_color == other_color:
+                        newdomain.append(focal_color)
+        if not len(newdomain)== len(self.domains[variable]):
+            self.domains[variable] = newdomain
+            self.queue.append([vertex for vertex in constraints])
+
+
 
     def domain_filter(self):
         raise NotImplementedError
