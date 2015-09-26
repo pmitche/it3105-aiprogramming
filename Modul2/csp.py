@@ -37,27 +37,35 @@ class CSP:
             args = args + ',' + n
         return eval('(lambda ' + args[1:] + ': ' + expression + ')', environment)
 
-    def revise(self,variable,constraints):
+    def revise(self,variable,constraint):
+        #maybe not very efficient
         newdomain = []
-        for const in constraints:
-            for focal_color in self.domains[variable]:
-                for other_color in self.domains[const]:
-                    if not focal_color == other_color:
-                        newdomain.append(focal_color)
-        if not len(newdomain)== len(self.domains[variable]):
+        for focal_color in self.domains[variable]:
+            for other_color in self.domains[constraint]:
+                if not focal_color == other_color:
+                    newdomain.append(focal_color)
+        if not len(newdomain) == len(self.domains[variable]):
             self.domains[variable] = newdomain
-            self.queue.append([vertex for vertex in constraints])
-
-
+            return True
+        return False
 
     def domain_filter(self):
-        raise NotImplementedError
+        while len(self.queue) > 0:
+            var,const = self.queue.pop()
+            returnval = self.revise(var,const)
+            if returnval:
+                for constraint in self.constraints[var]:
+                    self.queue.append(constraint,self.constraints[constraint])
 
-    def rerun(self):
-        raise NotImplementedError
+    def rerun(self,focal_variable):
+        self.queue.append(focal_variable,self.constraints[focal_variable])
+        self.domain_filter()
 
     def initialize_queue(self):
-        raise NotImplementedError
+        for variable in self.variables:
+            for constraint in variable.constraints:
+                self.queue.append(variable,constraint)
+
 
 colors = ['red', 'green', 'blue', 'yellow', 'black', 'pink']
 
