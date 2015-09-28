@@ -10,6 +10,26 @@ class Constraint:
     def __init__(self, vertices):
         self.vertices = vertices
 
+    def __repr__(self):
+        return str((self.vertices[0],self.vertices[1]))
+
+    def __eq__(self, other):
+        return self.vertices[0] == other.vertices[0] and self.vertices[1] == other.vertices[1]
+
+    def contains_variable(self, variable):
+        return self.vertices[0] == variable or self.vertices[1] == variable
+
+    def get_other(self,var):
+        if self.vertices[0] == var:
+            return self.vertices[1]
+        if self.vertices[1] == var:
+            return self.vertices[0]
+        else:
+            raise AttributeError
+
+
+
+
 
 class Variable:
 
@@ -47,38 +67,25 @@ class CSP:
         for focal_color in self.domains[variable]:
             satisfies_constraint = False
             for other_color in self.domains[constraint.vertices[1]]:
-                if focal_color == other_color:
+                if not focal_color == other_color:
                     satisfies_constraint = True
                     break
-            if not satisfies_constraint:
+            if satisfies_constraint is False:
                 self.domains[variable].remove(focal_color)
                 revised = True
         return revised
-        # #maybe not very efficient
-        # newdomain = []
-        # for focal_color in self.domains[variable]:
-        #     for other_color in self.domains[constraint.vertices[1]]:
-        #         if not focal_color == other_color:
-        #             newdomain.append(other_color)
-        #
-        #
-        # if not len(newdomain) == len(self.domains[variable]):
-        #     self.domains[variable] = newdomain
-        #     return True
-        # return False
 
     def domain_filter(self):
         while len(self.queue) > 0:  # While there are still tuples to be revised
             var, const = self.queue.pop()
             return_value = self.revise(var, const)
-            if return_value:
-                for constraintlist in self.constraints.values():
-                    for constraint in constraintlist:
-                        if not constraint == const:
-                            for vertex in constraint.vertices:
-                                if not vertex == var:
-                                    self.queue.append((vertex, constraint))
-                                    print "1"
+            constraints_containing_variable = []
+            if return_value is True:
+                for key, value in self.constraints.iteritems():
+                    if value.contains_variable(var) and not value == const:
+                        constraints_containing_variable.append(value)
+                for constraint in constraints_containing_variable:
+                    self.queue.append((constraint.get_other(var),constraint))
 
     def rerun(self, focal_variable):
         self.queue.append((focal_variable, self.constraints[focal_variable]))
@@ -122,7 +129,10 @@ def main():
     csp = create_csp("graph-color-1.txt", len(colors))
     csp.initialize_queue()
     csp.domain_filter()
-    print csp.domains
+    csp.domains[csp.domains.keys()[0]] = ['pink']
+    csp.domain_filter()
+    print [len(csp.domains[key]) for  key in csp.domains.keys()]
+
 
 if __name__ == "__main__":
     main()
