@@ -41,7 +41,7 @@ class CSP:
         #maybe not very efficient
         newdomain = []
         for focal_color in self.domains[variable]:
-            for other_color in self.domains[constraint]:
+            for other_color in self.domains[self.constraints[constraint.vertices[1]]]:
                 if not focal_color == other_color:
                     newdomain.append(focal_color)
         if not len(newdomain) == len(self.domains[variable]):
@@ -55,7 +55,7 @@ class CSP:
             returnval = self.revise(var,const)
             if returnval:
                 for constraint in self.constraints[var]:
-                    self.queue.append(constraint,self.constraints[constraint])
+                    self.queue.append(constraint,self.constraints[constraint.vertices[1]])
 
     def rerun(self,focal_variable):
         self.queue.append(focal_variable,self.constraints[focal_variable])
@@ -63,8 +63,8 @@ class CSP:
 
     def initialize_queue(self):
         for variable in self.variables:
-            for constraint in variable.constraints:
-                self.queue.append(variable,constraint)
+            for constraint in self.constraints[variable]:
+                self.queue.append((variable,constraint))
 
 
 colors = ['red', 'green', 'blue', 'yellow', 'black', 'pink']
@@ -96,8 +96,9 @@ def create_csp(graph_file, domain_size):
 
 
 def main():
-    create_csp("graph-color-1.txt", len(colors))
-
+    csp = create_csp("graph-color-1.txt", len(colors))
+    csp.initialize_queue()
+    csp.domain_filter()
 if __name__ == "__main__":
     main()
 
