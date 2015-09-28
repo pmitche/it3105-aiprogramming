@@ -6,10 +6,10 @@ __author__ = 'paulpm'
 """
 
 
-
 class Constraint:
-    def __init__(self,vertices):
+    def __init__(self, vertices):
         self.vertices = vertices
+
 
 class Variable:
 
@@ -22,7 +22,7 @@ class Variable:
         return 'n' + str(self.index)
 
     def __hash__(self):
-        return hash((self.index,self.x,self.y))
+        return hash((self.index, self.x, self.y))
 
     def __eq__(self, other):
         return self.index == other.index
@@ -54,8 +54,6 @@ class CSP:
                 self.domains[variable].remove(focal_color)
                 revised = True
         return revised
-
-
         # #maybe not very efficient
         # newdomain = []
         # for focal_color in self.domains[variable]:
@@ -70,28 +68,25 @@ class CSP:
         # return False
 
     def domain_filter(self):
-        while len(self.queue) > 0: # While there are still tuples to be revised
-            var,const = self.queue.pop()
-            returnval = self.revise(var,const)
-            if returnval:
+        while len(self.queue) > 0:  # While there are still tuples to be revised
+            var, const = self.queue.pop()
+            return_value = self.revise(var, const)
+            if return_value:
                 for constraintlist in self.constraints.values():
                     for constraint in constraintlist:
                         if not constraint == const:
                             for vertex in constraint.vertices:
                                 if not vertex == var:
-                                    self.queue.append((vertex,constraint))
+                                    self.queue.append((vertex, constraint))
                                     print "1"
 
-
-
-
-    def rerun(self,focal_variable):
-        self.queue.append((focal_variable,self.constraints[focal_variable]))
+    def rerun(self, focal_variable):
+        self.queue.append((focal_variable, self.constraints[focal_variable]))
         self.domain_filter()
 
     def initialize_queue(self):
-        for variable in self.variables: #Loop through all variables
-            for constraint in self.constraints[variable]: #for each variable, loop through all constraints and add revise-pair
+        for variable in self.variables:  # Loop through all variables
+            for constraint in self.constraints[variable]:
                 self.queue.append((variable, constraint))
 
 
@@ -129,9 +124,5 @@ def main():
     csp.domain_filter()
     print csp.domains
 
-
-
 if __name__ == "__main__":
     main()
-
-
