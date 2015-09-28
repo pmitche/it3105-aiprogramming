@@ -88,9 +88,9 @@ class CSP:
                 for constraint in constraints_containing_variable:
                     self.queue.append((constraint.get_other(var),constraint))
                     print constraint.get_other(var),constraint
-        print "done"
 
     def rerun(self, focal_variable):
+        #TODO REIMPLEMENT
         self.queue.append((focal_variable, self.constraints[focal_variable]))
         self.domain_filter()
 
