@@ -79,19 +79,24 @@ class CSP:
         self.domains[self.domains.keys()[0]] = ['pink']
         while len(self.queue) > 0:  # While there are still tuples to be revised
             var, const = self.queue.pop()
-            constraints_containing_variable = []
             if self.revise(var, const):
-                for key, value in self.constraints.iteritems():
-                    for otherconstraint in value:
-                        if otherconstraint.contains_variable(var) and not otherconstraint == const:
-                            constraints_containing_variable.append(otherconstraint)
-                for constraint in constraints_containing_variable:
-                    self.queue.append((constraint.get_other(var),constraint))
-                    print constraint.get_other(var),constraint
+                self.add_all_tuples_in_which_variable_occurs(var,const)
 
-    def rerun(self, focal_variable):
-        #TODO REIMPLEMENT
-        self.queue.append((focal_variable, self.constraints[focal_variable]))
+    def add_all_tuples_in_which_variable_occurs(self,var, const):
+        constraints_containing_variable = []
+        for key, value in self.constraints.iteritems():
+                    for otherconstraint in value:
+                        if const is None:
+                            if otherconstraint.contains_variable(var):
+                                constraints_containing_variable.append(otherconstraint)
+                        elif otherconstraint.contains_variable(var) and not otherconstraint == const:
+                            constraints_containing_variable.append(otherconstraint)
+                    for constraint in constraints_containing_variable:
+                        self.queue.append((constraint.get_other(var),constraint))
+                        print constraint.get_other(var),constraint
+
+    def rerun(self, var):
+        self.add_all_tuples_in_which_variable_occurs(var, None)
         self.domain_filter()
 
     def initialize_queue(self):
@@ -132,6 +137,10 @@ def main():
     csp = create_csp("graph-color-1.txt", len(colors))
     csp.initialize_queue()
     csp.domain_filter()
+    print [len(csp.domains[key]) for  key in csp.domains.keys()]
+    csp.rerun(csp.variables[0])
+    csp.domains[csp.variables[4]] = {'red'}
+    csp.rerun(csp.variables[4])
     print [len(csp.domains[key]) for  key in csp.domains.keys()]
 
 
