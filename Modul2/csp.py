@@ -76,16 +76,19 @@ class CSP:
         return revised
 
     def domain_filter(self):
+        self.domains[self.domains.keys()[0]] = ['pink']
         while len(self.queue) > 0:  # While there are still tuples to be revised
             var, const = self.queue.pop()
-            return_value = self.revise(var, const)
             constraints_containing_variable = []
-            if return_value is True:
+            if self.revise(var, const):
                 for key, value in self.constraints.iteritems():
-                    if value.contains_variable(var) and not value == const:
-                        constraints_containing_variable.append(value)
+                    for otherconstraint in value:
+                        if otherconstraint.contains_variable(var) and not otherconstraint == const:
+                            constraints_containing_variable.append(otherconstraint)
                 for constraint in constraints_containing_variable:
                     self.queue.append((constraint.get_other(var),constraint))
+                    print constraint.get_other(var),constraint
+        print "done"
 
     def rerun(self, focal_variable):
         self.queue.append((focal_variable, self.constraints[focal_variable]))
@@ -128,8 +131,6 @@ def create_csp(graph_file, domain_size):
 def main():
     csp = create_csp("graph-color-1.txt", len(colors))
     csp.initialize_queue()
-    csp.domain_filter()
-    csp.domains[csp.domains.keys()[0]] = ['pink']
     csp.domain_filter()
     print [len(csp.domains[key]) for  key in csp.domains.keys()]
 
