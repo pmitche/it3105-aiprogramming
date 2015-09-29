@@ -1,7 +1,8 @@
 __author__ = 'paulpm, sondredyvik'
 import variable as cspvariable
-import constraint as  cspconstraint
+import constraint as cspconstraint
 import state
+from collections import deque
 
 
 class CSP:
@@ -10,9 +11,8 @@ class CSP:
         self.variables = []
         self.domains = {}
         self.constraints = {}
-        self.queue = []
+        self.queue = deque()
 
-    ##Not used yet
 
     def makefunc(self, var_names, expression, environment=globals()):
         args = ""
@@ -22,24 +22,21 @@ class CSP:
 
     def revise(self, searchstate, statevariable, focal_constraint):
         revised = False
-        failing_color = ''
         for focal_color in searchstate.domains[statevariable]:
             satisfies_constraint = False
-            for other_color in searchstate.domains[focal_constraint.vertices[1]]:
+            for other_color in searchstate.domains[focal_constraint.get_other(statevariable)]:
                 if focal_constraint.check_if_satisfies(focal_color, other_color):
                     satisfies_constraint = True
                     break
-                failing_color = other_color
             if satisfies_constraint is False:
                 searchstate.domains[statevariable].remove(focal_color)
                 revised = True
-                print statevariable, focal_color+"-"+failing_color
-
         return revised
+
 
     def domain_filter(self):
         while len(self.queue) > 0:
-            focal_state, focal_variable, focal_constraint = self.queue.pop()
+            focal_state, focal_variable, focal_constraint = self.queue.popleft()
             if self.revise(focal_state, focal_variable, focal_constraint):
                 self.add_all_tuples_in_which_variable_occurs(focal_state, focal_variable, focal_constraint)
 
@@ -51,7 +48,8 @@ class CSP:
                         if focal_constraint is None:
                             if constraint_in_list_of_values.contains_variable(focal_variable):
                                 constraints_containing_variable.append(constraint_in_list_of_values)
-                        elif constraint_in_list_of_values.contains_variable(focal_variable) and not constraint_in_list_of_values == focal_constraint:
+                        elif constraint_in_list_of_values.contains_variable(focal_variable) and\
+                                not constraint_in_list_of_values == focal_constraint:
                             constraints_containing_variable.append(constraint_in_list_of_values)
                     for focal_constraint in constraints_containing_variable:
                         self.queue.append((focal_state, focal_constraint.get_other(focal_variable), focal_constraint))
@@ -100,13 +98,21 @@ def create_csp(graph_file, domain_size):
 def main():
     csp = create_csp("graph-color-1.txt", len(colors))
     searchstate = generate_initial_searchstate(csp)
-    searchstate.domains[csp.variables[0]]= ['pink']
     csp.initialize_queue(searchstate)
     csp.domain_filter()
-    for key in searchstate.domains.keys():
-        print len(searchstate.domains[key])
+    searchstate.domains[searchstate.domains.keys()[5]] = ['green']
+    csp.rerun(searchstate, searchstate.domains.keys()[5])
+    searchstate.domains[searchstate.domains.keys()[10]] = ['yellow']
+    csp.rerun(searchstate, searchstate.domains.keys()[10])
+    searchstate.domains[searchstate.domains.keys()[20]] = ['blue']
+    csp.rerun(searchstate, searchstate.domains.keys()[20])
 
-    csp.rerun(searchstate, csp.variables[0])
+
+
+
+
+    for key in searchstate.domains:
+        print len(searchstate.domains[key]),searchstate.domains[key]
 
 
 def generate_initial_searchstate(csp):
