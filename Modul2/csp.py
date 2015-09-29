@@ -4,6 +4,9 @@ __author__ = 'paulpm'
     Classes Constraint, Vertex and CSP should go into constraint.py, vertex.py and csp.py respectively.
     They are all in this class only during the initial stages of development.
 """
+class Searchstate:
+    def __init__(self):
+        pass
 
 
 class Constraint:
@@ -15,6 +18,9 @@ class Constraint:
 
     def __eq__(self, other):
         return self.vertices[0] == other.vertices[0] and self.vertices[1] == other.vertices[1]
+
+    def check_if_satisfies(self,focal, other):
+        return not focal == other
 
     def contains_variable(self, variable):
         return self.vertices[0] == variable or self.vertices[1] == variable
@@ -67,7 +73,7 @@ class CSP:
         for focal_color in self.domains[variable]:
             satisfies_constraint = False
             for other_color in self.domains[constraint.vertices[1]]:
-                if not focal_color == other_color:
+                if constraint.check_if_satisfies(focal_color,other_color):
                     satisfies_constraint = True
                     break
             if satisfies_constraint is False:
@@ -76,24 +82,23 @@ class CSP:
         return revised
 
     def domain_filter(self):
-        self.domains[self.domains.keys()[0]] = ['pink']
         while len(self.queue) > 0:  # While there are still tuples to be revised
-            var, const = self.queue.pop()
-            if self.revise(var, const):
-                self.add_all_tuples_in_which_variable_occurs(var,const)
+            focal_variable, focal_constraint = self.queue.pop()
+            if self.revise(focal_variable, focal_constraint):
+                self.add_all_tuples_in_which_variable_occurs(focal_variable,focal_constraint)
 
-    def add_all_tuples_in_which_variable_occurs(self,var, const):
+    def add_all_tuples_in_which_variable_occurs(self, focal_variable, focal_constraint):
         constraints_containing_variable = []
-        for key, value in self.constraints.iteritems():
-                    for otherconstraint in value:
-                        if const is None:
-                            if otherconstraint.contains_variable(var):
-                                constraints_containing_variable.append(otherconstraint)
-                        elif otherconstraint.contains_variable(var) and not otherconstraint == const:
-                            constraints_containing_variable.append(otherconstraint)
+        for key, list_of_values in self.constraints.iteritems():
+                    for constrain_in_list_of_values in list_of_values:
+                        if focal_constraint is None:
+                            if constrain_in_list_of_values.contains_variable(focal_variable):
+                                constraints_containing_variable.append(constrain_in_list_of_values)
+                        elif constrain_in_list_of_values.contains_variable(focal_variable) and not constrain_in_list_of_values == focal_constraint:
+                            constraints_containing_variable.append(constrain_in_list_of_values)
                     for constraint in constraints_containing_variable:
-                        self.queue.append((constraint.get_other(var),constraint))
-                        print constraint.get_other(var),constraint
+                        self.queue.append((constraint.get_other(focal_variable),constraint))
+                        print constraint.get_other(focal_variable),constraint
 
     def rerun(self, var):
         self.add_all_tuples_in_which_variable_occurs(var, None)

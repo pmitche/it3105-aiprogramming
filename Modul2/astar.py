@@ -22,7 +22,7 @@ class Astar(object):
         #g is set to zero
         self.searchstate.g = 0
         #the searchnodes heuristic is calculated
-        self.searchstate.updatef()
+        self.searchstate.update_f()
         #separate methods used to append to openlist.
         self.appendtoopen(self.searchstate)
         #Extra structure to see make it faster to check if node in openlist
@@ -51,7 +51,7 @@ class Astar(object):
         #add to support structure
         self.closeddict[hash(self.searchstate)] = self.searchstate
         #Generate children, these children now get searchstate as parent
-        successors = self.searchstate.calculateNeighbours()
+        successors = self.searchstate.calculate_neighbours()
         #for each child
         for succ in successors:
             if hash(succ) in self.opendict:
@@ -87,7 +87,7 @@ class Astar(object):
     def attach_and_eval(self, child, parent):
         child.parent = parent
         child.g = parent.g + self.arc_cost(child, parent)
-        child.updatef()
+        child.update_f()
 
 
     def arc_cost(self, child, parent):
@@ -99,7 +99,7 @@ class Astar(object):
             if parent.g + self.arc_cost(parent, child) < child.g:
                 child.parent = parent
                 child.g = parent.g + self.arc_cost(parent, child)
-                child.updatef()
+                child.update_f()
                 self.propagate_path_improvement(child)
 
     # method to pop from openlist type decides datastructure
