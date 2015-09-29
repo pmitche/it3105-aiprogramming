@@ -7,6 +7,7 @@ class State():
         self.h = float('inf')
         self.g = float('inf')
         self.children = []
+        self.parent = None
         self.f = self.g + self.g
 
     def __repr__(self):
