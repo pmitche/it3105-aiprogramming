@@ -111,9 +111,8 @@ def main():
     astar = astarmod2.Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-    for i in range (1000):
+    for i in range(200):
         astar.do_one_step()
-
     for key in astar.searchstate.domains.keys():
         print astar.searchstate.domains[key]
 
