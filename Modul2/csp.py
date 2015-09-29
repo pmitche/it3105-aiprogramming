@@ -8,8 +8,10 @@ import astarmod2
 NOTE
 Something is very odd. Probably because there is no check to see whether a search state is a success or not.
 It will start iterating over the elements of a string instead.
-'''
 
+'''
+# TODO Implement functionality to check if a state is contradictory or success
+# TODO fix problem in NOTE
 class CSP:
 
     def __init__(self):

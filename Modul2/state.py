@@ -8,7 +8,7 @@ class State():
         self.g = float('inf')
         self.children = []
         self.parent = None
-        self.f = self.update_f()
+        self.f = self.h + self.g
 
     def __repr__(self):
         return str(self.domains)
@@ -42,6 +42,7 @@ class State():
             neighbours.append(State(assumption))
         for state in neighbours:
             csp.rerun(state,smallestdomainkey)
+            print type(self.domains[smallestdomainkey]), self.domains[smallestdomainkey]
         return neighbours
 
 
