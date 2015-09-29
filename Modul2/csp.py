@@ -3,10 +3,13 @@ import variable
 import constraint
 import state
 
-""" NOTE:
-    Classes Constraint, Vertex and CSP should go into constraint.py, vertex.py and csp.py respectively.
-    They are all in this class only during the initial stages of development.
-"""
+'''NOTE
+Vi må gjøre så csp reduserer domenet til en spesifikk searchstate og ikke til sin egen kø eller whatever den gjør nå
+
+
+
+
+'''
 
 
 class CSP:
@@ -16,6 +19,8 @@ class CSP:
         self.domains = {}
         self.constraints = {}
         self.queue = []
+
+    ##Not used yet
 
     def makefunc(self, var_names, expression, environment=globals()):
         args = ""
