@@ -1,5 +1,5 @@
 __author__ = 'sondredyvik'
-import board
+
 from collections import deque
 from heapq import heappush, heappop
 
@@ -51,7 +51,7 @@ class Astar(object):
         #add to support structure
         self.closeddict[hash(self.searchstate)] = self.searchstate
         #Generate children, these children now get searchstate as parent
-        successors = self.searchstate.calculate_neighbours()
+        successors = self.generate_successors()
         #for each child
         for succ in successors:
             if hash(succ) in self.opendict:
@@ -73,6 +73,8 @@ class Astar(object):
         raise NotImplementedError
 
     def generate_initial_searchstate(self):
+        raise NotImplementedError
+    def generate_successors(self):
         raise NotImplementedError
 
     def findpath(self, state):

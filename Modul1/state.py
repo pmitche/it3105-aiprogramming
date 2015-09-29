@@ -52,24 +52,6 @@ class State():
         if not self.node_out_of_bounds(x, y - 1) and not self.is_wall(x, y - 1):
             neighbours.append(State(x, y - 1, board, self))
 
-
-
-
-
-
-
-            # if not self.nodeOutOfBounds(x+1,y-1) and not self.isWall(x+1,y-1):
-            # neighbours.append(State(x+1,y-1,board,self))
-
-            # if not self.nodeOutOfBounds(x-1,y-1) and not self.isWall(x-1,y-1):
-            #     neighbours.append(State(x-1,y-1,board,self))
-
-            # if not self.nodeOutOfBounds(x+1,y+1) and not self.isWall(x+1,y+1):
-            #    neighbours.append(State(x+1,y+1,board,self))
-
-            # if not self.nodeOutOfBounds(x-1,y+1) and not self.isWall(x-1,y+1):
-            # neighbours.append(State(x-1,y+1,board,self))
-
         return neighbours
 
     def is_wall(self, x, y):

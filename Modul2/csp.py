@@ -3,7 +3,12 @@ import variable as cspvariable
 import constraint as cspconstraint
 import state
 from collections import deque
-
+import astarmod2
+'''
+NOTE
+Something is very odd. Probably because there is no check to see whether a search state is a success or not.
+It will start iterating over the elements of a string instead.
+'''
 
 class CSP:
 
@@ -64,6 +69,10 @@ class CSP:
             for focal_constraint in self.constraints[variable]:
                 self.queue.append((searchstate, variable, focal_constraint))
 
+    def generate_initial_searchstate(self):
+        return state.State(self.domains)
+
+
 
 
 
@@ -97,22 +106,16 @@ def create_csp(graph_file, domain_size):
 
 def main():
     csp = create_csp("graph-color-1.txt", len(colors))
-    searchstate = generate_initial_searchstate(csp)
-    csp.initialize_queue(searchstate)
+    astar = astarmod2.Astarmod2(csp)
+    csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-    searchstate.domains[searchstate.domains.keys()[5]] = ['green']
-    csp.rerun(searchstate, searchstate.domains.keys()[5])
-    searchstate.domains[searchstate.domains.keys()[10]] = ['yellow']
-    csp.rerun(searchstate, searchstate.domains.keys()[10])
-    searchstate.domains[searchstate.domains.keys()[20]] = ['blue']
-    csp.rerun(searchstate, searchstate.domains.keys()[20])
+    for i in range (1000):
+        astar.do_one_step()
+
+    for key in astar.searchstate.domains.keys():
+        print astar.searchstate.domains[key]
 
 
-
-
-
-    for key in searchstate.domains:
-        print len(searchstate.domains[key]),searchstate.domains[key]
 
 
 def generate_initial_searchstate(csp):
