@@ -22,17 +22,20 @@ class CSP:
 
     def revise(self, searchstate, statevariable, focal_constraint):
         revised = False
+        failing_color = ''
         for focal_color in searchstate.domains[statevariable]:
             satisfies_constraint = False
             for other_color in searchstate.domains[focal_constraint.vertices[1]]:
-                if focal_constraint.check_if_satisfies(focal_color,other_color):
+                if focal_constraint.check_if_satisfies(focal_color, other_color):
                     satisfies_constraint = True
                     break
+                failing_color = other_color
             if satisfies_constraint is False:
                 searchstate.domains[statevariable].remove(focal_color)
                 revised = True
-        return revised
+                print statevariable, focal_color+"-"+failing_color
 
+        return revised
 
     def domain_filter(self):
         while len(self.queue) > 0:
@@ -97,13 +100,14 @@ def create_csp(graph_file, domain_size):
 def main():
     csp = create_csp("graph-color-1.txt", len(colors))
     searchstate = generate_initial_searchstate(csp)
+    searchstate.domains[csp.variables[0]]= ['pink']
     csp.initialize_queue(searchstate)
     csp.domain_filter()
-    searchstate.domains[csp.variables[0]] =['pink']
-    searchstate.domains[csp.variables[1]] =['yellow']
-    csp.rerun(searchstate,csp.variables[0])
     for key in searchstate.domains.keys():
         print len(searchstate.domains[key])
+
+    csp.rerun(searchstate, csp.variables[0])
+
 
 def generate_initial_searchstate(csp):
     return state.State(csp.domains)
