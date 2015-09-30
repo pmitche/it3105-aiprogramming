@@ -118,6 +118,10 @@ def main():
     csp.domain_filter()
     while len(astar.openlist)>0:
         astar.do_one_step()
+    for key in astar.searchstate.domains.keys():
+        for constraint in csp.constraints[key]:
+            print key, astar.searchstate.domains[key], constraint, constraint.get_other(key)[0]\
+                , astar.searchstate.domains[constraint.get_other(key)[0]]
 
 
 
