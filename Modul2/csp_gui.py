@@ -6,6 +6,7 @@ from csp import CSP
 import variable as cspvariable
 import constraint as cspconstraint
 import astarmod2
+import time
 
 class csp_gui:
     def __init__(self, parent):
@@ -14,7 +15,7 @@ class csp_gui:
         self.edge_dict = {}
         self.colors = [0, 1, 2, 3, 4, 5]
         self.number_to_color ={0: 'black', 1: "yellow", 2: "pink", 3: "purple", 4: "red", 5: "blue"}
-        self.csp = self.create_csp("graph-color-1.txt", 4)
+        self.csp = self.create_csp("spiral-500-4-color1.txt", 4)
         self.canvas = Canvas(master=self.parent,width=500, height=500)
         self.canvas.pack()
         self.parent.pack()
@@ -22,6 +23,7 @@ class csp_gui:
         self.astar = astarmod2.Astarmod2(self.csp)
         self.csp.initialize_queue(self.astar.searchstate)
         self.csp.domain_filter()
+        self.time = time.time()
         self.run_astar()
 
     def normalize_coordinates(self,xpos,ypos):
@@ -43,7 +45,7 @@ class csp_gui:
             if len(self.astar.searchstate.domains[key]) == 1:
                 self.canvas.itemconfig(self.vertex_dict[key.index], fill=self.number_to_color[self.astar.searchstate.domains[key][0]])
         if len(self.astar.openlist)> 0:
-            self.parent.after(300, lambda: self.run_astar())
+            self.parent.after(50, lambda: self.run_astar())
         else:
             for key in self.astar.searchstate.domains.keys():
                 self.canvas.itemconfig(self.vertex_dict[key.index], fill=self.number_to_color[self.astar.searchstate.domains[key][0]])
@@ -51,6 +53,8 @@ class csp_gui:
                 for constraint in self.csp.constraints[key]:
                     if self.astar.searchstate.domains[constraint.vertices[0]] ==self.astar.searchstate.domains[constraint.vertices[1]]:
                         print "suckadickanddie",  self.astar.searchstate.domains[constraint.vertices[0]], self.astar.searchstate.domains[constraint.vertices[1]]
+            print "DONE"
+            print time.time() - self.time
 
 
 

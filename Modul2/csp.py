@@ -54,9 +54,8 @@ class CSP:
 
     def add_all_tuples_in_which_variable_occurs(self, focal_state, focal_variable, focal_constraint):
         for constraint in self.constraints[focal_variable]:
-            if not constraint == focal_constraint:
-                for other_var in focal_constraint.get_other(focal_variable):
-                    self.queue.append((focal_state, other_var, focal_constraint))
+            if constraint != focal_constraint:
+                self.queue.append((focal_state, focal_variable, constraint))
 
 
     def add_all_tuples_specific_constraint(self,focal_state,focal_variable):
