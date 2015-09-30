@@ -33,15 +33,22 @@ class State():
         smallest = float('inf')
         smallestdomainkey = None
         for key in self.domains.keys():
-            if len(self.domains[key]) < smallest and isinstance(self.domains[key],list):
+            if 1< len(self.domains[key]) < smallest and isinstance(self.domains[key],list):
                 smallest = len(self.domains[key])
                 smallestdomainkey = key
+
         for possible_variable in self.domains[smallestdomainkey]:
             assumption = copy.deepcopy(self.domains)
             assumption[smallestdomainkey] = possible_variable
             neighbours.append(State(assumption))
         for state in neighbours:
-            csp.rerun(state,smallestdomainkey)
+            print state.domains[smallestdomainkey]
+            print "-----------------------------------------------------------------------"
+            print smallestdomainkey
+            csp.rerun(state, smallestdomainkey)
+            for key in state.domains.keys():
+                print state.domains[key], key
+
         return neighbours
 
 

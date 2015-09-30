@@ -13,6 +13,7 @@ It will start iterating over the elements of a string instead.
 # TODO Implement functionality to check if a state is contradictory or success
 # TODO fix problem in NOTE
 class CSP:
+    #Initialises the csp
 
     def __init__(self):
         self.variables = []
@@ -26,7 +27,10 @@ class CSP:
         for n in var_names:
             args = args + ',' + n
         return eval('(lambda ' + args[1:] + ': ' + expression + ')', environment)
+    '''
+    Goes through the domain of a state and revises it
 
+    '''
     def revise(self, searchstate, statevariable, focal_constraint):
         revised = False
         for focal_color in searchstate.domains[statevariable]:
@@ -40,30 +44,30 @@ class CSP:
                 revised = True
         return revised
 
-
     def domain_filter(self):
         while len(self.queue) > 0:
             focal_state, focal_variable, focal_constraint = self.queue.popleft()
             if self.revise(focal_state, focal_variable, focal_constraint):
                 self.add_all_tuples_in_which_variable_occurs(focal_state, focal_variable, focal_constraint)
 
-
     def add_all_tuples_in_which_variable_occurs(self, focal_state, focal_variable, focal_constraint):
-        constraints_containing_variable = []
-        for key, list_of_values in self.constraints.iteritems():
-                    for constraint_in_list_of_values in list_of_values:
-                        if focal_constraint is None:
-                            if constraint_in_list_of_values.contains_variable(focal_variable):
-                                constraints_containing_variable.append(constraint_in_list_of_values)
-                        elif constraint_in_list_of_values.contains_variable(focal_variable) and\
-                                not constraint_in_list_of_values == focal_constraint:
-                            constraints_containing_variable.append(constraint_in_list_of_values)
-                    for focal_constraint in constraints_containing_variable:
-                        self.queue.append((focal_state, focal_constraint.get_other(focal_variable), focal_constraint))
+        for constraint in self.constraints[focal_variable]:
+            if not constraint == focal_constraint:
+                self.queue.append((focal_state, focal_constraint.get_other(focal_variable), focal_constraint))
 
+
+    def add_all_tuples_specific_constraint(self,focal_state,focal_variable):
+        for focal_constraint in self.constraints[focal_variable]:
+            self.queue.append((focal_state,focal_constraint.get_other(focal_variable),focal_constraint))
 
     def rerun(self, state, var):
-        self.add_all_tuples_in_which_variable_occurs(state, var, None)
+        print "ADDALLTUPLES--------------------------------------------------------------"
+        print self.queue
+        self.add_all_tuples_specific_constraint(state,var)
+        for element in self.queue:
+            print element[1],element[2]
+
+        print "DOMAIN FILTER-------------------------------------------------------"
         self.domain_filter()
 
     def initialize_queue(self, searchstate):
@@ -111,8 +115,7 @@ def main():
     astar = astarmod2.Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-    for i in range(200):
-        astar.do_one_step()
+    astar.do_one_step()
     for key in astar.searchstate.domains.keys():
         print astar.searchstate.domains[key]
 
