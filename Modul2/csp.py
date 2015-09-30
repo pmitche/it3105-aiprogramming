@@ -112,7 +112,7 @@ def create_csp(graph_file, domain_size):
 
 
 def main():
-    csp = create_csp("graph-color-1.txt", len(colors))
+    csp = create_csp("graph-color-1.txt", 4)
     astar = astarmod2.Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()

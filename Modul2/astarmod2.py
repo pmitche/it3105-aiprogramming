@@ -16,6 +16,9 @@ class Astarmod2(astar.Astar):
         return self.searchstate.calculate_neighbours(self.csp)
 
     def arc_cost(self, child, parent):
+        for key in child.domains.keys():
+            if len (child.domains[key] ) ==0:
+                return float('inf')
         return 1
 
     def appendtoopen(self, state):
