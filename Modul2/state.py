@@ -39,15 +39,15 @@ class State():
 
         for possible_variable in self.domains[smallestdomainkey]:
             assumption = copy.deepcopy(self.domains)
-            assumption[smallestdomainkey] = possible_variable
+            assumption[smallestdomainkey] = [possible_variable]
             neighbours.append(State(assumption))
         for state in neighbours:
-            print state.domains[smallestdomainkey]
-            print "-----------------------------------------------------------------------"
-            print smallestdomainkey
             csp.rerun(state, smallestdomainkey)
             for key in state.domains.keys():
-                print state.domains[key], key
+                if len(state.domains[key]) <1:
+                    neighbours.remove(state)
+
+
 
         return neighbours
 

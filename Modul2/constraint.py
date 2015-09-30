@@ -19,8 +19,8 @@ class Constraint:
 
     def get_other(self, var):
         if self.vertices[0] == var:
-            return self.vertices[1]
+            return [self.vertices[1]]
         if self.vertices[1] == var:
-            return self.vertices[0]
+            return [self.vertices[0]]
         else:
             raise AttributeError

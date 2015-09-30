@@ -33,16 +33,18 @@ class CSP:
     '''
     def revise(self, searchstate, statevariable, focal_constraint):
         revised = False
-        for focal_color in searchstate.domains[statevariable]:
+        for value in searchstate.domains[statevariable]:
             satisfies_constraint = False
-            for other_color in searchstate.domains[focal_constraint.get_other(statevariable)]:
-                if focal_constraint.check_if_satisfies(focal_color, other_color):
-                    satisfies_constraint = True
-                    break
-            if satisfies_constraint is False:
-                searchstate.domains[statevariable].remove(focal_color)
-                revised = True
+            for other_variable in focal_constraint.get_other(statevariable):
+                for some_value in searchstate.domains[other_variable]:
+                    if focal_constraint.check_if_satisfies(value,some_value):
+                        satisfies_constraint = True
+                        break
+                if not satisfies_constraint:
+                    searchstate.domains[statevariable].remove(value)
+                    revised = True
         return revised
+
 
     def domain_filter(self):
         while len(self.queue) > 0:
@@ -53,21 +55,20 @@ class CSP:
     def add_all_tuples_in_which_variable_occurs(self, focal_state, focal_variable, focal_constraint):
         for constraint in self.constraints[focal_variable]:
             if not constraint == focal_constraint:
-                self.queue.append((focal_state, focal_constraint.get_other(focal_variable), focal_constraint))
+                for other_var in focal_constraint.get_other(focal_variable):
+                    self.queue.append((focal_state, other_var, focal_constraint))
 
 
     def add_all_tuples_specific_constraint(self,focal_state,focal_variable):
         for focal_constraint in self.constraints[focal_variable]:
-            self.queue.append((focal_state,focal_constraint.get_other(focal_variable),focal_constraint))
+            for other_var in focal_constraint.get_other(focal_variable):
+                self.queue.append((focal_state, other_var, focal_constraint))
+
 
     def rerun(self, state, var):
-        print "ADDALLTUPLES--------------------------------------------------------------"
-        print self.queue
         self.add_all_tuples_specific_constraint(state,var)
-        for element in self.queue:
-            print element[1],element[2]
-
-        print "DOMAIN FILTER-------------------------------------------------------"
+       # for element in self.queue:
+       #     print element[1],element[2]
         self.domain_filter()
 
     def initialize_queue(self, searchstate):
@@ -82,7 +83,7 @@ class CSP:
 
 
 
-colors = ['red', 'green', 'blue', 'yellow', 'black', 'pink']
+colors = [0,1,2,3,4,5,6]
 
 
 def create_csp(graph_file, domain_size):
@@ -115,9 +116,8 @@ def main():
     astar = astarmod2.Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-    astar.do_one_step()
-    for key in astar.searchstate.domains.keys():
-        print astar.searchstate.domains[key]
+    while len(astar.openlist)>0:
+        astar.do_one_step()
 
 
 
