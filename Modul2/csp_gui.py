@@ -5,17 +5,74 @@ from tkFileDialog import askopenfilename
 from csp import CSP
 import variable as cspvariable
 import constraint as cspconstraint
-
+import astarmod2
 
 class csp_gui:
     def __init__(self, parent):
         self.parent = Frame(parent, width=500, height=500)
-        self.colors =[0,1,2,3,4,5]
-        self.csp = self.create_csp("graph-color-1.txt", 6)
+        self.vertex_dict = {}
+        self.edge_dict = {}
+        self.colors = [0, 1, 2, 3, 4, 5]
+        self.number_to_color ={0: 'black', 1: "yellow", 2: "pink", 3: "purple", 4: "red", 5: "blue"}
+        self.csp = self.create_csp("graph-color-2.txt", 6)
         self.canvas = Canvas(master=self.parent,width=500, height=500)
+        self.canvas.pack()
         self.parent.pack()
+        self.drawmap()
+        self.astar = astarmod2.Astarmod2(self.csp)
+        self.csp.initialize_queue(self.astar.searchstate)
+        self.csp.domain_filter()
+        self.run_astar()
+
+    def normalize_coordinates(self,xpos,ypos):
+        self.highestx = max([float(var.x) for var in self.csp.variables])
+        self.lowestx = min([float(var.x )for var in self.csp.variables])
+        self.highesty = max([float(var.y) for var in self.csp.variables])
+        self.lowesty = min([float(var.y )for var in self.csp.variables])
+        old_range =float(self.highestx-self.lowestx)
+        new_range = float(480-20)
+        new_x = (((float(xpos)-self.lowestx)*new_range)/old_range) + 20
+        old_range = float(self.highesty-self.lowesty)
+        new_y = (((float(ypos)-self.lowesty)*new_range)/old_range) + 20
+        print new_x, new_y
+        return new_x, new_y
+
+
+    def run_astar(self):
+        self.astar.do_one_step()
+        for key in self.astar.searchstate.domains.keys():
+            if len(self.astar.searchstate.domains[key]) == 1:
+                self.canvas.itemconfig(self.vertex_dict[key.index], fill=self.number_to_color[self.astar.searchstate.domains[key][0]])
+        if len(self.astar.openlist)> 0:
+            self.parent.after(300, lambda: self.run_astar())
+        else:
+            for key in self.astar.searchstate.domains.keys():
+                self.canvas.itemconfig(self.vertex_dict[key.index], fill=self.number_to_color[self.astar.searchstate.domains[key][0]])
+
+
+
     def drawmap(self):
-        self.vertex_dict ={}
+        self.vertex_dict = {}
+        self.edge_dict = {}
+        self.canvas.delete('oval')
+        for key in self.csp.constraints.keys():
+            for constraint in self.csp.constraints[key]:
+                x1,y1 = self.normalize_coordinates(constraint.vertices[0].x, constraint.vertices[0].y)
+                x2,y2 = self.normalize_coordinates(constraint.vertices[1].x, constraint.vertices[1].y)
+                Canvas.create_line(self.canvas,x1,y1,x2,y2)
+        for variable in self.csp.variables:
+            x1,y1 = self.normalize_coordinates(variable.x, variable.y)
+            x1 = x1-10
+            y1 = y1 -10
+            x2 = x1 +20
+            y2 = y1 +20
+            self.vertex_dict[variable.index] = Canvas.create_oval(self.canvas, x1, y1, x2, y2)
+
+
+
+
+
+
 
 
 
