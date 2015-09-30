@@ -20,6 +20,8 @@ class State():
         for key in self.domains.keys():
             if len(self.domains[key]) == 0:
                 return True
+
+
         return False
 
     def check_if_goal_state(self):
@@ -37,29 +39,19 @@ class State():
                 smallest = len(self.domains[key])
                 smallestdomainkey = key
 
-        for possible_variable in self.domains[smallestdomainkey]:
-            assumption = copy.deepcopy(self.domains)
-            assumption[smallestdomainkey] = [possible_variable]
-            kid = State(assumption)
+        for assumption in self.domains[smallestdomainkey]:
+            assignment = copy.deepcopy(self.domains)
+            assignment[smallestdomainkey] = [assumption]
+            kid = State(assignment)
             csp.rerun(kid,smallestdomainkey)
             legal = True
             kid.calculate_heuristics()
             for key in kid.domains.keys():
                 if len(kid.domains[key]) == 0:
                     legal = False
+
             if legal is True:
                 neighbours.append(kid)
-        '''for state in neighbours:
-            try:
-                csp.rerun(state, smallestdomainkey)
-                state.calculate_heuristics()
-                for key in state.domains.keys():
-                    if len(state.domains[key]) <1:
-                        neighbours.remove(state)
-            except ValueError:
-                print neighbours
-                for key in state.domains.keys():
-                    print state.domains[key]'''
 
         return neighbours
 

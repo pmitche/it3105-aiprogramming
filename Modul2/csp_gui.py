@@ -14,7 +14,7 @@ class csp_gui:
         self.edge_dict = {}
         self.colors = [0, 1, 2, 3, 4, 5]
         self.number_to_color ={0: 'black', 1: "yellow", 2: "pink", 3: "purple", 4: "red", 5: "blue"}
-        self.csp = self.create_csp("graph-color-2.txt", 6)
+        self.csp = self.create_csp("graph-color-1.txt", 4)
         self.canvas = Canvas(master=self.parent,width=500, height=500)
         self.canvas.pack()
         self.parent.pack()
@@ -25,16 +25,15 @@ class csp_gui:
         self.run_astar()
 
     def normalize_coordinates(self,xpos,ypos):
-        self.highestx = max([float(var.x) for var in self.csp.variables])
-        self.lowestx = min([float(var.x )for var in self.csp.variables])
-        self.highesty = max([float(var.y) for var in self.csp.variables])
-        self.lowesty = min([float(var.y )for var in self.csp.variables])
-        old_range =float(self.highestx-self.lowestx)
+        highestx = max([float(var.x) for var in self.csp.variables])
+        lowestx = min([float(var.x )for var in self.csp.variables])
+        highesty = max([float(var.y) for var in self.csp.variables])
+        lowesty = min([float(var.y )for var in self.csp.variables])
+        old_range =float(highestx-lowestx)
         new_range = float(480-20)
-        new_x = (((float(xpos)-self.lowestx)*new_range)/old_range) + 20
-        old_range = float(self.highesty-self.lowesty)
-        new_y = (((float(ypos)-self.lowesty)*new_range)/old_range) + 20
-        print new_x, new_y
+        new_x = (((float(xpos)-lowestx)*new_range)/old_range) + 20
+        old_range = float(highesty-lowesty)
+        new_y = (((float(ypos)-lowesty)*new_range)/old_range) + 20
         return new_x, new_y
 
 
@@ -48,6 +47,12 @@ class csp_gui:
         else:
             for key in self.astar.searchstate.domains.keys():
                 self.canvas.itemconfig(self.vertex_dict[key.index], fill=self.number_to_color[self.astar.searchstate.domains[key][0]])
+            for key in self.csp.constraints.keys():
+                for constraint in self.csp.constraints[key]:
+                    if self.astar.searchstate.domains[constraint.vertices[0]] ==self.astar.searchstate.domains[constraint.vertices[1]]:
+                        print "suckadickanddie",  self.astar.searchstate.domains[constraint.vertices[0]], self.astar.searchstate.domains[constraint.vertices[1]]
+
+
 
 
 
