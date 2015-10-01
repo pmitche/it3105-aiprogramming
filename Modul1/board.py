@@ -1,4 +1,4 @@
-import state
+import StateMod1
 
 
 class Board():
@@ -38,10 +38,10 @@ class Board():
         for i in range(len(self.grid)):
             for j in range(len(self.grid[i])):
                 if self.grid[i][j] == 'S':
-                    return state.State(i, j, self, None)
+                    return StateMod1.StateMod1(i, j, self, None)
 
 
-# This class is a basic class to handle input from filename
+# Ths class is a basic class to handle input from filename
 # First line read is dimensions of grid
 #second line read is start and end coordinates
 #all subsequent lines are obstacles

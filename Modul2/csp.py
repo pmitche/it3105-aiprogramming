@@ -1,7 +1,7 @@
 __author__ = 'paulpm, sondredyvik'
 import variable as cspvariable
 import constraint as cspconstraint
-import state
+import cspstate as state
 from collections import deque
 import astarmod2
 '''
@@ -76,7 +76,7 @@ class CSP:
                 self.queue.append((searchstate, variable, focal_constraint))
 
     def generate_initial_searchstate(self):
-        return state.State(self.domains)
+        return state.CspState(self.domains)
 
 
 
@@ -124,9 +124,6 @@ def main():
 
 
 
-
-def generate_initial_searchstate(csp):
-    return state.State(csp.domains)
 
 
 

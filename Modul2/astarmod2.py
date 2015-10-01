@@ -12,6 +12,7 @@ class Astarmod2(astar.Astar):
 
     def generate_initial_searchstate(self):
         return self.csp.generate_initial_searchstate()
+
     def generate_successors(self):
         return self.searchstate.calculate_neighbours(self.csp)
 

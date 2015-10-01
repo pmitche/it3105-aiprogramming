@@ -15,6 +15,7 @@ class astarGui(Frame):
         self.size = size
         self.color1 = color1
         self.color2 = color2
+        self.rect_dict = {}
         self.running = False
         canvas_width = columns * size
         canvas_height = rows * size
@@ -103,7 +104,6 @@ class astarGui(Frame):
         self.setBoard(askopenfilename(parent=self.parent))
 
     def drawBoard(self, board):
-        self.rect_dict = {}
         width = self.canvas.winfo_width()
         height = self.canvas.winfo_height()
         xsize = (int(width / int(board.dimensions[0])))
@@ -116,17 +116,17 @@ class astarGui(Frame):
                 y1 = (y * self.size)
                 x2 = x1 + self.size
                 y2 = y1 + self.size
-                self.rect_dict[(x, y)] = self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", fill="white",
+                self.rect_dict[(x,y)] = self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", fill="white",
                                                                       tags="square")
         for i in range(int(board.dimensions[0])):
             for j in range(int(board.dimensions[1])):
                 if board.grid[i][j] == "#":
                     # self.canvas.itemconfig(self.rect_dict[i,j],fill="black")
-                    self.canvas.itemconfig(self.rect_dict[i, int(self.board.dimensions[1]) - 1 - j], fill="black")
+                    self.canvas.itemconfig(self.rect_dict[(i, int(self.board.dimensions[1]) - 1 - j)], fill="black")
                 if board.grid[i][j] == "G":
-                    self.canvas.itemconfig(self.rect_dict[i, int(self.board.dimensions[1]) - 1 - j], fill="green")
+                    self.canvas.itemconfig(self.rect_dict[(i, int(self.board.dimensions[1]) - 1 - j)], fill="green")
                 if board.grid[i][j] == "S":
-                    self.canvas.itemconfig(self.rect_dict[i, int(self.board.dimensions[1]) - 1 - j], fill="blue")
+                    self.canvas.itemconfig(self.rect_dict[(i, int(self.board.dimensions[1]) - 1 - j)], fill="blue")
 
 
     def setBoard(self, filename):
