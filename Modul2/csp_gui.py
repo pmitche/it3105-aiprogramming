@@ -150,8 +150,10 @@ class csp_gui:
             i1, i2 = [int(i) for i in f.readline().strip().split(' ')]
             this_vertex = csp.variables[i1]
             other_vertex = csp.variables[i2]
-            csp.constraints[this_vertex].append(cspconstraint.Constraint([this_vertex, other_vertex]))
-            csp.constraints[other_vertex].append(cspconstraint.Constraint([other_vertex, this_vertex]))
+            csp.constraints[this_vertex].append(cspconstraint.Constraint([this_vertex, other_vertex],
+                                                                     str(this_vertex) + "!=" + str(other_vertex)))
+            csp.constraints[other_vertex].append(cspconstraint.Constraint([other_vertex, this_vertex],
+                                                                     str(other_vertex) + "!=" + str(this_vertex)))
 
         for k in csp.variables:
             csp.domains[k] = [self.colors[x] for x in range(domain_size)]

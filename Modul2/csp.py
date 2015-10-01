@@ -33,16 +33,18 @@ class CSP:
     '''
     def revise(self, searchstate, statevariable, focal_constraint):
         revised = False
+        satisfies = self.makefunc([str(x) for x in focal_constraint.vertices], focal_constraint.expr)
         for value in searchstate.domains[statevariable]:
             satisfies_constraint = False
-            for other_variable in focal_constraint.get_other(statevariable):
-                for some_value in searchstate.domains[other_variable]:
-                    if focal_constraint.check_if_satisfies(value,some_value):
-                        satisfies_constraint = True
-                        break
-                if not satisfies_constraint:
-                    searchstate.domains[statevariable].remove(value)
-                    revised = True
+            for other_variable in focal_constraint.vertices:
+                if other_variable != statevariable:
+                    for some_value in searchstate.domains[other_variable]:
+                        if satisfies(value, some_value):
+                            satisfies_constraint = True
+                            break
+                    if not satisfies_constraint:
+                        searchstate.domains[statevariable].remove(value)
+                        revised = True
         return revised
 
 
@@ -100,8 +102,10 @@ def create_csp(graph_file, domain_size):
         i1, i2 = [int(i) for i in f.readline().strip().split(' ')]
         this_vertex = csp.variables[i1]
         other_vertex = csp.variables[i2]
-        csp.constraints[this_vertex].append(cspconstraint.Constraint([this_vertex, other_vertex]))
-        csp.constraints[other_vertex].append(cspconstraint.Constraint([other_vertex, this_vertex]))
+        csp.constraints[this_vertex].append(cspconstraint.Constraint([this_vertex, other_vertex],
+                                                                     str(this_vertex) + "!=" + str(other_vertex)))
+        csp.constraints[other_vertex].append(cspconstraint.Constraint([other_vertex, this_vertex],
+                                                                     str(other_vertex) + "!=" + str(this_vertex)))
 
     for k in csp.variables:
         csp.domains[k] = [colors[x] for x in range(domain_size)]

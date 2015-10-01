@@ -2,8 +2,9 @@ __author__ = 'sondredyvik'
 
 
 class Constraint:
-    def __init__(self, vertices):
+    def __init__(self, vertices, expr):
         self.vertices = vertices
+        self.expr = expr
 
     def __repr__(self):
         return str((self.vertices[0],self.vertices[1]))
