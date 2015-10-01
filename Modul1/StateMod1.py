@@ -26,6 +26,7 @@ class StateMod1(abstractstate.State):
 
         if not self.node_out_of_bounds(x, y + 1) and not self.is_wall(x, y + 1):
             neighbours.append(StateMod1(x, y + 1, board, self))
+
         if not self.node_out_of_bounds(x + 1, y) and not self.is_wall(x + 1, y):
             neighbours.append(StateMod1(x + 1, y, board, self))
 

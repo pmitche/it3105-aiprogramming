@@ -80,7 +80,7 @@ class astarGui(Frame):
             for el in self.oldsnake:
                 self.canvas.itemconfig(self.rect_dict[(int(el.xpos), int(self.board.dimensions[1]) - 1 - int(el.ypos))],
                                        fill="white")
-        for state in self.alg.closedlist:
+        for state in self.alg.closeddict.values():
             self.canvas.itemconfig(
                 self.rect_dict[(int(state.xpos), int(self.board.dimensions[1]) - 1 - (int(state.ypos)))], fill="grey")
 
@@ -93,9 +93,6 @@ class astarGui(Frame):
             self.running = False
             return True
 
-        if len(self.alg.openlist) == 0:
-            self.running = False
-            return False
         self.parent.after(10, lambda: self.do_one_step())
 
 
