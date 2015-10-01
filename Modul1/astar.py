@@ -77,6 +77,11 @@ class Astar(object):
             state = state.parent
             path.append(state)
         path.reverse()
+        length = 0
+        for state in path:
+            length += self.arc_cost(state,state.parent)
+            print length-1
+
         return path
 
 

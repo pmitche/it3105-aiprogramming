@@ -63,7 +63,7 @@ class astarGui(Frame):
     def run(self, type):
         if (not self.running):
             if self.board is None:
-                self.board = board.Board("board1.txt")
+                self.setBoard("board1.txt")
             else:
                 self.setBoard(self.board.filename)
             self.searchsnake = []
@@ -91,7 +91,6 @@ class astarGui(Frame):
             self.oldsnake = self.searchsnake
         if self.searchsnake[-1].h == 0:
             self.running = False
-
             return True
 
         if len(self.alg.openlist) == 0:
@@ -127,7 +126,6 @@ class astarGui(Frame):
                     self.canvas.itemconfig(self.rect_dict[(i, int(self.board.dimensions[1]) - 1 - j)], fill="green")
                 if board.grid[i][j] == "S":
                     self.canvas.itemconfig(self.rect_dict[(i, int(self.board.dimensions[1]) - 1 - j)], fill="blue")
-
 
     def setBoard(self, filename):
         self.board = board.Board(filename)
