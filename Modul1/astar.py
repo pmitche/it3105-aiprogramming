@@ -3,12 +3,10 @@ __author__ = 'sondredyvik'
 
 class Astar(object):
     def __init__(self):
-
-        self.hashtable = {}
-        self.closedlist = []
         self.opendict = dict()
         self.closeddict = dict()
         self.openlist = self.generate_openlist()
+        self.searchnodes_created = 0
 
         # first node is created
         self.searchstate = self.generate_initial_searchstate()
@@ -39,17 +37,19 @@ class Astar(object):
         del self.opendict[hash(self.searchstate)]
         if self.searchstate.h == 0:
             self.openlist = []
+            length = 0
+            for state in self.findpath(self.searchstate):
+                length += self.arc_cost(state,state.parent)
+            print "total length of path: " + str(length-1)
+            print self.searchnodes_created
             return self.findpath(self.searchstate)
 
-
-        #add to closedlist this node is now about to be expanded
-        self.closedlist.append(self.searchstate)
-        #add to support structure
         self.closeddict[hash(self.searchstate)] = self.searchstate
         #Generate children, these children now get searchstate as parent
         successors = self.searchstate.calculate_neighbours()
         #for each child
         for succ in successors:
+            self.searchnodes_created +=1
             if hash(succ) in self.opendict:
                 succ = self.opendict[hash(succ)]
             if hash(succ) in self.closeddict:
@@ -59,7 +59,7 @@ class Astar(object):
                 self.attach_and_eval(succ, self.searchstate)
                 self.opendict[hash(succ)] = succ
                 self.appendtoopen(succ)
-            elif self.searchstate.g + 1 < succ.g:
+            elif self.searchstate.g + self.arc_cost(succ, self.searchstate)< succ.g:
                 self.attach_and_eval(succ, self.searchstate)
                 if hash(succ) in self.closeddict:
                     self.propagate_path_improvement(self.closeddict[hash(succ)])
@@ -77,11 +77,6 @@ class Astar(object):
             state = state.parent
             path.append(state)
         path.reverse()
-        length = 0
-        for state in path:
-            length += self.arc_cost(state,state.parent)
-            print length-1
-
         return path
 
 
@@ -90,10 +85,8 @@ class Astar(object):
         child.g = parent.g + self.arc_cost(child, parent)
         child.update_f()
 
-
     def arc_cost(self, child, parent):
         raise NotImplementedError
-
 
     def propagate_path_improvement(self, parent):
         for child in parent.children:
