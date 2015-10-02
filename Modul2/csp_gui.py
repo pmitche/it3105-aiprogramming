@@ -64,6 +64,7 @@ class csp_gui:
     def setboard(self,filename):
         self.board = filename
 
+
     def run(self,k):
         if self.running is False:
             if self.board is None:
@@ -71,12 +72,14 @@ class csp_gui:
             self.canvas.delete("all")
             self.running = True
             self.csp = self.create_csp(self.board, k)
-            self.drawmap()
             self.astar = astarmod2.Astarmod2(self.csp)
+            self.drawmap()
             self.csp.initialize_queue(self.astar.searchstate)
             self.csp.domain_filter()
             self.time = time.time()
             self.run_astar()
+
+
 
     def normalize_coordinates(self,xpos,ypos):
         highestx = max([float(var.x) for var in self.csp.variables])

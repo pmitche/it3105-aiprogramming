@@ -3,6 +3,7 @@ __author__ = 'sondredyvik'
 
 
 class ConstraintNet:
+
     def __init__(self):
         self.constraints = {}
 
