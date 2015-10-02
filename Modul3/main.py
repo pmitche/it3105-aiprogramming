@@ -1,87 +1,105 @@
-from Modul2.csp import CSP
+from Modul2.gac import GAC
 from Modul2.variable import Variable
+from Modul2.constraintnet import  ConstraintNet
 from Modul2.constraint import Constraint
+from Modul2.cspstate import CspState
+
+# TODO make a method that calculates all domains for each variable
+
 
 __author__ = 'paulpm'
-
-
-class Segment:
-    def __init__(self, index, size, row_num, col_num):
-        self.index = index
+class Variable:
+    def __init__(self,index, type, id, segments, size):
         self.size = size
-        self.row_num = row_num
-        self.col_num = col_num
+        self.id = id
+        self.index = index
+        self.type = type
+        self.segments = segments
 
-    def __repr__(self):
-        if self.row_num == -1:
-            return str(self.index) + "col" + str(self.col_num) + "-" + str(self.size)
-        return str(self.index) + "row" + str(self.row_num) + "-" + str(self.size)
+
+class mod3GAC(GAC):
+    def __init__(self,CNET):
+        super(mod3GAC,self).__init__(CNET)
+        self.rowvars=[]
+        self.colvars=[]
+
+    def generate_constraints(self):
+        for rowvar in self.rowvars:
+            for colvar in self.colvars:
+                constraint = Constraint([rowvar, colvar], "x=y")
+                self.CNET.add_constraint(rowvar, constraint)
+                self.CNET.add_constraint(colvar, constraint)
+
+    def generate_domains(self, segments, size):
+        return []
+
+    '''This revise function assumes that the domain of a variable is a list of lists containing T/F variables
+    EXAMPLE:
+    [
+    [T,F,T,T,T,T,F,T]
+    [T,T,T,T,F,F,F,F]
+    [F,F,T,F,T,T,F,F]
+    ]'''
+    def revise(self, searchstate, statevariable, focal_constraint):
+        revised = False
+        for value in searchstate.domains[statevariable]:
+            all_true = True
+            all_false = True
+            satisfies_constraint = False
+            other_var = searchstate.domains[focal_constraint.get_other(statevariable)]
+            for other_value in other_var:
+                if len (other_var)==1:
+                    if focal_constraint.function(value[other_var.index],other_value[statevariable.index]):
+                        satisfies_constraint = True
+                        break
+                    if satisfies_constraint is False and len(other_var) ==1 :
+                            searchstate.domains[statevariable].remove(value)
+                            revised = True
+                    elif other_value[other_var.index] is True:
+                        all_false = False
+                    elif other_value[statevariable.index] is False:
+                        all_true = False
+            if all_false:
+                if value[other_var.index] is True:
+                    searchstate.domains[statevariable].remove(value)
+            elif all_true:
+                if value[other_var.index] is False:
+                    searchstate.domains[statevariable].remove(value)
+
+        return revised
 
 
 def main():
-    create_csp("nono-cat.txt")
+    csp = create_csp("nono-cat.txt")
 
 
 def create_csp(nonogram_file):
-        csp = CSP()
+        CNET = ConstraintNet()
+        csp = mod3GAC(CNET)
         f = open("nonograms/" + nonogram_file, 'r')
         columns, rows = [int(x) for x in f.readline().strip().split(' ')]
         id_counter = 0
 
         for row in range(rows):
-            for size in f.readline().strip().split(' '):
-                segment = Segment(id_counter, int(size), row, -1)
-                id_counter += 1
-                csp.variables.append(segment)
-                csp.constraints[segment] = []
-                csp.domains[segment] = [int(x) for x in range(rows)]
-
+            segments =[]
+            for seg in f.readline().strip().split(' '):
+                segments.append(seg)
+            var = Variable(row,"Row", id_counter,segments,rows-1)
+            csp.variables.append(var)
+            csp.rowvars.append(var)
+            csp.domains[var] = csp.generate_domains(csp,segments,rows-1)
 
         for column in range(columns):
-            for size in f.readline().strip().split(' '):
-                segment = Segment(id_counter, int(size), -1, column)
-                id_counter += 1
-                csp.variables.append(segment)
-                csp.constraints[segment] = []
-                csp.domains[segment] = [int(x) for x in range(columns)]
-
-
-        # TODO: Implement method to calculate initial reduced domain using arithmetic
-        # TODO: Populate csp.constraints with constraints on the form segmentA.start + segmentA.size > segmentB.start
-
-        print "CSP variables: " + str(csp.variables)
-        print "-------------------------------------------------------------"
-        print "CSP constraints: " + str(csp.constraints)
-        print "-------------------------------------------------------------"
-        print "CSP domains: " + str(csp.domains)
-
-
-
-
-
-
-
-
-
-
-        """for i in range(number_of_vertices):
-            index, x, y = [i for i in f.readline().strip().split(' ')]
-            vertex = Variable(int(index), float(x), float(y))
-            csp.variables.append(vertex)
-            csp.constraints[vertex] = []
-
-        for j in range(number_of_edges):
-            i1, i2 = [int(i) for i in f.readline().strip().split(' ')]
-            this_vertex = csp.variables[i1]
-            other_vertex = csp.variables[i2]
-            csp.constraints[this_vertex].append(Constraint([this_vertex, other_vertex]))
-            csp.constraints[other_vertex].append(Constraint([other_vertex, this_vertex]))
-
-        for k in csp.variables:
-            csp.domains[k] = [self.colors[x] for x in range(domain_size)]"""
+            segments =[]
+            for seg in f.readline().strip().split(' '):
+                segments.append(seg)
+            var = Variable(column,"column", id_counter, segments, columns-1)
+            csp.variables.append(var)
+            csp.colvars.append(var)
+            csp.domains[var] = csp.generate_domains(csp,segments,columns-1)
 
         f.close()
-        #return csp
+        return csp
 
 if __name__ == "__main__":
     main()

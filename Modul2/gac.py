@@ -14,7 +14,7 @@ It will start iterating over the elements of a string instead.
 '''
 # TODO Implement functionality to check if a state is contradictory or success
 # TODO fix problem in NOTE
-class GAC:
+class GAC(object):
 
     def __init__(self,constraintnet):
         self.CNET = constraintnet
