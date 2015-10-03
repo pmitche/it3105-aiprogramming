@@ -1,38 +1,27 @@
 from Modul2.gac import GAC
-from Modul2.variable import Variable
 from Modul2.constraintnet import  ConstraintNet
 from Modul2.constraint import Constraint
 from Modul2.cspstate import CspState
 import itertools
 
-# TODO make a method that calculates all domains for each variable
-
-
 __author__ = 'paulpm'
+
+
 class Variable:
-    def __init__(self,index, type, size):
+    def __init__(self, index, type, size):
         self.size = size
         self.index = index
         self.type = type
 
-class Segment:
-    def __init__(self, index, size, row_num, col_num):
-        self.index = index
-        self.size = size
-        self.row_num = row_num
-        self.col_num = col_num
-
     def __repr__(self):
-        if self.row_num == -1:
-            return str(self.index) + "col" + str(self.col_num) + "-" + str(self.size)
-        return str(self.index) + "row" + str(self.row_num) + "-" + str(self.size)
+        return self.type + str(self.index)
 
 
 class mod3GAC(GAC):
-    def __init__(self,CNET):
-        super(mod3GAC,self).__init__(CNET)
-        self.rowvars=[]
-        self.colvars=[]
+    def __init__(self, CNET):
+        super(mod3GAC, self).__init__(CNET)
+        self.rowvars = []
+        self.colvars = []
 
     def generate_constraints(self):
         for rowvar in self.rowvars:
@@ -80,14 +69,11 @@ class mod3GAC(GAC):
         return revised
 
 
-def main():
-    csp = create_csp("nono-cat.txt")
-
-def create_true_false_array(positionlist,lengthlist,length):
+def create_true_false_array(positionlist, lengthlist, length):
     return_array = [False]*length
     positionlist = list(positionlist)
     for i in range(len(positionlist)):
-        for j in range(positionlist[i],positionlist[i]+ lengthlist[i]):
+        for j in range(positionlist[i], positionlist[i] + lengthlist[i]):
             return_array[j] = True
     return return_array
 
@@ -131,10 +117,7 @@ def create_csp(nonogram_file):
         columns, rows = [int(x) for x in f.readline().strip().split(' ')]
 
         for row in range(rows):
-            segments = []
-            for size in f.readline().strip().split(' '):
-                segments.append(int(size))
-
+            segments = [int(x) for x in f.readline().strip().split(' ')]
             segment_domains = generate_segment_domains(segments, columns)
             permutations = calculate_permutations(segment_domains, segments)
             domain_permutations = [create_true_false_array(x, segments, columns) for x in permutations]
@@ -145,15 +128,9 @@ def create_csp(nonogram_file):
             csp.domains[var] = domain_permutations
 
             print "Row vars: " + str(csp.rowvars)
-            print "CSP variables: " + str(csp.variables)
-            print "CSP Domains: " + str(csp.domains)
-
 
         for column in range(columns):
-            segments = []
-            for size in f.readline().strip().split(' '):
-                segments.append(int(size))
-
+            segments = [int(x) for x in f.readline().strip().split(' ')]
             segment_domains = generate_segment_domains(segments, rows)
             permutations = calculate_permutations(segment_domains, segments)
             domain_permutations = [create_true_false_array(x, segments, rows) for x in permutations]
@@ -164,17 +141,16 @@ def create_csp(nonogram_file):
             csp.domains[var] = domain_permutations
 
             print "Col vars: " + str(csp.colvars)
-            print "CSP variables: " + str(csp.variables)
-            print "CSP Domains: " + str(csp.domains)
 
         print "CSP variables: " + str(csp.variables)
-        print "-------------------------------------------------------------"
-        #print "CSP constraints: " + str(csp.constraints)
-        print "-------------------------------------------------------------"
         print "CSP domains: " + str(csp.domains)
 
         f.close()
         return csp
+
+
+def main():
+    csp = create_csp("nono-cat.txt")
 
 if __name__ == "__main__":
     main()
