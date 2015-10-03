@@ -16,6 +16,18 @@ class Variable:
         self.type = type
         self.segments = segments
 
+class Segment:
+    def __init__(self, index, size, row_num, col_num):
+        self.index = index
+        self.size = size
+        self.row_num = row_num
+        self.col_num = col_num
+
+    def __repr__(self):
+        if self.row_num == -1:
+            return str(self.index) + "col" + str(self.col_num) + "-" + str(self.size)
+        return str(self.index) + "row" + str(self.row_num) + "-" + str(self.size)
+
 
 class mod3GAC(GAC):
     def __init__(self,CNET):
