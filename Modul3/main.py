@@ -29,21 +29,62 @@ def create_csp(nonogram_file):
         id_counter = 0
 
         for row in range(rows):
+            segments = []
+            segment_start_ranges = [0]
+            segment_end_ranges = []
+            start_total = 0
             for size in f.readline().strip().split(' '):
-                segment = Segment(id_counter, int(size), row, -1)
-                id_counter += 1
-                csp.variables.append(segment)
-                csp.constraints[segment] = []
-                csp.domains[segment] = [int(x) for x in range(rows)]
+                segments.append(int(size))
+            for i in range(1, len(segments)):
+                start_total += segments[i-1] + 1
+                segment_start_ranges.append(start_total)
+            for j in range(0, len(segments)):
+                end_total = columns + 1
+                for k in range(j, len(segments)):
+                    end_total -= segments[k] + 1
+                segment_end_ranges.append(end_total)
 
+            for k in range(len(segments)):
+                s = Segment(id_counter, segments[k], row, -1)
+                id_counter += 1
+                csp.variables.append(s)
+                csp.constraints[s] = []
+                csp.domains[s] = [int(x) for x in range(segment_start_ranges[k], segment_end_ranges[k]+1)]
+
+            for k in range(1, len(segments)):
+                csp.constraints[csp.variables[id_counter-1]].append(
+                    Constraint([csp.variables[id_counter-1], csp.variables[id_counter-2]],
+                               str(csp.variables[id_counter-1]) + ">" + str(csp.variables[id_counter-2]) + "+" +
+                               str(len(csp.domains[csp.variables[id_counter-2]]))))
 
         for column in range(columns):
+            segments = []
+            segment_start_ranges = [0]
+            segment_end_ranges = []
+            start_total = 0
             for size in f.readline().strip().split(' '):
-                segment = Segment(id_counter, int(size), -1, column)
+                segments.append(int(size))
+            for i in range(1, len(segments)):
+                start_total += segments[i-1] + 1
+                segment_start_ranges.append(start_total)
+            for j in range(0, len(segments)):
+                end_total = rows + 1
+                for k in range(j, len(segments)):
+                    end_total -= segments[k] + 1
+                segment_end_ranges.append(end_total)
+
+            for k in range(len(segments)):
+                s = Segment(id_counter, segments[k], -1, column)
                 id_counter += 1
-                csp.variables.append(segment)
-                csp.constraints[segment] = []
-                csp.domains[segment] = [int(x) for x in range(columns)]
+                csp.variables.append(s)
+                csp.constraints[s] = []
+                csp.domains[s] = [int(x) for x in range(segment_start_ranges[k], segment_end_ranges[k]+1)]
+
+            for k in range(1, len(segments)):
+                csp.constraints[csp.variables[id_counter-1]].append(
+                    Constraint([csp.variables[id_counter-1], csp.variables[id_counter-2]],
+                               str(csp.variables[id_counter-1]) + ">" + str(csp.variables[id_counter-2]) + "+" +
+                               str(len(csp.domains[csp.variables[id_counter-2]]))))
 
 
         # TODO: Implement method to calculate initial reduced domain using arithmetic
@@ -56,32 +97,8 @@ def create_csp(nonogram_file):
         print "CSP domains: " + str(csp.domains)
 
 
-
-
-
-
-
-
-
-
-        """for i in range(number_of_vertices):
-            index, x, y = [i for i in f.readline().strip().split(' ')]
-            vertex = Variable(int(index), float(x), float(y))
-            csp.variables.append(vertex)
-            csp.constraints[vertex] = []
-
-        for j in range(number_of_edges):
-            i1, i2 = [int(i) for i in f.readline().strip().split(' ')]
-            this_vertex = csp.variables[i1]
-            other_vertex = csp.variables[i2]
-            csp.constraints[this_vertex].append(Constraint([this_vertex, other_vertex]))
-            csp.constraints[other_vertex].append(Constraint([other_vertex, this_vertex]))
-
-        for k in csp.variables:
-            csp.domains[k] = [self.colors[x] for x in range(domain_size)]"""
-
         f.close()
-        #return csp
+        return csp
 
 if __name__ == "__main__":
     main()
