@@ -2,9 +2,15 @@ from Modul2.gac import GAC
 from Modul2.constraintnet import  ConstraintNet
 from Modul2.constraint import Constraint
 from Modul2.cspstate import CspState
+from Modul2.astarmod2 import Astarmod2
+import copy
 import itertools
 
+
 __author__ = 'paulpm'
+
+
+
 
 
 class Variable:
@@ -14,7 +20,12 @@ class Variable:
         self.type = type
 
     def __repr__(self):
-        return self.type + str(self.index)
+        return str(self.type)+ str(self.index)
+    def __hash__(self):
+        return hash(str(self.type)+ str(self.index))
+
+
+
 
 
 class mod3GAC(GAC):
@@ -26,7 +37,7 @@ class mod3GAC(GAC):
     def generate_constraints(self):
         for rowvar in self.rowvars:
             for colvar in self.colvars:
-                constraint = Constraint([rowvar, colvar], "x=y")
+                constraint = Constraint([rowvar, colvar], "x == y")
                 self.CNET.add_constraint(rowvar, constraint)
                 self.CNET.add_constraint(colvar, constraint)
 
@@ -42,31 +53,44 @@ class mod3GAC(GAC):
     ]'''
     def revise(self, searchstate, statevariable, focal_constraint):
         revised = False
-        for value in searchstate.domains[statevariable]:
+        for value in copy.deepcopy(searchstate.domains[statevariable]):
             all_true = True
             all_false = True
             satisfies_constraint = False
-            other_var = searchstate.domains[focal_constraint.get_other(statevariable)]
-            for other_value in other_var:
-                if len (other_var)==1:
-                    if focal_constraint.function(value[other_var.index],other_value[statevariable.index]):
+            other_var = focal_constraint.get_other(statevariable)[0]
+            other_var_domain = searchstate.domains[other_var]
+            for other_value in other_var_domain:
+                if len (other_var_domain)==1:
+                    if focal_constraint.function(value[other_var.index], other_value[statevariable.index]):
                         satisfies_constraint = True
                         break
-                    if satisfies_constraint is False and len(other_var) ==1 :
+                    if satisfies_constraint is False and len(other_var_domain) ==1 :
                             searchstate.domains[statevariable].remove(value)
                             revised = True
                     elif other_value[other_var.index] is True:
                         all_false = False
-                    elif other_value[statevariable.index] is False:
+                    elif other_value[other_var.index] is False:
                         all_true = False
             if all_false:
+
                 if value[other_var.index] is True:
                     searchstate.domains[statevariable].remove(value)
+                    revised = True
             elif all_true:
                 if value[other_var.index] is False:
                     searchstate.domains[statevariable].remove(value)
-
+                    revised = True
         return revised
+
+
+
+def main():
+    csp = create_csp("nono-cat.txt")
+    csp.generate_constraints()
+    astar = Astarmod2(csp)
+    csp.initialize_queue(astar.searchstate)
+    csp.domain_filter()
+    print astar.searchstate.domains
 
 
 def create_true_false_array(positionlist, lengthlist, length):
@@ -76,6 +100,8 @@ def create_true_false_array(positionlist, lengthlist, length):
         for j in range(positionlist[i], positionlist[i] + lengthlist[i]):
             return_array[j] = True
     return return_array
+
+
 
 
 def generate_segment_domains(segments, length):
