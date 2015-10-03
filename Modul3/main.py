@@ -85,6 +85,13 @@ class mod3GAC(GAC):
 def main():
     csp = create_csp("nono-cat.txt")
 
+def create_true_false_array(positionlist,lengthlist,length):
+    return_array = [False]*length
+    positionlist = list(positionlist)
+    for i in range(len(positionlist)):
+        for j in range(positionlist[i],positionlist[i]+ lengthlist[i]):
+            return_array[j] = True
+    return return_array
 
 
 
@@ -120,7 +127,14 @@ def create_csp(nonogram_file):
                     if isinstance(list_element, list):
                         if not list_element[i] + segments[i] + 1 < list_element[i]:
                             permutations.remove(list_element)
-            print permutations
+            print permutations [0][0] + segments[0]
+            domainlist = []
+            for i in permutations:
+                domainlist.append(create_true_false_array(i,segments,columns))
+
+            print domainlist
+
+
             #true_false = [[True for i in range(columns)] for j in range(segment_start_ranges[j], segment_end_ranges[j]+1) ]
             #print true_false
 
