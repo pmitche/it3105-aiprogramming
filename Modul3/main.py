@@ -3,6 +3,7 @@ from Modul2.variable import Variable
 from Modul2.constraintnet import  ConstraintNet
 from Modul2.constraint import Constraint
 from Modul2.cspstate import CspState
+import itertools
 
 # TODO make a method that calculates all domains for each variable
 
@@ -85,6 +86,8 @@ def main():
     csp = create_csp("nono-cat.txt")
 
 
+
+
 def create_csp(nonogram_file):
         CNET = ConstraintNet()
         csp = mod3GAC(CNET)
@@ -96,6 +99,7 @@ def create_csp(nonogram_file):
             segments = []
             segment_start_ranges = [0]
             segment_end_ranges = []
+            segment_domains = []
             start_total = 0
             for size in f.readline().strip().split(' '):
                 segments.append(int(size))
@@ -107,19 +111,35 @@ def create_csp(nonogram_file):
                 for k in range(j, len(segments)):
                     end_total -= segments[k] + 1
                 segment_end_ranges.append(end_total)
+            for i in range(len(segments)):
+                    segment_domains.append([x for x in range(segment_start_ranges[i], segment_end_ranges[i]+1)])
+            print "Row " + str(row) + ": " + str(segment_domains)
+            permutations = list(itertools.product(*segment_domains))
+            for list_element in permutations:
+                for i in range(len(list_element)-1):
+                    if isinstance(list_element, list):
+                        if not list_element[i] + segments[i] + 1 < list_element[i]:
+                            permutations.remove(list_element)
+            print permutations
+            #true_false = [[True for i in range(columns)] for j in range(segment_start_ranges[j], segment_end_ranges[j]+1) ]
+            #print true_false
+
+
+
+
 
             for k in range(len(segments)):
                 s = Segment(id_counter, segments[k], row, -1)
                 id_counter += 1
                 csp.variables.append(s)
-                csp.constraints[s] = []
+                #csp.constraints[s] = []
                 csp.domains[s] = [int(x) for x in range(segment_start_ranges[k], segment_end_ranges[k]+1)]
 
             for k in range(1, len(segments)):
-                csp.constraints[csp.variables[id_counter-1]].append(
+                """csp.constraints[csp.variables[id_counter-1]].append(
                     Constraint([csp.variables[id_counter-1], csp.variables[id_counter-2]],
                                str(csp.variables[id_counter-1]) + ">" + str(csp.variables[id_counter-2]) + "+" +
-                               str(len(csp.domains[csp.variables[id_counter-2]]))))
+                               str(len(csp.domains[csp.variables[id_counter-2]]))))"""
 
         for column in range(columns):
             segments = []
@@ -136,19 +156,20 @@ def create_csp(nonogram_file):
                 for k in range(j, len(segments)):
                     end_total -= segments[k] + 1
                 segment_end_ranges.append(end_total)
+            print "Col " + str(column) + ": " + str(segment_start_ranges), str(segment_end_ranges)
 
             for k in range(len(segments)):
                 s = Segment(id_counter, segments[k], -1, column)
                 id_counter += 1
                 csp.variables.append(s)
-                csp.constraints[s] = []
+                #csp.constraints[s] = []
                 csp.domains[s] = [int(x) for x in range(segment_start_ranges[k], segment_end_ranges[k]+1)]
 
             for k in range(1, len(segments)):
-                csp.constraints[csp.variables[id_counter-1]].append(
+                """csp.constraints[csp.variables[id_counter-1]].append(
                     Constraint([csp.variables[id_counter-1], csp.variables[id_counter-2]],
                                str(csp.variables[id_counter-1]) + ">" + str(csp.variables[id_counter-2]) + "+" +
-                               str(len(csp.domains[csp.variables[id_counter-2]]))))
+                               str(len(csp.domains[csp.variables[id_counter-2]]))))"""
 
 
         # TODO: Implement method to calculate initial reduced domain using arithmetic
@@ -156,7 +177,7 @@ def create_csp(nonogram_file):
 
         print "CSP variables: " + str(csp.variables)
         print "-------------------------------------------------------------"
-        print "CSP constraints: " + str(csp.constraints)
+        #print "CSP constraints: " + str(csp.constraints)
         print "-------------------------------------------------------------"
         print "CSP domains: " + str(csp.domains)
 
