@@ -10,6 +10,7 @@ class Astarmod2(astar.Astar):
         super(Astarmod2, self).__init__()
 
 
+
     def generate_initial_searchstate(self):
         return self.csp.generate_initial_searchstate()
 

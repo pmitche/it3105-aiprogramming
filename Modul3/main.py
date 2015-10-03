@@ -3,7 +3,7 @@ from Modul2.constraintnet import  ConstraintNet
 from Modul2.constraint import Constraint
 from Modul2.cspstate import CspState
 from Modul2.astarmod2 import Astarmod2
-import copy
+import uuid
 import itertools
 
 
@@ -21,18 +21,28 @@ class Variable:
 
     def __repr__(self):
         return str(self.type)+ str(self.index)
+
+    def __eq__(self, other):
+        return self.size == other.size and self.index == other.index and self.type == other.type
+
     def __hash__(self):
         return hash(str(self.type)+ str(self.index))
 
 
+class NoNoState(CspState):
+    def __init__(self, domains):
+        super(NoNoState,self).__init__(domains)
+        self.id = uuid.uuid4()
 
-
+    def __hash__(self):
+        return hash(self.id)
 
 class mod3GAC(GAC):
     def __init__(self, CNET):
         super(mod3GAC, self).__init__(CNET)
         self.rowvars = []
         self.colvars = []
+
 
     def generate_constraints(self):
         for rowvar in self.rowvars:
@@ -41,9 +51,8 @@ class mod3GAC(GAC):
                 self.CNET.add_constraint(rowvar, constraint)
                 self.CNET.add_constraint(colvar, constraint)
 
-    def generate_domains(self, segments, size):
-        return []
-
+    def generate_initial_searchstate(self):
+        return NoNoState(self.domains)
     '''This revise function assumes that the domain of a variable is a list of lists containing T/F variables
     EXAMPLE:
     [
@@ -51,36 +60,41 @@ class mod3GAC(GAC):
     [T,T,T,T,F,F,F,F]
     [F,F,T,F,T,T,F,F]
     ]'''
-    def revise(self, searchstate, statevariable, focal_constraint):
+    def revise(self, searchstate, focal_variable, focal_constraint):
+        other_var = focal_constraint.get_other(focal_variable)[0]
+        this_index = focal_variable.index
+        other_index = other_var.index
+        other_var_domain = searchstate.domains[other_var]
         revised = False
-        for value in copy.deepcopy(searchstate.domains[statevariable]):
+        for this_value in searchstate.domains[focal_variable]:
             all_true = True
             all_false = True
             satisfies_constraint = False
-            other_var = focal_constraint.get_other(statevariable)[0]
-            other_var_domain = searchstate.domains[other_var]
             for other_value in other_var_domain:
-                if len (other_var_domain)==1:
-                    if focal_constraint.function(value[other_var.index], other_value[statevariable.index]):
+                if len(other_var_domain) ==1:
+                    if focal_constraint.function(this_value[other_var.index], other_value[focal_variable.index]):
                         satisfies_constraint = True
-                        break
-                    if satisfies_constraint is False and len(other_var_domain) ==1 :
-                            searchstate.domains[statevariable].remove(value)
-                            revised = True
-                    elif other_value[other_var.index] is True:
-                        all_false = False
-                    elif other_value[other_var.index] is False:
+                        revised = True
+                else:
+                    if other_value[this_index] is False:
                         all_true = False
-            if all_false:
+                    elif other_value[this_index] is True:
+                        all_false = False
 
-                if value[other_var.index] is True:
-                    searchstate.domains[statevariable].remove(value)
+            if all_false:
+                if this_value[other_index] is True:
+                    searchstate.domains[focal_variable].remove(this_value)
                     revised = True
             elif all_true:
-                if value[other_var.index] is False:
-                    searchstate.domains[statevariable].remove(value)
+                if this_value[other_index] is False:
+                    searchstate.domains[focal_variable].remove(this_value)
                     revised = True
         return revised
+
+
+
+
+
 
 
 
@@ -90,7 +104,11 @@ def main():
     astar = Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-    print astar.searchstate.domains
+    for key in astar.searchstate.domains.keys():
+        print key, astar.searchstate.domains[key]
+
+
+
 
 
 def create_true_false_array(positionlist, lengthlist, length):
@@ -153,7 +171,6 @@ def create_csp(nonogram_file):
             csp.variables.append(var)
             csp.domains[var] = domain_permutations
 
-            print "Row vars: " + str(csp.rowvars)
 
         for column in range(columns):
             segments = [int(x) for x in f.readline().strip().split(' ')]
@@ -166,17 +183,11 @@ def create_csp(nonogram_file):
             csp.variables.append(var)
             csp.domains[var] = domain_permutations
 
-            print "Col vars: " + str(csp.colvars)
-
-        print "CSP variables: " + str(csp.variables)
-        print "CSP domains: " + str(csp.domains)
 
         f.close()
         return csp
 
 
-def main():
-    csp = create_csp("nono-cat.txt")
 
 if __name__ == "__main__":
     main()
