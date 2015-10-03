@@ -42,7 +42,7 @@ class CspState(State):
                     legal = False
             if legal is True:
                 neighbours.append(kid)
-
+        print neighbours
         return neighbours
 
     def calculate_heuristics(self):

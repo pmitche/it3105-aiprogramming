@@ -5,7 +5,7 @@ from Modul2.cspstate import CspState
 from Modul2.astarmod2 import Astarmod2
 import uuid
 import itertools
-
+import copy
 
 __author__ = 'paulpm'
 
@@ -66,29 +66,31 @@ class mod3GAC(GAC):
         other_index = other_var.index
         other_var_domain = searchstate.domains[other_var]
         revised = False
-        for this_value in searchstate.domains[focal_variable]:
+        for this_value in copy.deepcopy(searchstate.domains[focal_variable]):
             all_true = True
             all_false = True
-            satisfies_constraint = False
+            breaks_constraints = False
             for other_value in other_var_domain:
                 if len(other_var_domain) ==1:
-                    if focal_constraint.function(this_value[other_var.index], other_value[focal_variable.index]):
-                        satisfies_constraint = True
-                        revised = True
+                    if not focal_constraint.function(this_value[other_var.index], other_value[focal_variable.index]):
+                        breaks_constraints = True
+                        break
                 else:
                     if other_value[this_index] is False:
                         all_true = False
                     elif other_value[this_index] is True:
                         all_false = False
-
-            if all_false:
-                if this_value[other_index] is True:
-                    searchstate.domains[focal_variable].remove(this_value)
-                    revised = True
-            elif all_true:
+            if all_true:
                 if this_value[other_index] is False:
-                    searchstate.domains[focal_variable].remove(this_value)
-                    revised = True
+                    breaks_constraints = True
+
+            elif all_false:
+                if this_value[other_index] is True:
+                    breaks_constraints = True
+            if breaks_constraints:
+                print this_value
+                searchstate.domains[focal_variable].remove(this_value)
+
         return revised
 
 
@@ -104,9 +106,20 @@ def main():
     astar = Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
+    sum = 0
     for key in astar.searchstate.domains.keys():
-        print key, astar.searchstate.domains[key]
+        sum += len(astar.searchstate.domains[key])
+       # print key, astar.searchstate.domains[key]
+    print sum
 
+    astar.do_one_step()
+    astar.do_one_step()
+    astar.do_one_step()
+    sum = 0
+    for key in astar.searchstate.domains.keys():
+        sum += len(astar.searchstate.domains[key])
+        #print key, astar.searchstate.domains[key]
+    print sum
 
 
 
@@ -170,7 +183,6 @@ def create_csp(nonogram_file):
             csp.rowvars.append(var)
             csp.variables.append(var)
             csp.domains[var] = domain_permutations
-
 
         for column in range(columns):
             segments = [int(x) for x in f.readline().strip().split(' ')]
