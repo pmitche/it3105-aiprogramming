@@ -33,6 +33,45 @@ class NoNoState(CspState):
     def __init__(self, domains):
         super(NoNoState,self).__init__(domains)
         self.id = uuid.uuid4()
+        self.bannedkeys =[]
+
+    def calculate_neighbours(self, csp):
+        neighbours = []
+
+        smallest = float('inf')
+        smallest_domain_key = None
+        for key in self.domains.keys():
+            if key not in self.bannedkeys and 1< len(self.domains[key]) <smallest:
+           # if 1 < len(self.domains[key]) < smallest and isinstance(self.domains[key], list) and key not in\
+            #        self.bannedkeys:
+
+                smallest = len(self.domains[key])
+                smallest_domain_key = key
+        print smallest_domain_key
+        print self.domains.keys(), self.bannedkeys
+
+        for assumption in self.domains[smallest_domain_key]:
+            assignment = copy.deepcopy(self.domains)
+            csp.print_domain_lengths(assignment)
+            assignment[smallest_domain_key] = [assumption]
+            kid = NoNoState(assignment)
+            csp.rerun(kid,smallest_domain_key)
+            legal = True
+            kid.calculate_heuristics()
+            print kid.domains[smallest_domain_key]
+            for key in kid.domains.keys():
+                if len(kid.domains[key]) == 0:
+                    legal = False
+            if legal is True:
+                neighbours.append(kid)
+        if len (neighbours) > 0:
+            return (neighbours)
+        else:
+            self.bannedkeys.append(smallest_domain_key)
+            print "HEI", self.bannedkeys
+
+            neighbours = self.calculate_neighbours(csp)
+
 
     def __hash__(self):
         return hash(self.id)
@@ -43,6 +82,11 @@ class mod3GAC(GAC):
         self.rowvars = []
         self.colvars = []
 
+    def print_domain_lengths(self,domain):
+        sum = 0
+        for key in domain.keys():
+            sum +=len( domain[key])
+        print sum
 
     def generate_constraints(self):
         for rowvar in self.rowvars:
@@ -88,7 +132,6 @@ class mod3GAC(GAC):
                 if this_value[other_index] is True:
                     breaks_constraints = True
             if breaks_constraints:
-                print this_value
                 searchstate.domains[focal_variable].remove(this_value)
 
         return revised
@@ -106,20 +149,7 @@ def main():
     astar = Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-    sum = 0
-    for key in astar.searchstate.domains.keys():
-        sum += len(astar.searchstate.domains[key])
-       # print key, astar.searchstate.domains[key]
-    print sum
-
     astar.do_one_step()
-    astar.do_one_step()
-    astar.do_one_step()
-    sum = 0
-    for key in astar.searchstate.domains.keys():
-        sum += len(astar.searchstate.domains[key])
-        #print key, astar.searchstate.domains[key]
-    print sum
 
 
 
@@ -182,7 +212,10 @@ def create_csp(nonogram_file):
             var = Variable(row, "row", columns)
             csp.rowvars.append(var)
             csp.variables.append(var)
-            csp.domains[var] = domain_permutations
+            csp.domains[var] = []
+            for i in domain_permutations:
+                if i not in csp.domains[var]:
+                    csp.domains[var].append(i)
 
         for column in range(columns):
             segments = [int(x) for x in f.readline().strip().split(' ')]
@@ -193,7 +226,11 @@ def create_csp(nonogram_file):
             var = Variable(column, "column", columns)
             csp.colvars.append(var)
             csp.variables.append(var)
-            csp.domains[var] = domain_permutations
+            csp.domains[var] = []
+            for i in domain_permutations:
+                if i not in csp.domains[var]:
+                    csp.domains[var].append(i)
+
 
 
         f.close()
