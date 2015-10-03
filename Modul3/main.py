@@ -10,12 +10,10 @@ import itertools
 
 __author__ = 'paulpm'
 class Variable:
-    def __init__(self,index, type, id, segments, size):
+    def __init__(self,index, type, size):
         self.size = size
-        self.id = id
         self.index = index
         self.type = type
-        self.segments = segments
 
 class Segment:
     def __init__(self, index, size, row_num, col_num):
@@ -94,100 +92,80 @@ def create_true_false_array(positionlist,lengthlist,length):
     return return_array
 
 
+def generate_segment_domains(segments, length):
+    segment_start_ranges = [0]
+    segment_end_ranges = []
+    start_total = 0
+
+    for i in range(1, len(segments)):
+        start_total += segments[i-1] + 1
+        segment_start_ranges.append(start_total)
+
+    for j in range(0, len(segments)):
+        end_total = length + 1
+        for k in range(j, len(segments)):
+            end_total -= segments[k] + 1
+        segment_end_ranges.append(end_total)
+
+    segment_domains = []
+    for k in range(len(segments)):
+        segment_domains.append([x for x in range(segment_start_ranges[k], segment_end_ranges[k]+1)])
+
+    return segment_domains
+
+
+def calculate_permutations(segment_domains, segments):
+    permutations = list(itertools.product(*segment_domains))
+    for list_element in permutations:
+        for i in range(len(list_element)-1):
+            if isinstance(list_element, list):
+                if not list_element[i] + segments[i] + 1 < list_element[i]:
+                    permutations.remove(list_element)
+    return permutations
+
 
 def create_csp(nonogram_file):
         CNET = ConstraintNet()
         csp = mod3GAC(CNET)
         f = open("nonograms/" + nonogram_file, 'r')
         columns, rows = [int(x) for x in f.readline().strip().split(' ')]
-        id_counter = 0
 
         for row in range(rows):
             segments = []
-            segment_start_ranges = [0]
-            segment_end_ranges = []
-            segment_domains = []
-            start_total = 0
             for size in f.readline().strip().split(' '):
                 segments.append(int(size))
-            for i in range(1, len(segments)):
-                start_total += segments[i-1] + 1
-                segment_start_ranges.append(start_total)
-            for j in range(0, len(segments)):
-                end_total = columns + 1
-                for k in range(j, len(segments)):
-                    end_total -= segments[k] + 1
-                segment_end_ranges.append(end_total)
-            for i in range(len(segments)):
-                    segment_domains.append([x for x in range(segment_start_ranges[i], segment_end_ranges[i]+1)])
-            print "Row " + str(row) + ": " + str(segment_domains)
-            permutations = list(itertools.product(*segment_domains))
-            for list_element in permutations:
-                for i in range(len(list_element)-1):
-                    if isinstance(list_element, list):
-                        if not list_element[i] + segments[i] + 1 < list_element[i]:
-                            permutations.remove(list_element)
-            print permutations [0][0] + segments[0]
-            domainlist = []
-            for i in permutations:
-                domainlist.append(create_true_false_array(i,segments,columns))
 
-            print domainlist
+            segment_domains = generate_segment_domains(segments, columns)
+            permutations = calculate_permutations(segment_domains, segments)
+            domain_permutations = [create_true_false_array(x, segments, columns) for x in permutations]
 
+            var = Variable(row, "row", columns)
+            csp.rowvars.append(var)
+            csp.variables.append(var)
+            csp.domains[var] = domain_permutations
 
-            #true_false = [[True for i in range(columns)] for j in range(segment_start_ranges[j], segment_end_ranges[j]+1) ]
-            #print true_false
+            print "Row vars: " + str(csp.rowvars)
+            print "CSP variables: " + str(csp.variables)
+            print "CSP Domains: " + str(csp.domains)
 
-
-
-
-
-            for k in range(len(segments)):
-                s = Segment(id_counter, segments[k], row, -1)
-                id_counter += 1
-                csp.variables.append(s)
-                #csp.constraints[s] = []
-                csp.domains[s] = [int(x) for x in range(segment_start_ranges[k], segment_end_ranges[k]+1)]
-
-            for k in range(1, len(segments)):
-                """csp.constraints[csp.variables[id_counter-1]].append(
-                    Constraint([csp.variables[id_counter-1], csp.variables[id_counter-2]],
-                               str(csp.variables[id_counter-1]) + ">" + str(csp.variables[id_counter-2]) + "+" +
-                               str(len(csp.domains[csp.variables[id_counter-2]]))))"""
 
         for column in range(columns):
             segments = []
-            segment_start_ranges = [0]
-            segment_end_ranges = []
-            start_total = 0
             for size in f.readline().strip().split(' '):
                 segments.append(int(size))
-            for i in range(1, len(segments)):
-                start_total += segments[i-1] + 1
-                segment_start_ranges.append(start_total)
-            for j in range(0, len(segments)):
-                end_total = rows + 1
-                for k in range(j, len(segments)):
-                    end_total -= segments[k] + 1
-                segment_end_ranges.append(end_total)
-            print "Col " + str(column) + ": " + str(segment_start_ranges), str(segment_end_ranges)
 
-            for k in range(len(segments)):
-                s = Segment(id_counter, segments[k], -1, column)
-                id_counter += 1
-                csp.variables.append(s)
-                #csp.constraints[s] = []
-                csp.domains[s] = [int(x) for x in range(segment_start_ranges[k], segment_end_ranges[k]+1)]
+            segment_domains = generate_segment_domains(segments, rows)
+            permutations = calculate_permutations(segment_domains, segments)
+            domain_permutations = [create_true_false_array(x, segments, rows) for x in permutations]
 
-            for k in range(1, len(segments)):
-                """csp.constraints[csp.variables[id_counter-1]].append(
-                    Constraint([csp.variables[id_counter-1], csp.variables[id_counter-2]],
-                               str(csp.variables[id_counter-1]) + ">" + str(csp.variables[id_counter-2]) + "+" +
-                               str(len(csp.domains[csp.variables[id_counter-2]]))))"""
+            var = Variable(column, "column", columns)
+            csp.colvars.append(var)
+            csp.variables.append(var)
+            csp.domains[var] = domain_permutations
 
-
-        # TODO: Implement method to calculate initial reduced domain using arithmetic
-        # TODO: Populate csp.constraints with constraints on the form segmentA.start + segmentA.size > segmentB.start
+            print "Col vars: " + str(csp.colvars)
+            print "CSP variables: " + str(csp.variables)
+            print "CSP Domains: " + str(csp.domains)
 
         print "CSP variables: " + str(csp.variables)
         print "-------------------------------------------------------------"
