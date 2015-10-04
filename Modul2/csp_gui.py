@@ -142,10 +142,10 @@ class csp_gui:
 
 
 
-    def create_csp(self,graph_file, domain_size):
+    def create_csp(self, graph_file, domain_size):
         self.CNET = constraintnet.ConstraintNet()
         gac = GAC(self.CNET)
-        f = open(graph_file, 'r')
+        f = open("graphs/" + graph_file, 'r')
         number_of_vertices, number_of_edges = [int(x) for x in f.readline().strip().split(' ')]
 
         for i in range(number_of_vertices):
