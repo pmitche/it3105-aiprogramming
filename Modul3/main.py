@@ -213,7 +213,7 @@ class NonoAstarGac:
                 permutations = self.calculate_permutations(segment_domains, segments)
                 domain_permutations = [self.create_true_false_array(x, segments, rows) for x in permutations]
 
-                var = Variable(column, "column", row)
+                var = Variable(column, "column", columns)
                 csp.colvars.append(var)
                 csp.variables.append(var)
                 csp.domains[var] = []
