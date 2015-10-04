@@ -114,42 +114,41 @@ class mod3GAC(GAC):
     [F,F,T,F,T,T,F,F]
     ]'''
     def revise(self, searchstate, focal_variable, focal_constraint):
-        if focal_variable.type == "row":
-            return False
         other_var = focal_constraint.get_other(focal_variable)[0]
         this_index = focal_variable.index
+        this_var_domain = searchstate.domains[focal_variable]
         other_index = other_var.index
         other_var_domain = searchstate.domains[other_var]
-        revised = False
-        for this_combination in searchstate.domains[focal_variable]:
-            all_true = True
-            all_false = True
-            breaks_constraints = False
+        check_if_satisfies = focal_constraint.function
+        all_true = True
+        all_false = True
+        for other_combination in other_var_domain:
+            if other_combination[this_index] == False:
+                all_true = False
+            elif other_combination[this_index]==True:
+                all_false = False
+        for this_combination in this_var_domain:
+            if all_false and this_combination[other_index] == True:
+               this_var_domain.remove(this_combination)
+               return True
+            if all_true and this_combination[other_index] == False:
+                this_var_domain.remove(this_combination)
+                return True
+                print (this_combination[other_index]), focal_variable
+            if all_false and all_true:
+                print "something is very wrong"
             for other_combination in other_var_domain:
-                if len(other_var_domain) == 1 and isinstance(other_combination,list):
-                    if not (focal_constraint.function(this_combination[other_index],other_combination[this_index])):
-                        breaks_constraints = True
-                        break
-                else:
-                    if other_combination[this_index] is False:
-                        all_true = False
-                    elif other_combination[this_index] is True:
-                        all_false = False
-            if all_true:
-                if this_combination[other_index] is False:
-                    breaks_constraints = True
-            elif all_false:
-                if this_combination[other_index] is True:
-                    breaks_constraints  = True
-
-            if breaks_constraints:
-                searchstate.domains[focal_variable].remove(this_combination)
-                revised = True
-        return revised
-
-
-
-
+                if len(other_var_domain)==1:
+                    pass
+        for this_combination in this_var_domain:
+            for other_combination in other_var_domain:
+                if len(other_var_domain) == 1:
+                    if not check_if_satisfies(this_combination[other_index],other_combination[this_index]):
+                        print check_if_satisfies(this_combination[other_index],other_combination[this_index])
+                        print this_combination in this_var_domain, "heir"
+                        this_var_domain.remove(this_combination)
+                        return True
+        return False
 
 
 
@@ -160,7 +159,6 @@ def main():
     astar = Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-
     check_key = None
     for key in astar.searchstate.domains.keys():
         print key, astar.searchstate.domains[key]
@@ -220,8 +218,11 @@ def create_csp(nonogram_file):
         for row in range(rows):
             segments = [int(x) for x in f.readline().strip().split(' ')]
             segment_domains = generate_segment_domains(segments, columns)
+            print segment_domains, "bapp"
             permutations = calculate_permutations(segment_domains, segments)
             domain_permutations = [create_true_false_array(x, segments, columns) for x in permutations]
+            for perm in domain_permutations:
+                print perm , "sapp"
 
             var = Variable(row, "row", columns)
             csp.rowvars.append(var)
@@ -237,7 +238,7 @@ def create_csp(nonogram_file):
             permutations = calculate_permutations(segment_domains, segments)
             domain_permutations = [create_true_false_array(x, segments, rows) for x in permutations]
 
-            var = Variable(column, "column", columns)
+            var = Variable(column, "column", row)
             csp.colvars.append(var)
             csp.variables.append(var)
             csp.domains[var] = []
