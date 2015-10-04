@@ -36,29 +36,7 @@ class NoNoState(CspState):
         self.bannedkeys =[]
 
     def calculate_neighbours(self, csp):
-        # neighbours = []
-        #
-        # smallest = float('inf')
-        # smallest_domain_key = None
-        # for key in self.domains.keys():
-        #     smallest_domain_key = key
-        #     for assumption in self.domains[smallest_domain_key]:
-        #         assignment = copy.deepcopy(self.domains)
-        #         assignment[smallest_domain_key] = [assumption]
-        #         kid = NoNoState(assignment)
-        #         csp.rerun(kid,smallest_domain_key)
-        #         legal = True
-        #         kid.calculate_heuristics()
-        #
-        #         for key in kid.domains.keys():
-        #             if len(kid.domains[key]) == 0:
-        #                 legal = False
-        #         if legal is True:
-        #             neighbours.append(kid)
-        #     if len (neighbours) > 0:
-        #         pass
-        #
-        # print neighbours
+        print "hei"
         neighbours = []
         smallest = float('inf')
         smallest_domain_key = None
@@ -71,7 +49,13 @@ class NoNoState(CspState):
             assignment = copy.deepcopy(self.domains)
             assignment[smallest_domain_key] = [assumption]
             kid = NoNoState(assignment)
+            print "BEFORE-------------"
+            for key in kid.domains.keys():
+                     print key, kid.domains[key]
             csp.rerun(kid, smallest_domain_key)
+            print "AFTER-------------"
+            for key in kid.domains.keys():
+                     print key, kid.domains[key]
             legal = True
             kid.calculate_heuristics()
             for key in kid.domains.keys():
@@ -79,7 +63,10 @@ class NoNoState(CspState):
                     legal = False
             if legal is True:
                 neighbours.append(kid)
-        print neighbours
+                for key in kid.domains.keys():
+                     print key, kid.domains[key]
+        print len(neighbours)
+
         return neighbours
 
     def __hash__(self):
@@ -114,6 +101,40 @@ class mod3GAC(GAC):
     [F,F,T,F,T,T,F,F]
     ]'''
     def revise(self, searchstate, focal_variable, focal_constraint):
+        # other_var = focal_constraint.get_other(focal_variable)[0]
+        # other_index = other_var.index
+        # other_var_domain = searchstate.domains[other_var]
+        # this_var = focal_variable
+        # this_index =this_var.index
+        # satisfies_constraint = False
+        # this_var_domain = searchstate.domains[this_var]
+        # check_if_satisfies = focal_constraint.function
+        # for focal_combination in this_var_domain:
+        #     all_true = True
+        #     all_false = True
+        #     for other_combination in other_var_domain:
+        #         if len(other_var_domain)==1:
+        #             if check_if_satisfies(focal_combination[other_index], other_combination[this_index]):
+        #                 satisfies_constraint = True
+        #                 break
+        #         elif other_combination[this_index] is False:
+        #             all_true = False
+        #         elif other_combination[this_index] is True:
+        #             all_false = False
+        #     if all_true and focal_combination[other_index] is False and len(other_var_domain)>1:
+        #         this_var_domain.remove(focal_combination)
+        #         return True
+        #     if all_false and focal_combination[other_index] is True and len(other_var_domain)>1:
+        #         this_var_domain.remove(focal_combination)
+        #         return True
+        #
+        #
+        # return False
+        #
+
+
+
+
         other_var = focal_constraint.get_other(focal_variable)[0]
         this_index = focal_variable.index
         this_var_domain = searchstate.domains[focal_variable]
@@ -159,17 +180,14 @@ def main():
     astar = Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-    check_key = None
     for key in astar.searchstate.domains.keys():
         print key, astar.searchstate.domains[key]
-
 def create_true_false_array(positionlist, lengthlist, length):
     return_array = [False]*length
     positionlist = list(positionlist)
     for i in range(len(positionlist)):
         for j in range(positionlist[i], positionlist[i] + lengthlist[i]):
             return_array[j] = True
-    print positionlist,lengthlist,return_array
     return return_array
 
 
@@ -218,12 +236,8 @@ def create_csp(nonogram_file):
         for row in range(rows):
             segments = [int(x) for x in f.readline().strip().split(' ')]
             segment_domains = generate_segment_domains(segments, columns)
-            print segment_domains, "bapp"
             permutations = calculate_permutations(segment_domains, segments)
             domain_permutations = [create_true_false_array(x, segments, columns) for x in permutations]
-            for perm in domain_permutations:
-                print perm , "sapp"
-
             var = Variable(row, "row", columns)
             csp.rowvars.append(var)
             csp.variables.append(var)
