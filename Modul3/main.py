@@ -150,24 +150,6 @@ class mod3GAC(GAC):
                         return True
         return False
 
-    def domain_filter(self):
-        while len(self.queue) > 0:
-            focal_state, focal_variable, focal_constraint = self.queue.popleft()
-            if self.revise(focal_state, focal_variable, focal_constraint):
-                self.add_all_tuples_in_which_variable_occurs(focal_state, focal_variable, focal_constraint)
-
-    def add_all_tuples_in_which_variable_occurs(self, focal_state, focal_variable, focal_constraint):
-        for constraint in self.CNET.constraints[focal_variable]:
-            if constraint != focal_constraint:
-                for variable in constraint.get_other(focal_variable):
-                    if variable != focal_variable:
-                        print focal_variable,constraint.get_other(focal_variable)[0]
-                        self.queue.append((focal_state,constraint.get_other(focal_variable)[0],constraint))
-
-    def add_all_tuples_specific_constraint(self,focal_state,focal_variable):
-        for focal_constraint in self.CNET.constraints[focal_variable]:
-            for other_var in focal_constraint.get_other(focal_variable):
-                self.queue.append((focal_state, other_var, focal_constraint))
 
 
 
