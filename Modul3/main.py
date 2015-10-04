@@ -1,6 +1,6 @@
 from Modul2.gac import GAC
-from Modul2.constraintnet import  ConstraintNet
-from Modul2.constraint import Constraint
+from common.constraintnet import ConstraintNet
+from common.constraint import Constraint
 from Modul2.cspstate import CspState
 from Modul2.astarmod2 import Astarmod2
 import uuid

@@ -4,8 +4,8 @@ from Tkinter import *
 from tkFileDialog import askopenfilename
 from gac import GAC
 import variable as cspvariable
-import constraint as cspconstraint
-import constraintnet
+from common import constraint as cspconstraint
+from common import constraintnet
 import astarmod2
 import time
 
