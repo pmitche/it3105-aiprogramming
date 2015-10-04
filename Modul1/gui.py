@@ -63,7 +63,7 @@ class astarGui(Frame):
     def run(self, type):
         if (not self.running):
             if self.board is None:
-                self.setBoard("board1.txt")
+                self.setBoard("boards/board1.txt")
             else:
                 self.setBoard(self.board.filename)
             self.searchsnake = []
