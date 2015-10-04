@@ -1,7 +1,7 @@
 __author__ = 'sondredyvik'
 
 
-class Constraint:
+class Constraint(object):
     def __init__(self, vertices,expr):
         self.vertices = vertices
         self.expr = expr

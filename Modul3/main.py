@@ -11,7 +11,12 @@ __author__ = 'paulpm'
 
 
 
+class NoNoConstraint(Constraint):
+    def __init__(self, vertices, exp):
+        super(NoNoConstraint,self).__init__(vertices,exp)
 
+    def check_if_satisfies(self,focal_list,other_list,focal_index,other_index):
+        return self.function(focal_list[other_index],other_list[focal_index])
 
 class Variable:
     def __init__(self, index, type, size):
@@ -36,26 +41,23 @@ class NoNoState(CspState):
         self.bannedkeys =[]
 
     def calculate_neighbours(self, csp):
-        print "hei"
+
         neighbours = []
         smallest = float('inf')
         smallest_domain_key = None
         for key in self.domains.keys():
-            if 1 < len(self.domains[key]) < smallest and isinstance(self.domains[key], list):
+            if 1 < len(self.domains[key]) < smallest and isinstance(self.domains[key], list) and key not in \
+                    self.bannedkeys:
                 smallest = len(self.domains[key])
                 smallest_domain_key = key
+        if smallest_domain_key is None:
+            return []
 
         for assumption in self.domains[smallest_domain_key]:
             assignment = copy.deepcopy(self.domains)
             assignment[smallest_domain_key] = [assumption]
             kid = NoNoState(assignment)
-            print "BEFORE-------------"
-            for key in kid.domains.keys():
-                     print key, kid.domains[key]
             csp.rerun(kid, smallest_domain_key)
-            print "AFTER-------------"
-            for key in kid.domains.keys():
-                     print key, kid.domains[key]
             legal = True
             kid.calculate_heuristics()
             for key in kid.domains.keys():
@@ -63,9 +65,7 @@ class NoNoState(CspState):
                     legal = False
             if legal is True:
                 neighbours.append(kid)
-                for key in kid.domains.keys():
-                     print key, kid.domains[key]
-        print len(neighbours)
+
 
         return neighbours
 
@@ -78,6 +78,7 @@ class mod3GAC(GAC):
         self.rowvars = []
         self.colvars = []
 
+
     def print_domain_lengths(self,domain):
         sum = 0
         for key in domain.keys():
@@ -87,7 +88,7 @@ class mod3GAC(GAC):
     def generate_constraints(self):
         for rowvar in self.rowvars:
             for colvar in self.colvars:
-                constraint = Constraint([rowvar, colvar], "x == y")
+                constraint = NoNoConstraint([rowvar, colvar], "x == y")
                 self.CNET.add_constraint(rowvar, constraint)
                 self.CNET.add_constraint(colvar, constraint)
 
@@ -100,88 +101,55 @@ class mod3GAC(GAC):
     [T,T,T,T,F,F,F,F]
     [F,F,T,F,T,T,F,F]
     ]'''
-    def revise(self, searchstate, focal_variable, focal_constraint):
-        # other_var = focal_constraint.get_other(focal_variable)[0]
-        # other_index = other_var.index
-        # other_var_domain = searchstate.domains[other_var]
-        # this_var = focal_variable
-        # this_index =this_var.index
-        # satisfies_constraint = False
-        # this_var_domain = searchstate.domains[this_var]
-        # check_if_satisfies = focal_constraint.function
-        # for focal_combination in this_var_domain:
-        #     all_true = True
-        #     all_false = True
-        #     for other_combination in other_var_domain:
-        #         if len(other_var_domain)==1:
-        #             if check_if_satisfies(focal_combination[other_index], other_combination[this_index]):
-        #                 satisfies_constraint = True
-        #                 break
-        #         elif other_combination[this_index] is False:
-        #             all_true = False
-        #         elif other_combination[this_index] is True:
-        #             all_false = False
-        #     if all_true and focal_combination[other_index] is False and len(other_var_domain)>1:
-        #         this_var_domain.remove(focal_combination)
-        #         return True
-        #     if all_false and focal_combination[other_index] is True and len(other_var_domain)>1:
-        #         this_var_domain.remove(focal_combination)
-        #         return True
-        #
-        #
-        # return False
-        #
 
 
 
 
-        other_var = focal_constraint.get_other(focal_variable)[0]
-        this_index = focal_variable.index
-        this_var_domain = searchstate.domains[focal_variable]
-        other_index = other_var.index
-        other_var_domain = searchstate.domains[other_var]
-        check_if_satisfies = focal_constraint.function
-        all_true = True
-        all_false = True
-        for other_combination in other_var_domain:
-            if other_combination[this_index] == False:
-                all_true = False
-            elif other_combination[this_index]==True:
-                all_false = False
-        for this_combination in this_var_domain:
-            if all_false and this_combination[other_index] == True:
-               this_var_domain.remove(this_combination)
-               return True
-            if all_true and this_combination[other_index] == False:
-                this_var_domain.remove(this_combination)
-                return True
-                print (this_combination[other_index]), focal_variable
-            if all_false and all_true:
-                print "something is very wrong"
-            for other_combination in other_var_domain:
-                if len(other_var_domain)==1:
-                    pass
-        for this_combination in this_var_domain:
-            for other_combination in other_var_domain:
-                if len(other_var_domain) == 1:
-                    if not check_if_satisfies(this_combination[other_index],other_combination[this_index]):
-                        print check_if_satisfies(this_combination[other_index],other_combination[this_index])
-                        print this_combination in this_var_domain, "heir"
-                        this_var_domain.remove(this_combination)
-                        return True
-        return False
+    def add_all_tuples_in_which_variable_occurs(self, focal_state, focal_variable, focal_constraint):
+        for constraint in self.CNET.constraints[focal_variable]:
+            if constraint != focal_constraint:
+                for variable in constraint.get_other(focal_variable):
+                    if variable != focal_variable:
+                        self.queue.append((focal_state, variable, constraint))
 
 
+    def add_all_tuples_specific_constraint(self,focal_state,focal_variable):
+        for focal_constraint in self.CNET.constraints[focal_variable]:
+            for other_var in focal_constraint.get_other(focal_variable):
+                if other_var != other_var:
+                    self.queue.append((focal_state, other_var, focal_constraint))
+
+    def revise(self, searchstate, statevariable, focal_constraint):
+        revised = False
+        for value in searchstate.domains[statevariable]:
+            satisfies_constraint = False
+            for other_variable in focal_constraint.vertices:
+                if other_variable != statevariable:
+                    for some_value in searchstate.domains[other_variable]:
+                        if focal_constraint.check_if_satisfies(value, some_value,
+                                                               statevariable.index,other_variable.index):
+                            satisfies_constraint = True
+                            break
+                    if not satisfies_constraint:
+                        searchstate.domains[statevariable].remove(value)
+                        revised = True
+        return revised
 
 
 def main():
-    csp = create_csp("nono-cat.txt")
+    csp = create_csp("nono-sailboat.txt")
     csp.generate_constraints()
     astar = Astarmod2(csp)
+
+
+
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
     for key in astar.searchstate.domains.keys():
         print key, astar.searchstate.domains[key]
+
+
+
 def create_true_false_array(positionlist, lengthlist, length):
     return_array = [False]*length
     positionlist = list(positionlist)
@@ -221,9 +189,9 @@ def calculate_permutations(segment_domains, segments):
         for i in range(len(list_element)-1):
             if isinstance(list_element, tuple):
                 if not list_element[i] + segments[i]  < list_element[i+1]:
-                    #problem here.  Does not remove well enoguh
                     if list_element in permutations:
                         permutations.remove(list_element)
+                        break
     return permutations
 
 
@@ -233,7 +201,7 @@ def create_csp(nonogram_file):
         f = open("nonograms/" + nonogram_file, 'r')
         columns, rows = [int(x) for x in f.readline().strip().split(' ')]
 
-        for row in range(rows):
+        for row in reversed(range(rows)):
             segments = [int(x) for x in f.readline().strip().split(' ')]
             segment_domains = generate_segment_domains(segments, columns)
             permutations = calculate_permutations(segment_domains, segments)

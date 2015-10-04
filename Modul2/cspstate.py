@@ -40,8 +40,11 @@ class CspState(State):
             for key in kid.domains.keys():
                 if len(kid.domains[key]) == 0:
                     legal = False
+
             if legal is True:
                 neighbours.append(kid)
+
+
         return neighbours
 
     def calculate_heuristics(self):
