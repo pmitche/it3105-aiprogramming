@@ -2,7 +2,7 @@ __author__ = 'sondredyvik'
 from Tkinter import *
 from tkFileDialog import askopenfilename
 
-from main import NonoAstarGac
+from nonogram import NonoAstarGac
 class Gui:
     def __init__(self, parent,width=800, height=800 ):
         self.width = width
