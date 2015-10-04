@@ -33,7 +33,6 @@ class NonoAstarGac:
     def domainfilter(self):
         self.csp.domain_filter()
 
-
     def create_true_false_array(self, positionlist, lengthlist, length):
         return_array = [False]*length
         positionlist = list(positionlist)
