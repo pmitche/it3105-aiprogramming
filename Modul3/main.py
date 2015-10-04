@@ -36,41 +36,52 @@ class NoNoState(CspState):
         self.bannedkeys =[]
 
     def calculate_neighbours(self, csp):
+        # neighbours = []
+        #
+        # smallest = float('inf')
+        # smallest_domain_key = None
+        # for key in self.domains.keys():
+        #     smallest_domain_key = key
+        #     for assumption in self.domains[smallest_domain_key]:
+        #         assignment = copy.deepcopy(self.domains)
+        #         assignment[smallest_domain_key] = [assumption]
+        #         kid = NoNoState(assignment)
+        #         csp.rerun(kid,smallest_domain_key)
+        #         legal = True
+        #         kid.calculate_heuristics()
+        #
+        #         for key in kid.domains.keys():
+        #             if len(kid.domains[key]) == 0:
+        #                 legal = False
+        #         if legal is True:
+        #             neighbours.append(kid)
+        #     if len (neighbours) > 0:
+        #         pass
+        #
+        # print neighbours
         neighbours = []
-
         smallest = float('inf')
         smallest_domain_key = None
         for key in self.domains.keys():
-            if key not in self.bannedkeys and 1< len(self.domains[key]) <smallest:
-           # if 1 < len(self.domains[key]) < smallest and isinstance(self.domains[key], list) and key not in\
-            #        self.bannedkeys:
-
+            if 1 < len(self.domains[key]) < smallest and isinstance(self.domains[key], list):
                 smallest = len(self.domains[key])
                 smallest_domain_key = key
-        print smallest_domain_key
-        print self.domains.keys(), self.bannedkeys
 
         for assumption in self.domains[smallest_domain_key]:
             assignment = copy.deepcopy(self.domains)
-            csp.print_domain_lengths(assignment)
             assignment[smallest_domain_key] = [assumption]
-            kid = NoNoState(assignment)
-            csp.rerun(kid,smallest_domain_key)
+            kid = CspState(assignment)
+            csp.rerun(kid, smallest_domain_key)
             legal = True
             kid.calculate_heuristics()
-            print kid.domains[smallest_domain_key]
             for key in kid.domains.keys():
                 if len(kid.domains[key]) == 0:
                     legal = False
             if legal is True:
                 neighbours.append(kid)
-        if len (neighbours) > 0:
-            return (neighbours)
-        else:
-            self.bannedkeys.append(smallest_domain_key)
-            print "HEI", self.bannedkeys
+        print neighbours
+        return neighbours
 
-            neighbours = self.calculate_neighbours(csp)
 
 
     def __hash__(self):
@@ -149,9 +160,8 @@ def main():
     astar = Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-    astar.do_one_step()
-
-
+    for key in astar.searchstate.domains.keys():
+        print astar.searchstate.domains[key]
 
 
 def create_true_false_array(positionlist, lengthlist, length):
@@ -160,6 +170,7 @@ def create_true_false_array(positionlist, lengthlist, length):
     for i in range(len(positionlist)):
         for j in range(positionlist[i], positionlist[i] + lengthlist[i]):
             return_array[j] = True
+    print positionlist,lengthlist,return_array
     return return_array
 
 
@@ -189,11 +200,13 @@ def generate_segment_domains(segments, length):
 
 def calculate_permutations(segment_domains, segments):
     permutations = list(itertools.product(*segment_domains))
-    for list_element in permutations:
+    for list_element in copy.deepcopy(permutations):
         for i in range(len(list_element)-1):
-            if isinstance(list_element, list):
-                if not list_element[i] + segments[i] + 1 < list_element[i]:
-                    permutations.remove(list_element)
+            if isinstance(list_element, tuple):
+                if not list_element[i] + segments[i] + 1 < list_element[i+1]:
+                    #problem here.  Does not remove well enoguh
+                    if list_element in permutations:
+                        permutations.remove(list_element)
     return permutations
 
 
