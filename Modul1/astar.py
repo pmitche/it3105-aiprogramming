@@ -10,7 +10,7 @@ class Astar(object):
 
         # first node is created
         self.searchstate = self.generate_initial_searchstate()
-        # self.searchstate = state.State(11,8,self.board,None)
+     # self.searchstate = state.State(11,8,self.board,None)
         #print self.searchstate.calculateNeighbours()
 
         #g is set to zero
