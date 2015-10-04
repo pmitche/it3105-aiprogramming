@@ -1,17 +1,23 @@
 __author__ = 'sondredyvik'
-import state as abstractstate
+from common import state
 
-class StateMod1(abstractstate.State):
+class StateMod1(state.State):
 
     def __init__(self, xpos, ypos, board, parent):
         self.board = board
         self.dimensions = board.dimensions
         self.xpos = xpos
         self.ypos = ypos
-        super(StateMod1, self).__init__(parent)
+        self.parent = parent
+        super(StateMod1, self).__init__()
+        self.calculate_heuristic()
 
     def __repr__(self):
         return str(self.xpos) + " " + str(self.ypos)
+
+    def update_f(self):
+        self.calculate_heuristic()
+        self.f = self.h + self.g
 
     def calculate_heuristic(self):
         self.h = abs(self.xpos - int(self.board.goal[0])) + abs(self.ypos - int(self.board.goal[1]))

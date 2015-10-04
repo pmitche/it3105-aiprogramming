@@ -1,9 +1,9 @@
 __author__ = 'sondredyvik'
-from state import State
+from common import state
 import copy
 
 
-class CspState(State):
+class CspState(state.State):
 
     def __init__(self, domains):
         self.domains = domains
