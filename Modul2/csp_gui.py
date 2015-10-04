@@ -8,7 +8,8 @@ import constraint as cspconstraint
 import constraintnet
 import astarmod2
 import time
-import gc
+
+import cProfile
 
 class csp_gui:
     def __init__(self, parent):
@@ -68,7 +69,7 @@ class csp_gui:
     def run(self,k):
         if self.running is False:
             if self.board is None:
-                self.setboard("graph-color-1")
+                self.setboard("spiral-500-4-color1.txt")
             self.canvas.delete("all")
             self.running = True
             self.csp = self.create_csp(self.board, k)
@@ -111,7 +112,9 @@ class csp_gui:
                 for constraint in self.CNET.constraints[key]:
                     if self.astar.searchstate.domains[constraint.vertices[0]] ==self.astar.searchstate.domains[constraint.vertices[1]]:
                         Canvas.create_text(self.canvas, 400, 400, fill="red", text="NO SOLUTION FOUND")
-            print "DONE"
+            print "nodes created: " + str(self.astar.nodes_created)
+            print "nodes expanded: " +str(self.astar.nodes_expanded)
+            print len(self.astar.findpath(self.astar.searchstate))
             print time.time() - self.time
             self.running = False
 
@@ -169,9 +172,8 @@ class csp_gui:
 
 
 
-
 root = Tk()
 gui = csp_gui(root)
-
 root.mainloop()
+
 

@@ -7,6 +7,7 @@ class Astarmod2(astar.Astar):
 
     def __init__(self, csp):
         self.csp = csp
+
         super(Astarmod2, self).__init__()
 
 

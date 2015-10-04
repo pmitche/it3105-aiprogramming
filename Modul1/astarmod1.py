@@ -18,7 +18,7 @@ class Astarmod1(astar.Astar):
         if self.type == "astar":
             heappush(self.openlist, state)
         if self.type == "bfs":
-            self.openlist.append( )
+            self.openlist.append(state)
         if self.type == "dfs":
             self.openlist.append(state)
 

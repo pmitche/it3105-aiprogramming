@@ -8,6 +8,8 @@ class Astar(object):
     def __init__(self):
 
         # variable used to determined search function
+        self.nodes_expanded= 0
+        self.nodes_created = 0
         self.hashtable = {}
         self.closedlist = []
         self.opendict = dict()
@@ -16,6 +18,8 @@ class Astar(object):
 
         # first node is created
         self.searchstate = self.generate_initial_searchstate()
+        self.nodes_created +=1
+
         # self.searchstate = state.State(11,8,self.board,None)
         #print self.searchstate.calculateNeighbours()
 
@@ -31,7 +35,6 @@ class Astar(object):
 
     # Have to implement this method because gui is main loop
     def do_one_step(self):
-        print "here"
         # if openlist is empty, no solution is found, return false
         if len(self.openlist) == 0:
             return False
@@ -39,6 +42,7 @@ class Astar(object):
 
         # pop element with highest F from openlist
         self.searchstate = self.popfromopen()
+        self.nodes_expanded +=1
 
         #remove from support structure
         del self.opendict[hash(self.searchstate)]
@@ -50,16 +54,19 @@ class Astar(object):
         self.closedlist.append(self.searchstate)
         #add to support structure
         self.closeddict[hash(self.searchstate)] = self.searchstate
+
         #Generate children, these children now get searchstate as parent
         successors = self.generate_successors()
         #for each child
         for succ in successors:
+
             if hash(succ) in self.opendict:
                 succ = self.opendict[hash(succ)]
             if hash(succ) in self.closeddict:
                 succ = self.closeddict[hash(succ)]
             self.searchstate.children.append(succ)
             if hash(succ) not in self.opendict and hash(succ) not in self.closeddict:
+                self.nodes_created +=1
                 self.attach_and_eval(succ, self.searchstate)
                 self.opendict[hash(succ)] = succ
                 self.appendtoopen(succ)

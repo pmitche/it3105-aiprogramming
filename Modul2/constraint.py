@@ -14,8 +14,7 @@ class Constraint(object):
     def __eq__(self, other):
         return self.vertices[0] == other.vertices[0] and self.vertices[1] == other.vertices[1]
 
-
-    def makefunc(self, var_names, expression, envir = globals()):
+    def makefunc(self, var_names, expression, envir=globals()):
         args = ",".join(var_names)
         return eval("(lambda " + args + ":" + expression + ")", envir)
 

@@ -12,6 +12,7 @@ class Gui:
         self.canvas.pack()
         self.rect_dict = {}
         self.parent.pack()
+        self.running = False
 
 
         menubar = Menu(parent)
@@ -22,6 +23,7 @@ class Gui:
         boardmenu.add_command(label="Heart", command=lambda: self.setboard("nono-heart-1.txt"))
         boardmenu.add_command(label="Rabbit", command=lambda: self.setboard("nono-rabbit.txt"))
         boardmenu.add_command(label="Sailboat", command=lambda: self.setboard("nono-sailboat.txt"))
+        boardmenu.add_command(label="Telephone", command=lambda: self.setboard("nono-telephone.txt"))
         boardmenu.add_command(label="Custom board", command=lambda: self.openfile())
         boardmenu.add_separator()
         boardmenu.add_command(label="Exit", command=parent.quit)
@@ -32,18 +34,33 @@ class Gui:
         self.setboard(askopenfilename(parent=self.parent))
 
     def setboard(self,filename):
+        self.running= False
         self.canvas.delete("all")
         self.nonoastargac = NonoAstarGac(filename)
         self.drawMap()
         self.run()
+    def do_one_astar_step(self):
+        self.nonoastargac.astar.do_one_step()
+        self.redraw(self.nonoastargac.csp.rowvars,self.nonoastargac.csp.colvars)
+
 
     def run(self):
-        self.nonoastargac.domainfilter()
-        self.running = True
-        self.redraw(self.nonoastargac.csp.rowvars,self.nonoastargac.csp.colvars)
-        while len(self.nonoastargac.astar.openlist)>0:
+        if not self.running:
+            self.nonoastargac.domainfilter()
+            self.running = True
+            self.redraw(self.nonoastargac.csp.rowvars,self.nonoastargac.csp.colvars)
+        if self.running:
             self.nonoastargac.astar.do_one_step()
-        self.redraw(self.nonoastargac.csp.rowvars,self.nonoastargac.csp.colvars)
+            self.redraw(self.nonoastargac.csp.rowvars,self.nonoastargac.csp.colvars)
+
+        if len(self.nonoastargac.astar.openlist)>0:
+            self.parent.after(100, self.run)
+
+        print "nodes created: " + str(self.nonoastargac.astar.nodes_created)
+        print "nodes expanded: " +str(self.nonoastargac.astar.nodes_expanded)
+        print "length of path: "+ str(len(self.nonoastargac.astar.findpath(self.nonoastargac.astar.searchstate)))
+
+
 
 
     def redraw(self,rows,cols):
@@ -59,6 +76,19 @@ class Gui:
                         fillcolor = "white"
                         outlinecol ="white"
                     self.canvas.itemconfig(self.rect_dict[(i,j)],fill = fillcolor,outline=outlinecol)
+        for i in (range(len(rows))):
+            row_list = self.nonoastargac.astar.searchstate.domains[rows[i]]
+            if len(row_list) == 1:
+                row_list = row_list[0]
+                for j in range(len(rows)-1):
+                    if row_list[j] is True:
+                        fillcolor = "black"
+                        outlinecol = "white"
+                    else:
+                        fillcolor = "white"
+                        outlinecol ="white"
+
+                    self.canvas.itemconfig(self.rect_dict[(j,len(rows)-1-i)],fill = fillcolor,outline=outlinecol)
 
     def drawMap(self):
         squarewidth =self.width/len(self.nonoastargac.csp.colvars)

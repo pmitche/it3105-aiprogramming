@@ -95,10 +95,13 @@ class mod3GAC(GAC):
     ]'''
     def revise(self, searchstate, statevariable, focal_constraint):
         revised = False
-        for value in searchstate.domains[statevariable]:
-            satisfies_constraint = False
-            for other_variable in focal_constraint.vertices:
-                if other_variable != statevariable:
+        for other_variable in focal_constraint.vertices:
+            if other_variable != statevariable:
+                boolset = set()
+                for other_value in searchstate.domains[other_variable]:
+                    boolset.add(other_value[statevariable.index])
+                for value in searchstate.domains[statevariable]:
+                    satisfies_constraint = False
                     for some_value in searchstate.domains[other_variable]:
                         if focal_constraint.function(value[other_variable.index],some_value[statevariable.index]):
                             satisfies_constraint = True
@@ -106,6 +109,15 @@ class mod3GAC(GAC):
                     if not satisfies_constraint:
                         searchstate.domains[statevariable].remove(value)
                         revised = True
+                    else:
+                        if len(boolset) >0:
+                            if not value[other_variable.index] in boolset:
+                                print "here"
+                                searchstate.domains[statevariable].remove(value)
+
+
+
+
         return revised
 
 
