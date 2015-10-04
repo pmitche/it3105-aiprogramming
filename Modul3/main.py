@@ -11,13 +11,6 @@ __author__ = 'paulpm'
 
 
 
-class NoNoConstraint(Constraint):
-    def __init__(self, vertices, exp):
-        super(NoNoConstraint,self).__init__(vertices,exp)
-
-    def check_if_satisfies(self,focal_list,other_list,focal_index,other_index):
-        return self.function(focal_list[other_index],other_list[focal_index])
-
 class Variable:
     def __init__(self, index, type, size):
         self.size = size
@@ -41,7 +34,6 @@ class NoNoState(CspState):
         self.bannedkeys =[]
 
     def calculate_neighbours(self, csp):
-
         neighbours = []
         smallest = float('inf')
         smallest_domain_key = None
@@ -88,7 +80,7 @@ class mod3GAC(GAC):
     def generate_constraints(self):
         for rowvar in self.rowvars:
             for colvar in self.colvars:
-                constraint = NoNoConstraint([rowvar, colvar], "x == y")
+                constraint = Constraint([rowvar, colvar], "x == y")
                 self.CNET.add_constraint(rowvar, constraint)
                 self.CNET.add_constraint(colvar, constraint)
 
@@ -101,24 +93,6 @@ class mod3GAC(GAC):
     [T,T,T,T,F,F,F,F]
     [F,F,T,F,T,T,F,F]
     ]'''
-
-
-
-
-    def add_all_tuples_in_which_variable_occurs(self, focal_state, focal_variable, focal_constraint):
-        for constraint in self.CNET.constraints[focal_variable]:
-            if constraint != focal_constraint:
-                for variable in constraint.get_other(focal_variable):
-                    if variable != focal_variable:
-                        self.queue.append((focal_state, variable, constraint))
-
-
-    def add_all_tuples_specific_constraint(self,focal_state,focal_variable):
-        for focal_constraint in self.CNET.constraints[focal_variable]:
-            for other_var in focal_constraint.get_other(focal_variable):
-                if other_var != other_var:
-                    self.queue.append((focal_state, other_var, focal_constraint))
-
     def revise(self, searchstate, statevariable, focal_constraint):
         revised = False
         for value in searchstate.domains[statevariable]:
@@ -126,8 +100,7 @@ class mod3GAC(GAC):
             for other_variable in focal_constraint.vertices:
                 if other_variable != statevariable:
                     for some_value in searchstate.domains[other_variable]:
-                        if focal_constraint.check_if_satisfies(value, some_value,
-                                                               statevariable.index,other_variable.index):
+                        if focal_constraint.function(value[other_variable.index],some_value[statevariable.index]):
                             satisfies_constraint = True
                             break
                     if not satisfies_constraint:
@@ -136,105 +109,109 @@ class mod3GAC(GAC):
         return revised
 
 
-def main():
-    csp = create_csp("nono-sailboat.txt")
-    csp.generate_constraints()
-    astar = Astarmod2(csp)
+class NonoAstarGac:
+
+    def __init__(self,filename):
+        self.csp = self.create_csp(filename)
+        self.astar = Astarmod2(self.csp)
+        self.generate_constraints()
+        self.initialize_queue()
+
+
+    def run(self):
+        while len(self.astar.openlist)>0:
+            self.astar.do_one_step()
+        for key in self.astar.searchstate.domains.keys():
+            print key, self.astar.searchstate.domains[key]
 
 
 
-    csp.initialize_queue(astar.searchstate)
-    csp.domain_filter()
-    for key in astar.searchstate.domains.keys():
-        print key, astar.searchstate.domains[key]
+    def initialize_queue(self):
+        self.csp.initialize_queue(self.astar.searchstate)
+
+    def generate_constraints(self):
+        self.csp.generate_constraints()
+
+    def domainfilter(self):
+        self.csp.domain_filter()
+
+
+    def create_true_false_array(self, positionlist, lengthlist, length):
+        return_array = [False]*length
+        positionlist = list(positionlist)
+        for i in range(len(positionlist)):
+            for j in range(positionlist[i], positionlist[i] + lengthlist[i]):
+                return_array[j] = True
+        return return_array
+
+    def generate_segment_domains(self,segments, length):
+        segment_start_ranges = [0]
+        segment_end_ranges = []
+        start_total = 0
+
+        for i in range(1, len(segments)):
+            start_total += segments[i-1] + 1
+            segment_start_ranges.append(start_total)
+
+        for j in range(0, len(segments)):
+            end_total = length + 1
+            for k in range(j, len(segments)):
+                end_total -= segments[k] + 1
+            segment_end_ranges.append(end_total)
+
+        segment_domains = []
+        for k in range(len(segments)):
+            segment_domains.append([x for x in range(segment_start_ranges[k], segment_end_ranges[k]+1)])
+
+        return segment_domains
+
+    def calculate_permutations(self,segment_domains, segments):
+        permutations = list(itertools.product(*segment_domains))
+        for list_element in copy.deepcopy(permutations):
+            for i in range(len(list_element)-1):
+                if isinstance(list_element, tuple):
+                    if not list_element[i] + segments[i]  < list_element[i+1]:
+                        if list_element in permutations:
+                            permutations.remove(list_element)
+                            break
+        return permutations
+
+
+    def create_csp(self,nonogram_file):
+            CNET = ConstraintNet()
+            csp = mod3GAC(CNET)
+            f = open( nonogram_file, 'r')
+            columns, rows = [int(x) for x in f.readline().strip().split(' ')]
+            for row in reversed(range(rows)):
+                segments = [int(x) for x in f.readline().strip().split(' ')]
+                segment_domains = self.generate_segment_domains(segments, columns)
+                permutations = self.calculate_permutations(segment_domains, segments)
+                domain_permutations = [self.create_true_false_array(x, segments, columns) for x in permutations]
+                var = Variable(row, "row", columns)
+                csp.rowvars.append(var)
+                csp.variables.append(var)
+                csp.domains[var] = []
+                for i in domain_permutations:
+                    if i not in csp.domains[var]:
+                        csp.domains[var].append(i)
+
+            for column in range(columns):
+                segments = [int(x) for x in f.readline().strip().split(' ')]
+                segment_domains = self.generate_segment_domains(segments, rows)
+                permutations = self.calculate_permutations(segment_domains, segments)
+                domain_permutations = [self.create_true_false_array(x, segments, rows) for x in permutations]
+
+                var = Variable(column, "column", row)
+                csp.colvars.append(var)
+                csp.variables.append(var)
+                csp.domains[var] = []
+                for i in domain_permutations:
+                    if i not in csp.domains[var]:
+                        csp.domains[var].append(i)
 
 
 
-def create_true_false_array(positionlist, lengthlist, length):
-    return_array = [False]*length
-    positionlist = list(positionlist)
-    for i in range(len(positionlist)):
-        for j in range(positionlist[i], positionlist[i] + lengthlist[i]):
-            return_array[j] = True
-    return return_array
+            f.close()
+            return csp
 
-
-
-
-def generate_segment_domains(segments, length):
-    segment_start_ranges = [0]
-    segment_end_ranges = []
-    start_total = 0
-
-    for i in range(1, len(segments)):
-        start_total += segments[i-1] + 1
-        segment_start_ranges.append(start_total)
-
-    for j in range(0, len(segments)):
-        end_total = length + 1
-        for k in range(j, len(segments)):
-            end_total -= segments[k] + 1
-        segment_end_ranges.append(end_total)
-
-    segment_domains = []
-    for k in range(len(segments)):
-        segment_domains.append([x for x in range(segment_start_ranges[k], segment_end_ranges[k]+1)])
-
-    return segment_domains
-
-
-def calculate_permutations(segment_domains, segments):
-    permutations = list(itertools.product(*segment_domains))
-    for list_element in copy.deepcopy(permutations):
-        for i in range(len(list_element)-1):
-            if isinstance(list_element, tuple):
-                if not list_element[i] + segments[i]  < list_element[i+1]:
-                    if list_element in permutations:
-                        permutations.remove(list_element)
-                        break
-    return permutations
-
-
-def create_csp(nonogram_file):
-        CNET = ConstraintNet()
-        csp = mod3GAC(CNET)
-        f = open("nonograms/" + nonogram_file, 'r')
-        columns, rows = [int(x) for x in f.readline().strip().split(' ')]
-
-        for row in reversed(range(rows)):
-            segments = [int(x) for x in f.readline().strip().split(' ')]
-            segment_domains = generate_segment_domains(segments, columns)
-            permutations = calculate_permutations(segment_domains, segments)
-            domain_permutations = [create_true_false_array(x, segments, columns) for x in permutations]
-            var = Variable(row, "row", columns)
-            csp.rowvars.append(var)
-            csp.variables.append(var)
-            csp.domains[var] = []
-            for i in domain_permutations:
-                if i not in csp.domains[var]:
-                    csp.domains[var].append(i)
-
-        for column in range(columns):
-            segments = [int(x) for x in f.readline().strip().split(' ')]
-            segment_domains = generate_segment_domains(segments, rows)
-            permutations = calculate_permutations(segment_domains, segments)
-            domain_permutations = [create_true_false_array(x, segments, rows) for x in permutations]
-
-            var = Variable(column, "column", row)
-            csp.colvars.append(var)
-            csp.variables.append(var)
-            csp.domains[var] = []
-            for i in domain_permutations:
-                if i not in csp.domains[var]:
-                    csp.domains[var].append(i)
-
-
-
-        f.close()
-        return csp
-
-
-
-if __name__ == "__main__":
-    main()
 
