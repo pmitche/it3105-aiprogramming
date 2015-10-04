@@ -70,7 +70,7 @@ class NoNoState(CspState):
         for assumption in self.domains[smallest_domain_key]:
             assignment = copy.deepcopy(self.domains)
             assignment[smallest_domain_key] = [assumption]
-            kid = CspState(assignment)
+            kid = NoNoState(assignment)
             csp.rerun(kid, smallest_domain_key)
             legal = True
             kid.calculate_heuristics()
@@ -81,8 +81,6 @@ class NoNoState(CspState):
                 neighbours.append(kid)
         print neighbours
         return neighbours
-
-
 
     def __hash__(self):
         return hash(self.id)
@@ -116,35 +114,37 @@ class mod3GAC(GAC):
     [F,F,T,F,T,T,F,F]
     ]'''
     def revise(self, searchstate, focal_variable, focal_constraint):
+        if focal_variable.type == "row":
+            return False
         other_var = focal_constraint.get_other(focal_variable)[0]
         this_index = focal_variable.index
         other_index = other_var.index
         other_var_domain = searchstate.domains[other_var]
         revised = False
-        for this_value in copy.deepcopy(searchstate.domains[focal_variable]):
+        for this_combination in searchstate.domains[focal_variable]:
             all_true = True
             all_false = True
             breaks_constraints = False
-            for other_value in other_var_domain:
-                if len(other_var_domain) ==1:
-                    if not focal_constraint.function(this_value[other_var.index], other_value[focal_variable.index]):
+            for other_combination in other_var_domain:
+                if len(other_var_domain) == 1 and isinstance(other_combination,list):
+                    if not (focal_constraint.function(this_combination[other_index],other_combination[this_index])):
                         breaks_constraints = True
                         break
                 else:
-                    if other_value[this_index] is False:
+                    if other_combination[this_index] is False:
                         all_true = False
-                    elif other_value[this_index] is True:
+                    elif other_combination[this_index] is True:
                         all_false = False
             if all_true:
-                if this_value[other_index] is False:
+                if this_combination[other_index] is False:
                     breaks_constraints = True
-
             elif all_false:
-                if this_value[other_index] is True:
-                    breaks_constraints = True
-            if breaks_constraints:
-                searchstate.domains[focal_variable].remove(this_value)
+                if this_combination[other_index] is True:
+                    breaks_constraints  = True
 
+            if breaks_constraints:
+                searchstate.domains[focal_variable].remove(this_combination)
+                revised = True
         return revised
 
 
@@ -160,9 +160,10 @@ def main():
     astar = Astarmod2(csp)
     csp.initialize_queue(astar.searchstate)
     csp.domain_filter()
-    for key in astar.searchstate.domains.keys():
-        print astar.searchstate.domains[key]
 
+    check_key = None
+    for key in astar.searchstate.domains.keys():
+        print key, astar.searchstate.domains[key]
 
 def create_true_false_array(positionlist, lengthlist, length):
     return_array = [False]*length
@@ -203,7 +204,7 @@ def calculate_permutations(segment_domains, segments):
     for list_element in copy.deepcopy(permutations):
         for i in range(len(list_element)-1):
             if isinstance(list_element, tuple):
-                if not list_element[i] + segments[i] + 1 < list_element[i+1]:
+                if not list_element[i] + segments[i]  < list_element[i+1]:
                     #problem here.  Does not remove well enoguh
                     if list_element in permutations:
                         permutations.remove(list_element)
