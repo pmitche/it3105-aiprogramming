@@ -58,7 +58,8 @@ class GAC(object):
     def add_all_tuples_specific_constraint(self,focal_state,focal_variable):
         for focal_constraint in self.CNET.constraints[focal_variable]:
             for other_var in focal_constraint.get_other(focal_variable):
-                self.queue.append((focal_state, other_var, focal_constraint))
+                if other_var != focal_variable:
+                    self.queue.append((focal_state, other_var, focal_constraint))
 
     def rerun(self, state, var):
         self.add_all_tuples_specific_constraint(state,var)

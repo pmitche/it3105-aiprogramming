@@ -31,6 +31,7 @@ class Astar(object):
 
     # Have to implement this method because gui is main loop
     def do_one_step(self):
+        print "here"
         # if openlist is empty, no solution is found, return false
         if len(self.openlist) == 0:
             return False
@@ -44,7 +45,6 @@ class Astar(object):
         if self.searchstate.h == 0:
             self.openlist = []
             return self.findpath(self.searchstate)
-
 
         #add to closedlist this node is now about to be expanded
         self.closedlist.append(self.searchstate)
