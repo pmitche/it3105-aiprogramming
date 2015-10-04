@@ -1,6 +1,7 @@
 __author__ = 'sondredyvik'
 from common import state
 
+
 class StateMod1(state.State):
 
     def __init__(self, xpos, ypos, board, parent):

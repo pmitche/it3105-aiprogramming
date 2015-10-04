@@ -1,10 +1,7 @@
 __author__ = 'paulpm, sondredyvik'
-import variable as cspvariable
-import constraint as cspconstraint
+
 import cspstate as state
 from collections import deque
-import astarmod2
-import constraint
 
 '''
 NOTE
