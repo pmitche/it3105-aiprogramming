@@ -192,7 +192,7 @@ class NonoAstarGac:
     def create_csp(self, nonogram_file):
             CNET = ConstraintNet()
             csp = mod3GAC(CNET)
-            f = open("nonograms/" + nonogram_file, 'r')
+            f = open(nonogram_file, 'r')
             columns, rows = [int(x) for x in f.readline().strip().split(' ')]
             for row in reversed(range(rows)):
                 segments = [int(x) for x in f.readline().strip().split(' ')]

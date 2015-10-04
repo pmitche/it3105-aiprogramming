@@ -39,12 +39,12 @@ class astarGui(Frame):
 
         # create more pulldown menus
         editmenu = Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Board 1", command=lambda: self.setBoard("board1.txt"))
-        editmenu.add_command(label="Board 2", command=lambda: self.setBoard("board2.txt"))
-        editmenu.add_command(label="Board 3", command=lambda: self.setBoard("board3.txt"))
-        editmenu.add_command(label="Board 4", command=lambda: self.setBoard("board4.txt"))
-        editmenu.add_command(label="Board 5", command=lambda: self.setBoard("board5.txt"))
-        editmenu.add_command(label="Board 6", command=lambda: self.setBoard("board6.txt"))
+        editmenu.add_command(label="Board 1", command=lambda: self.setBoard("boards/board1.txt"))
+        editmenu.add_command(label="Board 2", command=lambda: self.setBoard("boards/board2.txt"))
+        editmenu.add_command(label="Board 3", command=lambda: self.setBoard("boards/board3.txt"))
+        editmenu.add_command(label="Board 4", command=lambda: self.setBoard("boards/board4.txt"))
+        editmenu.add_command(label="Board 5", command=lambda: self.setBoard("boards/board5.txt"))
+        editmenu.add_command(label="Board 6", command=lambda: self.setBoard("boards/board6.txt"))
         editmenu.add_command(label="Custom", command=lambda: self.openfile())
         menubar.add_cascade(label="Board", menu=editmenu)
 

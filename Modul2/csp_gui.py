@@ -32,12 +32,12 @@ class csp_gui:
 
         menubar = Menu(parent)
         boardmenu = Menu(menubar, tearoff=0)
-        boardmenu.add_command(label="Board 1", command=lambda: self.setboard("graph-color-1.txt"))
-        boardmenu.add_command(label="Board 2", command=lambda: self.setboard("graph-color-2.txt"))
-        boardmenu.add_command(label="Board 3", command=lambda: self.setboard("rand-50-4-color1.txt"))
-        boardmenu.add_command(label="Board 4", command=lambda: self.setboard("rand-100-4-color1.txt"))
-        boardmenu.add_command(label="Board 5", command=lambda: self.setboard("rand-100-6-color1.txt"))
-        boardmenu.add_command(label="Board 6", command=lambda: self.setboard("spiral-500-4-color1.txt"))
+        boardmenu.add_command(label="Board 1", command=lambda: self.setboard("graphs/graph-color-1.txt"))
+        boardmenu.add_command(label="Board 2", command=lambda: self.setboard("graphs/graph-color-2.txt"))
+        boardmenu.add_command(label="Board 3", command=lambda: self.setboard("graphs/rand-50-4-color1.txt"))
+        boardmenu.add_command(label="Board 4", command=lambda: self.setboard("graphs/rand-100-4-color1.txt"))
+        boardmenu.add_command(label="Board 5", command=lambda: self.setboard("graphs/rand-100-6-color1.txt"))
+        boardmenu.add_command(label="Board 6", command=lambda: self.setboard("graphs/spiral-500-4-color1.txt"))
         boardmenu.add_command(label="Custom board", command=lambda: self.openfile())
         boardmenu.add_separator()
         boardmenu.add_command(label="Exit", command=parent.quit)
@@ -69,7 +69,7 @@ class csp_gui:
     def run(self,k):
         if self.running is False:
             if self.board is None:
-                self.setboard("spiral-500-4-color1.txt")
+                self.setboard("graphs/spiral-500-4-color1.txt")
             self.canvas.delete("all")
             self.running = True
             self.csp = self.create_csp(self.board, k)
@@ -145,7 +145,7 @@ class csp_gui:
     def create_csp(self, graph_file, domain_size):
         self.CNET = constraintnet.ConstraintNet()
         gac = GAC(self.CNET)
-        f = open("graphs/" + graph_file, 'r')
+        f = open(graph_file, 'r')
         number_of_vertices, number_of_edges = [int(x) for x in f.readline().strip().split(' ')]
 
         for i in range(number_of_vertices):
