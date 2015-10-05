@@ -11,6 +11,9 @@ class NoNoState(CspState):
         self.id = uuid.uuid4()
         self.bannedkeys =[]
 
+    # This method generates a state based on each possible assumption in the domain with the fewest different
+    # possibilities. It then reduces their domains using gac rerun.
+    # If the domain is valid, the state is returned.
     def calculate_neighbours(self, csp):
         neighbours = []
         smallest = float('inf')

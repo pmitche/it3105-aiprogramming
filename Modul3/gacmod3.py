@@ -12,14 +12,8 @@ class mod3GAC(GAC):
         self.rowvars = []
         self.colvars = []
 
-
-    def print_domain_lengths(self,domain):
-        sum = 0
-        for key in domain.keys():
-            sum +=len( domain[key])
-        print sum
-
     def generate_constraints(self):
+        """ Generates all the constraints for this problem and adds them to the constraint net """
         for rowvar in self.rowvars:
             for colvar in self.colvars:
                 constraint = Constraint([rowvar, colvar], "x == y")
@@ -28,14 +22,25 @@ class mod3GAC(GAC):
 
     def generate_initial_searchstate(self):
         return NoNoState(self.domains)
-    '''This revise function assumes that the domain of a variable is a list of lists containing T/F variables
-    EXAMPLE:
-    [
-    [T,F,T,T,T,T,F,T]
-    [T,T,T,T,F,F,F,F]
-    [F,F,T,F,T,T,F,F]
-    ]'''
+
     def revise(self, searchstate, statevariable, focal_constraint):
+        """ Revise the domain of a variable based on the domains of a constraint
+
+        Args:
+            :param searchstate: the current search state
+            :param statevariable: the focal variable on which to revise its domain (x)
+            :param focal_constraint: the constraint used to determine which of the focal variables domains to remove (C)
+        Returns:
+            :return: Boolean indicating whether the focal variable was revised or not
+        Comment:
+            This revise function assumes that the domain of a variable is a list of lists containing T/F variables
+            EXAMPLE:
+            [
+            [T,F,T,T,T,T,F,T]
+            [T,T,T,T,F,F,F,F]
+            [F,F,T,F,T,T,F,F]
+            ]
+        """
         revised = False
         for other_variable in focal_constraint.vertices:
             if other_variable != statevariable:
@@ -56,8 +61,5 @@ class mod3GAC(GAC):
                             if not value[other_variable.index] in boolset:
                                 print "here"
                                 searchstate.domains[statevariable].remove(value)
-
-
-
 
         return revised
