@@ -7,6 +7,7 @@ class State(object):
         # Initialises the searchstate. It has to know about board to calculate neighbours
         self.h = float('inf')
         self.g = float('inf')
+        self.nodes_created = 0
         self.children = []
         self.parent = None
         self.f = self.g + self.h
