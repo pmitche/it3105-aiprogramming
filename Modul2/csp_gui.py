@@ -5,7 +5,7 @@ from tkFileDialog import askopenfilename
 from gac import GAC
 from common import constraint as cspconstraint
 from common import constraintnet
-from common import variable as cspvariable
+import variable as cspvariable
 import astarmod2
 import time
 
@@ -18,9 +18,9 @@ class csp_gui:
         self.parent = Frame(parent, width =self.width, height =self.width)
         self.vertex_dict = {}
         self.edge_dict = {}
-        self.colors = [0, 1, 2, 3, 4, 5, 6, 7]
+        self.colors = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         self.number_to_color = {0: 'blue', 1: "green", 2: "yellow", 3: "chocolate", 4: "dark khaki", 5: "seashell2",
-                                6: "red", 7: "cadet blue"}
+                                6: "red", 7: "cadet blue",8:"purple",9:"orange"}
         self.csp = None
         self.canvas = Canvas(master=self.parent,width= self.width, height =self.height)
         self.canvas.pack()
@@ -28,6 +28,8 @@ class csp_gui:
         self.board = None
         self.CNET = None
         self.running = False
+        self.unsatisfied_constraints = 0
+        self.unfill_vertexes = 0
 
 
         menubar = Menu(parent)
@@ -52,6 +54,8 @@ class csp_gui:
         k_menu.add_command(label="K=6", command=lambda: self.run(6))
         k_menu.add_command(label="K=7", command=lambda: self.run(7))
         k_menu.add_command(label="K=8", command=lambda: self.run(8))
+        k_menu.add_command(label="K=9", command=lambda: self.run(9))
+        k_menu.add_command(label="K=10", command=lambda: self.run(10))
         menubar.add_cascade(label="Colors", menu=k_menu)
 
         speedmenu = Menu(menubar,tearoff=0)
@@ -111,9 +115,12 @@ class csp_gui:
             for key in self.CNET.constraints.keys():
                 for constraint in self.CNET.constraints[key]:
                     if self.astar.searchstate.domains[constraint.vertices[0]] ==self.astar.searchstate.domains[constraint.vertices[1]]:
+                        self.unsatisfied_constraints +=1
                         Canvas.create_text(self.canvas, 400, 400, fill="red", text="NO SOLUTION FOUND")
-            print "nodes created: " + str(self.astar.nodes_created)
-            print "nodes expanded: " +str(self.astar.nodes_expanded)
+                    if len(self.astar.searchstate.domains[key])>1:
+                        self.unfill_vertexes+= len(self.astar.searchstate.domains[key])
+            print "Unsatisfied constraints: "+str(self.unsatisfied_constraints)
+            print "Unfilled vertexes:" + str(self.unfill_vertexes)
             print len(self.astar.findpath(self.astar.searchstate))
             print time.time() - self.time
             self.running = False

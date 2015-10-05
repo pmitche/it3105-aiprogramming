@@ -39,7 +39,7 @@ class StateMod1(state.State):
 
         if not self.node_out_of_bounds(x, y - 1) and not self.is_wall(x, y - 1):
             neighbours.append(StateMod1(x, y - 1, board, self))
-
+        self.nodes_created += len(neighbours)
         return neighbours
 
     def is_wall(self, x, y):

@@ -47,6 +47,7 @@ class CspState(state.State):
 
             if legal is True:
                 neighbours.append(kid)
+        self.nodes_created += len(neighbours)
         return neighbours
 
     #The heuristics here is the length of all (domains -1).

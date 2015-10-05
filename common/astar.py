@@ -31,13 +31,54 @@ class Astar(object):
 
     # Have to implement this method because gui is main loop
     def do_one_step(self):
-        raise NotImplementedError
+        # if openlist is empty, no solution is found, return false
+        if len(self.openlist) == 0:
+            return False
+
+
+        # pop element with highest F from openlist
+        self.searchstate = self.popfromopen()
+        self.nodes_expanded +=1
+
+        #remove from support structure
+        del self.opendict[hash(self.searchstate)]
+        if self.searchstate.h == 0:
+            self.openlist = []
+            length = 0
+            for state in self.findpath(self.searchstate):
+                length += self.arc_cost(state,state.parent)
+            print "total length of path: " + str(length-1)
+            print "nodes created: " + str(self.nodes_created)
+            print "nodes expanded: " + str(self.nodes_expanded)
+            return self.findpath(self.searchstate)
+
+        self.closeddict[hash(self.searchstate)] = self.searchstate
+        #Generate children, these children now get searchstate as parent
+        successors = self.generate_successors()
+        self.nodes_created += self.searchstate.nodes_created
+        #for each child
+        for succ in successors:
+            if hash(succ) in self.opendict:
+                succ = self.opendict[hash(succ)]
+            if hash(succ) in self.closeddict:
+                succ = self.closeddict[hash(succ)]
+            self.searchstate.children.append(succ)
+            if hash(succ) not in self.opendict and hash(succ) not in self.closeddict:
+                self.attach_and_eval(succ, self.searchstate)
+                self.opendict[hash(succ)] = succ
+                self.appendtoopen(succ)
+            elif self.searchstate.g + self.arc_cost(succ, self.searchstate)< succ.g:
+                self.attach_and_eval(succ, self.searchstate)
+                if hash(succ) in self.closeddict:
+                    self.propagate_path_improvement(self.closeddict[hash(succ)])
+        return self.findpath(self.searchstate)
 
     def generate_openlist(self):
         raise NotImplementedError
 
     def generate_initial_searchstate(self):
         raise NotImplementedError
+
     def generate_successors(self):
         raise NotImplementedError
 
