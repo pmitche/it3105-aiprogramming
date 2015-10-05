@@ -8,6 +8,7 @@ import board
 
 class astarGui(Frame):
     def __init__(self, parent, rows, columns, size=10, color1="white", color2="white"):
+        #These are all variables for the gui
         self.parent = Frame(parent, width=300, height=300)
         self.parent.pack()
         self.rows = rows
@@ -66,16 +67,15 @@ class astarGui(Frame):
                 self.setBoard("boards/board1.txt")
             else:
                 self.setBoard(self.board.filename)
-            self.searchsnake = []
-            self.oldsnake = []
-            self.alg = astarmod1.Astarmod1(type, self.board)
+            self.searchsnake = [] #used for visualisation
+            self.oldsnake = []      #used for visualisation
+            self.alg = astarmod1.Astarmod1(type, self.board) #create an instance of astar
             self.running = True
-            # while len(self.alg.openlist)> 0:
             self.do_one_step()
 
 
     def do_one_step(self):
-        self.searchsnake = self.alg.do_one_step()
+        self.searchsnake = self.alg.do_one_step() # Performs one iteration of astar. The rest is gui
         if not self.oldsnake is None:
             for el in self.oldsnake:
                 self.canvas.itemconfig(self.rect_dict[(int(el.xpos), int(self.board.dimensions[1]) - 1 - int(el.ypos))],
@@ -95,7 +95,7 @@ class astarGui(Frame):
 
         self.parent.after(10, lambda: self.do_one_step())
 
-
+    #The rest is gui
     def openfile(self):
         self.setBoard(askopenfilename(parent=self.parent))
 

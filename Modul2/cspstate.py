@@ -9,18 +9,22 @@ class CspState(state.State):
         self.domains = domains
         super(CspState, self).__init__()
 
+    #If the domain of any variable is zero, it is a contradictory state
     def check_if_contradictory(self):
         for key in self.domains.keys():
             if len(self.domains[key]) == 0:
                 return True
         return False
-
+    #If all domains have length one, we have a goal state.
     def check_if_goal_state(self):
         for key in self.domains.keys():
             if not len(self.domains[key]) == 1:
                 return False
         return True
 
+    # This method generates a state based on each possible assumption in the domain with the fewest different
+    # possibilities. It then reduces their domains using gac rerun.
+    # If the domain is valid, the state is returned.
     def calculate_neighbours(self, csp):
         neighbours = []
         smallest = float('inf')
@@ -43,10 +47,9 @@ class CspState(state.State):
 
             if legal is True:
                 neighbours.append(kid)
-
-
         return neighbours
 
+    #The heuristics here is the length of all (domains -1).
     def calculate_heuristics(self):
         self.h = 0
         for key in self.domains.keys():

@@ -54,6 +54,8 @@ class Astarmod1(astar.Astar):
     def arc_cost(self, child, parent):
         return 1
 
+
+    # appends to open in a different matter for each algorithm
     def appendtoopen(self, state):
         if self.type == "astar":
             heappush(self.openlist, state)
@@ -61,7 +63,7 @@ class Astarmod1(astar.Astar):
             self.openlist.append(state)
         if self.type == "dfs":
             self.openlist.append(state)
-
+     # pops from open in a different matter for each algorithm
     def popfromopen(self):
         if self.type == "astar":
             return heappop(self.openlist)
@@ -70,9 +72,11 @@ class Astarmod1(astar.Astar):
         if self.type == "dfs":
             return self.openlist.pop()
 
+
+    #forwards call to generate initial searchstate
     def generate_initial_searchstate(self):
         return self.board.generateInitialState()
-
+    #Generates openlist
     def generate_openlist(self):
         if self.type == "bfs":
             openlist = deque()

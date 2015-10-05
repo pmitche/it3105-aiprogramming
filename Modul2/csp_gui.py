@@ -81,7 +81,7 @@ class csp_gui:
             self.run_astar()
 
 
-
+    #gui method to put all coordinates on the canvas
     def normalize_coordinates(self,xpos,ypos):
         highestx = max([float(var.x) for var in self.csp.variables])
         lowestx = min([float(var.x )for var in self.csp.variables])
@@ -94,7 +94,7 @@ class csp_gui:
         new_y = (((float(ypos)-lowesty)*new_range)/old_range) + 20
         return new_x, new_y
 
-
+    #This method performs one iteration of astar as long as there are more elements on openlist
     def run_astar(self):
         self.astar.do_one_step()
         for key in self.astar.searchstate.domains.keys():

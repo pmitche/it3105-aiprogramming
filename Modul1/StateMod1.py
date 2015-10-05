@@ -3,6 +3,7 @@ from common import state
 
 
 class StateMod1(state.State):
+    ##The methods in this document have names that explain them
 
     def __init__(self, xpos, ypos, board, parent):
         self.board = board
@@ -12,10 +13,9 @@ class StateMod1(state.State):
         self.parent = parent
         super(StateMod1, self).__init__()
         self.calculate_heuristic()
-
+    #overrides built in method
     def __repr__(self):
         return str(self.xpos) + " " + str(self.ypos)
-
     def update_f(self):
         self.calculate_heuristic()
         self.f = self.h + self.g
