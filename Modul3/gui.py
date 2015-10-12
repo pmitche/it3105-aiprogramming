@@ -3,6 +3,8 @@ from Tkinter import *
 from tkFileDialog import askopenfilename
 
 from nonogram import NonoAstarGac
+import cProfile
+
 class Gui:
     def __init__(self, parent,width=800, height=800 ):
         self.width = width
@@ -106,4 +108,4 @@ class Gui:
 
 root = Tk()
 gui = Gui(root)
-root.mainloop()
+cProfile.run("gui.setboard('nonograms/nono3.txt')")

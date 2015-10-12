@@ -93,6 +93,7 @@ class astarGui(Frame):
             self.running = False
             return True
 
+
         self.parent.after(10, lambda: self.do_one_step())
 
     #The rest is gui
