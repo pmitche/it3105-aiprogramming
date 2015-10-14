@@ -1,6 +1,6 @@
 from Tkinter import *
 from board import Board
-
+from ExpectimaxChooser import ExpectimaxChooser
 GRID_LEN              = 4
 GRID_PADDING          = 10
 SIZE                  = 500
@@ -33,24 +33,42 @@ class GameWindow(Frame):
     def __init__(self):
         Frame.__init__(self)
 
+
         self.grid()
         self.master.title('2048')
         self.board = Board()
-        self.board.place_tile()
+        self.expectimax = ExpectimaxChooser(self.board)
+        self.board.place_tile(self.board.state)
         self.grid_cells = []
         self.init_grid()
-        self.update_view(self.board.board)
+        self.update_view(self.board.state.board)
         self.bind("<KeyPress>", self.onKeyPress)
+
 
 
 
     #end
     def onKeyPress(self,direction):
-        if self.board.move(direction):
-            self.update_view(self.board.board)
+        print self.board.state, "here "
+        if self.board.move(direction, self.board.state):
+            print self.board.state, "but then"
+            self.update_view(self.board.state.board)
+            self.board.place_tile(self.board.state)
+            self.update_view(self.board.state.board)
+            print self.expectimax.recommend_move(self.board.state)
 
 
-    
+    def do_one_move(self):
+        if self.board.move(self.expectimax.recommend_move(self.board.state,4),self.board.state):
+            self.board.place_tile(self.board.state)
+            self.update_view(self.board.state.board)
+            self.after(10, lambda  : self.do_one_move())
+        else:
+            print "FAIL"
+
+
+
+
     def init_grid(self):
         background = Frame(self, bg = BACKGROUND_COLOR_GAME, width = SIZE, height = SIZE )
         background.grid()
@@ -84,7 +102,7 @@ class GameWindow(Frame):
                                                 text = "",
                                                 bg   = BACKGROUND_COLOR_CELL_EMPTY)
                 else:
-                    foreground_color = '#f9f6f2' if digit > 2 else '#776e65'
+                    foreground_color = '#f9f6f2' if digit > 4 else '#776e65'
                     number = digit # the human friendly representation
                     
                     self.grid_cells[i][j].configure(
@@ -102,7 +120,7 @@ root.bind('<Left>', lambda x : game.onKeyPress("left") )
 root.bind('<Up>', lambda x : game.onKeyPress("up") )
 root.bind('<Right>', lambda x : game.onKeyPress("right"))
 root.bind('<Down>', lambda x : game.onKeyPress("down"))
-
+game.do_one_move()
 
 root.mainloop()
 
