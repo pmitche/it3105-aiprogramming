@@ -1,7 +1,7 @@
 __author__ = 'sondredyvik'
 from TileChooser import TileChooser
 from random import randint
-import os
+
 class Board():
     def __init__(self):
         self.board = [[0 for x in range(4)]for i in range (4)]
@@ -140,35 +140,34 @@ class Board():
                             break
         return moved
 
-    def listen_for_move(self):
+    def move(self, direction):
         print "Score: " + str(self.score)
-
         self.print_self()
-        move = raw_input("Do a move (awsd):\n")
-        legal_moves = ["a","d","s","w","q"]
-        if move not in legal_moves:
-            print "NOT LEGAL"
-            return
-        else:
-            if move == "w":
-                if self.move_all_tiles_up():
-                    self.place_tile()
-                    print "moved up"
+        tile_placed = False
+        move = direction
+        if move == "up":
+            if self.move_all_tiles_up():
+                self.place_tile()
+                tile_placed = True
+                print "moved up"
 
-            elif move =="s":
-                if self.move_all_tiles_down():
-                    print "moved down"
-                    self.place_tile()
-            elif move =="a":
-                if self.move_all_tiles_left():
-                    print "moved left"
-                    self.place_tile()
-            elif move =="d":
-                if self.move_all_tiles_right():
-                    print "moved right"
-                    self.place_tile()
-            elif move =="q":
-                self.full = True
+        elif move =="down":
+            if self.move_all_tiles_down():
+                print "moved down"
+                self.place_tile()
+                tile_placed = True
+        elif move =="left":
+            if self.move_all_tiles_left():
+                print "moved left"
+                self.place_tile()
+                tile_placed = True
+        elif move =="right":
+            if self.move_all_tiles_right():
+                print "moved right"
+                self.place_tile()
+                tile_placed = True
+        return tile_placed
+
 
 
 
