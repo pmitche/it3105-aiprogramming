@@ -69,7 +69,7 @@ class ExpectimaxChooser:
 
     def create_children_for_random_node(self, node):
         node_children = []
-        free_slots = self.board.get_free_positions(node)
+        free_slots = self.board.get_free_cells(node)
         for slot in free_slots:
             new_node = State(deepcopy(node.board),deepcopy(node.score))
             n = randint(1,10)
