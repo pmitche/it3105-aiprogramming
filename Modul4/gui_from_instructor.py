@@ -1,4 +1,5 @@
 from Tkinter import *
+
 from board import Board
 from ExpectimaxChooser import ExpectimaxChooser
 GRID_LEN              = 4
@@ -59,11 +60,14 @@ class GameWindow(Frame):
 
 
     def do_one_move(self):
-        if self.board.move(self.expectimax.recommend_move(self.board.state,4),self.board.state):
+        move = self.expectimax.recommend_move(self.board.state, 0,True)
+        if self.board.move(move,self.board.state):
+
             self.board.place_tile(self.board.state)
             self.update_view(self.board.state.board)
             self.after(10, lambda  : self.do_one_move())
         else:
+
             print "FAIL"
 
 
