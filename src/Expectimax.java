@@ -5,7 +5,7 @@ import java.util.ArrayList;
  */
 public class Expectimax {
 
-    private static final int DEPTH = 6;
+    private static final int DEPTH = 8;
     private static final int[][] WEIGHT_MATRIX = new int[][]{
             {0,1,2,3},
             {6,5,5,4},
