@@ -8,7 +8,7 @@ public class GUI extends JPanel {
     private static final Color[] TILE_COLORS = new Color[]{new Color(0x9e948a), new Color(0xeee4da), new Color(0xede0c8), new Color(0xf2b179), new Color(0xf59563), new Color(0xf67c5f),
             new Color(0xf65e3b), new Color(0xedcf72), new Color(0xedcc61), new Color(0xedc850), new Color(0xedc53f), new Color(0xedc22e), new Color(0x3c3a32)};
     private static final Color[] TEXT_COLORS = new Color[]{new Color(0x776E65), new Color(0xf9f6f2)};
-    private int[] board = null;
+    private int[] board = new int[16];
 
 
     public static GUI getWindow() {
@@ -76,7 +76,7 @@ public class GUI extends JPanel {
 
         Board board = new Board();
         Expectimax ai = new Expectimax(board);
-        int[] grid = convert(board.getGrid());
+        int[] grid;
         gui.drawBoard(new int[16]);
 
         while (board.isAvailableMoves()) {

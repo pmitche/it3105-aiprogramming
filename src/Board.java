@@ -197,9 +197,6 @@ public class Board {
     }
 
     public boolean isAvailableMoves() {
-        if (getFreeTiles().size() > 0) {
-            return true;
-        }
 
         Board copy = copy();
         if (copy.moveDown() || copy.moveUp() || copy.moveLeft() || copy.moveRight()) {

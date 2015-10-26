@@ -1,17 +1,17 @@
-import java.util.ArrayList;
-
 /**
  * Created by paulpm on 22/10/15.
  */
 public class Expectimax {
 
-    private static final int DEPTH = 8;
+    private static final int DEPTH = 5;
     private static final int[][] WEIGHT_MATRIX = new int[][]{
             {0,1,2,3},
             {6,5,5,4},
             {7,9,12,15},
             {55,35,25,20}
     };
+
+
     private Board board;
 
     public Expectimax(Board board) {
@@ -33,7 +33,7 @@ public class Expectimax {
         for (Direction direction : Direction.values()) {
             Board copy = board.copy();
             if (copy.move(direction)) {
-                double currentScore = expectimax(copy, depth - 1);
+                double currentScore = expectimax(copy, depth );
                 if (currentScore > maxScore) {
                     maxScore = currentScore;
                     bestDirection = direction;
@@ -42,7 +42,6 @@ public class Expectimax {
         }
         return bestDirection;
     }
-
     /**
      * Expectimax algorithm. If we, the AI player, are to play at node (e.g. if the depth of the search tree
      * is even), we check which of the four directions will yield the highest score if moved to. Otherwise,
@@ -54,11 +53,9 @@ public class Expectimax {
      */
     public double expectimax(Board board, int depth) {
         double score = Double.NEGATIVE_INFINITY;
-
         if (depth == 0) {
-            return !board.isAvailableMoves() ? score : calculateHeuristic(board);
+            return !board.isAvailableMoves() ? score : calculateUtility(board);
         }
-
         else if (depth % 2 == 0) {
             for (Direction direction : Direction.values()) {
                 Board copy = board.copy();
@@ -67,16 +64,13 @@ public class Expectimax {
                 }
             }
         }
-
         else if (depth % 2 == 1) {
             score = 0;
             for (Coordinate coordinate : board.getFreeTiles()) {
                 Board alpha = board.copy();
                 Board beta = board.copy();
-
                 alpha.placeTile(coordinate, 2);
                 beta.placeTile(coordinate, 4);
-
                 score += 0.9 * expectimax(alpha, depth - 1);
                 score += 0.1 * expectimax(beta, depth - 1);
             }
@@ -91,8 +85,9 @@ public class Expectimax {
      * @param node - A Board object (state) on which to calculate the heuristic for.
      * @return The score of the current board based on the Snake Pattern heuristic.
      */
-    private double calculateHeuristic(Board node) {
-        int value = 0;
+    private double calculateUtility(Board node) {
+
+        double value = 0;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 value += node.getGrid()[i][j]*WEIGHT_MATRIX[i][j]*2;
@@ -100,6 +95,8 @@ public class Expectimax {
         }
         return value;
     }
+
+
 
     /**
      * AI plays 2048. First retrieve the best direction to move given the current state, and dynamically look ahead
@@ -109,28 +106,13 @@ public class Expectimax {
     public void run() {
         Board board = getBoard();
 
-        Direction bestDirection = board.getFreeTiles().size() < 3 ?
+        Direction bestDirection = board.getFreeTiles().size() < 4 ?
                 recommendMove(board, DEPTH + 2) : recommendMove(board, DEPTH);
 
-        try {
+
             board.move(bestDirection);
             board.placeRandomTile();
 
-        } catch (NullPointerException ex) {
-
-            try {
-                bestDirection = board.getFreeTiles().size() < 3 ?
-                        recommendMove(board, 1) : recommendMove(board, 1);
-                board.move(bestDirection);
-                board.placeRandomTile();
-
-
-            } catch (NullPointerException e) {
-                System.out.println("No more available moves!");
-
-
-            }
-        }
 
         }
 
