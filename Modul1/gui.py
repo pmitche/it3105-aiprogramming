@@ -8,6 +8,7 @@ import board
 
 class astarGui(Frame):
     def __init__(self, parent, rows, columns, size=10, color1="white", color2="white"):
+        #These are all variables for the gui
         self.parent = Frame(parent, width=300, height=300)
         self.parent.pack()
         self.rows = rows
@@ -39,12 +40,12 @@ class astarGui(Frame):
 
         # create more pulldown menus
         editmenu = Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Board 1", command=lambda: self.setBoard("board1.txt"))
-        editmenu.add_command(label="Board 2", command=lambda: self.setBoard("board2.txt"))
-        editmenu.add_command(label="Board 3", command=lambda: self.setBoard("board3.txt"))
-        editmenu.add_command(label="Board 4", command=lambda: self.setBoard("board4.txt"))
-        editmenu.add_command(label="Board 5", command=lambda: self.setBoard("board5.txt"))
-        editmenu.add_command(label="Board 6", command=lambda: self.setBoard("board6.txt"))
+        editmenu.add_command(label="Board 1", command=lambda: self.setBoard("boards/board1.txt"))
+        editmenu.add_command(label="Board 2", command=lambda: self.setBoard("boards/board2.txt"))
+        editmenu.add_command(label="Board 3", command=lambda: self.setBoard("boards/board3.txt"))
+        editmenu.add_command(label="Board 4", command=lambda: self.setBoard("boards/board4.txt"))
+        editmenu.add_command(label="Board 5", command=lambda: self.setBoard("boards/board5.txt"))
+        editmenu.add_command(label="Board 6", command=lambda: self.setBoard("boards/board6.txt"))
         editmenu.add_command(label="Custom", command=lambda: self.openfile())
         menubar.add_cascade(label="Board", menu=editmenu)
 
@@ -63,19 +64,18 @@ class astarGui(Frame):
     def run(self, type):
         if (not self.running):
             if self.board is None:
-                self.setBoard("board1.txt")
+                self.setBoard("boards/board1.txt")
             else:
                 self.setBoard(self.board.filename)
-            self.searchsnake = []
-            self.oldsnake = []
-            self.alg = astarmod1.Astarmod1(type, self.board)
+            self.searchsnake = [] #used for visualisation
+            self.oldsnake = []      #used for visualisation
+            self.alg = astarmod1.Astarmod1(type, self.board) #create an instance of astar
             self.running = True
-            # while len(self.alg.openlist)> 0:
             self.do_one_step()
 
 
     def do_one_step(self):
-        self.searchsnake = self.alg.do_one_step()
+        self.searchsnake = self.alg.do_one_step() # Performs one iteration of astar. The rest is gui
         if not self.oldsnake is None:
             for el in self.oldsnake:
                 self.canvas.itemconfig(self.rect_dict[(int(el.xpos), int(self.board.dimensions[1]) - 1 - int(el.ypos))],
@@ -93,9 +93,10 @@ class astarGui(Frame):
             self.running = False
             return True
 
+
         self.parent.after(10, lambda: self.do_one_step())
 
-
+    #The rest is gui
     def openfile(self):
         self.setBoard(askopenfilename(parent=self.parent))
 

@@ -1,17 +1,24 @@
 __author__ = 'sondredyvik'
-import state as abstractstate
+from common import state
 
-class StateMod1(abstractstate.State):
+
+class StateMod1(state.State):
+    ##The methods in this document have names that explain them
 
     def __init__(self, xpos, ypos, board, parent):
         self.board = board
         self.dimensions = board.dimensions
         self.xpos = xpos
         self.ypos = ypos
-        super(StateMod1, self).__init__(parent)
-
+        self.parent = parent
+        super(StateMod1, self).__init__()
+        self.calculate_heuristic()
+    #overrides built in method
     def __repr__(self):
         return str(self.xpos) + " " + str(self.ypos)
+    def update_f(self):
+        self.calculate_heuristic()
+        self.f = self.h + self.g
 
     def calculate_heuristic(self):
         self.h = abs(self.xpos - int(self.board.goal[0])) + abs(self.ypos - int(self.board.goal[1]))
@@ -32,7 +39,7 @@ class StateMod1(abstractstate.State):
 
         if not self.node_out_of_bounds(x, y - 1) and not self.is_wall(x, y - 1):
             neighbours.append(StateMod1(x, y - 1, board, self))
-
+        self.nodes_created += len(neighbours)
         return neighbours
 
     def is_wall(self, x, y):

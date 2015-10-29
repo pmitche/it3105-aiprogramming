@@ -3,9 +3,9 @@ __author__ = 'sondredyvik'
 from Tkinter import *
 from tkFileDialog import askopenfilename
 from gac import GAC
+from common import constraint as cspconstraint
+from common import constraintnet
 import variable as cspvariable
-import constraint as cspconstraint
-import constraintnet
 import astarmod2
 import time
 
@@ -18,9 +18,9 @@ class csp_gui:
         self.parent = Frame(parent, width =self.width, height =self.width)
         self.vertex_dict = {}
         self.edge_dict = {}
-        self.colors = [0, 1, 2, 3, 4, 5, 6, 7]
+        self.colors = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         self.number_to_color = {0: 'blue', 1: "green", 2: "yellow", 3: "chocolate", 4: "dark khaki", 5: "seashell2",
-                                6: "red", 7: "cadet blue"}
+                                6: "red", 7: "cadet blue",8:"purple",9:"orange"}
         self.csp = None
         self.canvas = Canvas(master=self.parent,width= self.width, height =self.height)
         self.canvas.pack()
@@ -28,16 +28,18 @@ class csp_gui:
         self.board = None
         self.CNET = None
         self.running = False
+        self.unsatisfied_constraints = 0
+        self.unfill_vertexes = 0
 
 
         menubar = Menu(parent)
         boardmenu = Menu(menubar, tearoff=0)
-        boardmenu.add_command(label="Board 1", command=lambda: self.setboard("graph-color-1.txt"))
-        boardmenu.add_command(label="Board 2", command=lambda: self.setboard("graph-color-2.txt"))
-        boardmenu.add_command(label="Board 3", command=lambda: self.setboard("rand-50-4-color1.txt"))
-        boardmenu.add_command(label="Board 4", command=lambda: self.setboard("rand-100-4-color1.txt"))
-        boardmenu.add_command(label="Board 5", command=lambda: self.setboard("rand-100-6-color1.txt"))
-        boardmenu.add_command(label="Board 6", command=lambda: self.setboard("spiral-500-4-color1.txt"))
+        boardmenu.add_command(label="Board 1", command=lambda: self.setboard("graphs/graph-color-1.txt"))
+        boardmenu.add_command(label="Board 2", command=lambda: self.setboard("graphs/graph-color-2.txt"))
+        boardmenu.add_command(label="Board 3", command=lambda: self.setboard("graphs/rand-50-4-color1.txt"))
+        boardmenu.add_command(label="Board 4", command=lambda: self.setboard("graphs/rand-100-4-color1.txt"))
+        boardmenu.add_command(label="Board 5", command=lambda: self.setboard("graphs/rand-100-6-color1.txt"))
+        boardmenu.add_command(label="Board 6", command=lambda: self.setboard("graphs/spiral-500-4-color1.txt"))
         boardmenu.add_command(label="Custom board", command=lambda: self.openfile())
         boardmenu.add_separator()
         boardmenu.add_command(label="Exit", command=parent.quit)
@@ -52,6 +54,8 @@ class csp_gui:
         k_menu.add_command(label="K=6", command=lambda: self.run(6))
         k_menu.add_command(label="K=7", command=lambda: self.run(7))
         k_menu.add_command(label="K=8", command=lambda: self.run(8))
+        k_menu.add_command(label="K=9", command=lambda: self.run(9))
+        k_menu.add_command(label="K=10", command=lambda: self.run(10))
         menubar.add_cascade(label="Colors", menu=k_menu)
 
         speedmenu = Menu(menubar,tearoff=0)
@@ -69,7 +73,7 @@ class csp_gui:
     def run(self,k):
         if self.running is False:
             if self.board is None:
-                self.setboard("spiral-500-4-color1.txt")
+                self.setboard("graphs/spiral-500-4-color1.txt")
             self.canvas.delete("all")
             self.running = True
             self.csp = self.create_csp(self.board, k)
@@ -81,7 +85,7 @@ class csp_gui:
             self.run_astar()
 
 
-
+    #gui method to put all coordinates on the canvas
     def normalize_coordinates(self,xpos,ypos):
         highestx = max([float(var.x) for var in self.csp.variables])
         lowestx = min([float(var.x )for var in self.csp.variables])
@@ -94,7 +98,7 @@ class csp_gui:
         new_y = (((float(ypos)-lowesty)*new_range)/old_range) + 20
         return new_x, new_y
 
-
+    #This method performs one iteration of astar as long as there are more elements on openlist
     def run_astar(self):
         self.astar.do_one_step()
         for key in self.astar.searchstate.domains.keys():
@@ -111,9 +115,12 @@ class csp_gui:
             for key in self.CNET.constraints.keys():
                 for constraint in self.CNET.constraints[key]:
                     if self.astar.searchstate.domains[constraint.vertices[0]] ==self.astar.searchstate.domains[constraint.vertices[1]]:
+                        self.unsatisfied_constraints +=1
                         Canvas.create_text(self.canvas, 400, 400, fill="red", text="NO SOLUTION FOUND")
-            print "nodes created: " + str(self.astar.nodes_created)
-            print "nodes expanded: " +str(self.astar.nodes_expanded)
+                    if len(self.astar.searchstate.domains[key])>1:
+                        self.unfill_vertexes+= len(self.astar.searchstate.domains[key])
+            print "Unsatisfied constraints: "+str(self.unsatisfied_constraints)
+            print "Unfilled vertexes:" + str(self.unfill_vertexes)
             print len(self.astar.findpath(self.astar.searchstate))
             print time.time() - self.time
             self.running = False
@@ -142,7 +149,7 @@ class csp_gui:
 
 
 
-    def create_csp(self,graph_file, domain_size):
+    def create_csp(self, graph_file, domain_size):
         self.CNET = constraintnet.ConstraintNet()
         gac = GAC(self.CNET)
         f = open(graph_file, 'r')

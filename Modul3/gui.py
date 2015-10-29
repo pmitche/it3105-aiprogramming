@@ -2,7 +2,9 @@ __author__ = 'sondredyvik'
 from Tkinter import *
 from tkFileDialog import askopenfilename
 
-from main import  NonoAstarGac
+from nonogram import NonoAstarGac
+import cProfile
+
 class Gui:
     def __init__(self, parent,width=800, height=800 ):
         self.width = width
@@ -17,13 +19,13 @@ class Gui:
 
         menubar = Menu(parent)
         boardmenu = Menu(menubar, tearoff=0)
-        boardmenu.add_command(label="Camel", command=lambda: self.setboard("nono-camel.txt"))
-        boardmenu.add_command(label="Cat", command=lambda: self.setboard("nono-cat.txt"))
-        boardmenu.add_command(label="Chick", command=lambda: self.setboard("nono-chick.txt"))
-        boardmenu.add_command(label="Heart", command=lambda: self.setboard("nono-heart-1.txt"))
-        boardmenu.add_command(label="Rabbit", command=lambda: self.setboard("nono-rabbit.txt"))
-        boardmenu.add_command(label="Sailboat", command=lambda: self.setboard("nono-sailboat.txt"))
-        boardmenu.add_command(label="Telephone", command=lambda: self.setboard("nono-telephone.txt"))
+        boardmenu.add_command(label="Camel", command=lambda: self.setboard("nonograms/nono-camel.txt"))
+        boardmenu.add_command(label="Cat", command=lambda: self.setboard("nonograms/nono-cat.txt"))
+        boardmenu.add_command(label="Chick", command=lambda: self.setboard("nonograms/nono-chick.txt"))
+        boardmenu.add_command(label="Heart", command=lambda: self.setboard("nonograms/nono-heart-1.txt"))
+        boardmenu.add_command(label="Rabbit", command=lambda: self.setboard("nonograms/nono-rabbit.txt"))
+        boardmenu.add_command(label="Sailboat", command=lambda: self.setboard("nonograms/nono-sailboat.txt"))
+        boardmenu.add_command(label="Telephone", command=lambda: self.setboard("nonograms/nono-telephone.txt"))
         boardmenu.add_command(label="Custom board", command=lambda: self.openfile())
         boardmenu.add_separator()
         boardmenu.add_command(label="Exit", command=parent.quit)
@@ -106,4 +108,4 @@ class Gui:
 
 root = Tk()
 gui = Gui(root)
-root.mainloop()
+cProfile.run("gui.setboard('nonograms/nono3.txt')")

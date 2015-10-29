@@ -1,15 +1,13 @@
 __author__ = 'sondredyvik'
 
 from heapq import heappush, heappop
-import astar
+from common import astar
 
 class Astarmod2(astar.Astar):
 
     def __init__(self, csp):
         self.csp = csp
-
         super(Astarmod2, self).__init__()
-
 
 
     def generate_initial_searchstate(self):
