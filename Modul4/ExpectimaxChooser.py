@@ -6,27 +6,12 @@ from copy import deepcopy
 from random import randint
 from state import State
 
-TopLeftGrading = [
-    [1000,500,300,200],
-    [500,400,0,0],
-    [300,0,0,0],
-    [200,0,0,0]
-]
-TopRightGrading = [
-    [200,300,500,1000],
-    [0,0,400,500],
-    [0,0,0,300],
-    [0,0,0,200]]
-BottOmLeftGrading = [
-    [200,0,0,0],
-    [300,0,0,0],
-    [500,400,0,0],
-    [1000,500,300,200]]
-BottomRightGrading = [
-    [0,0,0,200],
-    [0,0,0,300],
-    [0,0,400,500],
-    [200,300,500,1000]]
+weights= [[0.135759,0.121925,0.102812,0.099937],
+          [0.0997992,0.088405,0.076711,0.0724143],
+          [0.60654,0.0562579,0.037116,0.0161889],
+          [0.0125498,0.00992495,0.00575871,0.00335193]
+          ]
+
 
 pool = mp.Pool(4)
 class ExpectimaxChooser:
@@ -112,13 +97,16 @@ class ExpectimaxChooser:
         if depth == 0:
             return self.calculate_heuristic(node)
         elif depth % 2 == 0:
-            value = float("-inf")
+            value = 0
             for child in self.create_children(node):
                 value = max(value, self.expectimax(child,depth-1))
         elif depth % 2 ==1:
             value = 0
+            count =0
             for child in self.create_children_for_random_node(node):
-                value = value +(child[0]*self.expectimax(child[1],depth-1))
+                count +=1
+                value+=self.expectimax(child[1],depth-1)
+            value = value/count
 
         return value
 
@@ -126,7 +114,14 @@ class ExpectimaxChooser:
 
 
     def calculate_heuristic(self,node):
-        return node.score
+        score = 0
+        for i in range(4):
+            score += node.board[0][i]*100*0.75**i
+            score += node.board[0][0]*100
+            score += node.board[1][3-i]*15*0.6**i
+        if self.board.get_free_cells(node) ==0:
+            return 0
+        return score + len(self.board.get_free_cells(node))*50
         # TopLeftPoints = 0
         # TopRightPoints = 0
         # BottomLeftPoints = 0

@@ -60,7 +60,7 @@ class GameWindow(Frame):
 
 
     def do_one_move(self):
-        move = self.expectimax.recommend_move(self.board.state, 0,True)
+        move = self.expectimax.recommend_move(self.board.state, 4, False)
         if self.board.move(move,self.board.state):
 
             self.board.place_tile(self.board.state)
