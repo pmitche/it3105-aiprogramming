@@ -18,3 +18,6 @@ Repository for hosting deliverables in the course IT3105 Artificial Intelligence
 **module5:** TBC
 
 **module6:** TBC
+
+## Licence
+See the [LICENCE](https://github.com/pmitche/it3105-aiprogramming/blob/master/LICENCE.md) file for license rights and limitations (MIT).
