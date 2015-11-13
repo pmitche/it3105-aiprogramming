@@ -4,7 +4,9 @@ Repository for hosting deliverables in the course IT3105 Artificial Intelligence
 ## PROJECT 1
 ###### Implemented in Python 2.7
 **module1:** Using A* to solve Navigation Problems.
+
 **module2:** A*-GAC, A General Constraint-Satisfaction Problem Solver.
+
 **module3:** Using A*-GAC to Solve Nonograms.
 
 ## PROJECT 2
@@ -14,4 +16,5 @@ Repository for hosting deliverables in the course IT3105 Artificial Intelligence
 ## PROJECT 3
 ###### TBC
 **module5:** TBC
+
 **module6:** TBC
