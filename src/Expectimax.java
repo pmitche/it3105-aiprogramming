@@ -106,15 +106,13 @@ public class Expectimax {
     public void run() {
         Board board = getBoard();
 
-        Direction bestDirection = board.getFreeTiles().size() < 4 ?
-                recommendMove(board, DEPTH + 2) : recommendMove(board, DEPTH);
+        Direction bestDirection = board.getFreeTiles().size() < 4
+                ? recommendMove(board, DEPTH + 2)
+                : recommendMove(board, DEPTH);
 
-
-            board.move(bestDirection);
-            board.placeRandomTile();
-
-
-        }
+        board.move(bestDirection);
+        board.placeRandomTile();
+    }
 
 
     /**
