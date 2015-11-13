@@ -15,9 +15,9 @@ Repository for hosting deliverables in the course IT3105 Artificial Intelligence
 
 ## PROJECT 3
 ###### TBC
-**module5:** TBC
+**module5:** Neural Networks for Image Classification
 
-**module6:** TBC
+**module6:** Neural Networks for Game Playing
 
 ## Licence
 See the [LICENCE](https://github.com/pmitche/it3105-aiprogramming/blob/master/LICENCE.md) file for license rights and limitations (MIT).
