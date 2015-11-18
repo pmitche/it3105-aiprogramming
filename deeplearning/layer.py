@@ -1,20 +1,18 @@
 import numpy as np
-from time import time
+
 import theano
 import theano.tensor as T
-from deeplearning import mnist_basics as mnist
+from Modul5.deeplearning import mnist_basics as mnist
 
 
 class HiddenLayer(object):
     def __init__(self, input, num_in, number_of_nodes, activation):
-
         self.num_in = num_in
         self.number_of_nodes = number_of_nodes
-
         self.weights = theano.shared(value=np.random.randn(num_in, number_of_nodes), name='weights') # Different initialization based on activation fn
-        self.bias = theano.shared(value=np.random.randn(number_of_nodes, 1), name='bias')
-        self.output = activation(T.dot(input, self.weights) + self.bias)
-        self.params = [self.weights, self.bias]
+
+        self.output = activation(T.dot(input, self.weights))
+        self.params = [self.weights]
 
 
 class ANN(object):
@@ -48,8 +46,8 @@ class ANN(object):
 
 def compile_model(num_in, hidden, num_out, learning_rate):
 
-    X = T.fmatrix("X")
-    Y = T.fmatrix("Y") #vector?
+    X = T.dmatrix("X")
+    Y = T.dscalar("Y") #vector?
 
     def sgd(cost, params, lr):
         gradients = [T.grad(cost=cost, wrt=param) for param in params]
@@ -61,7 +59,7 @@ def compile_model(num_in, hidden, num_out, learning_rate):
 
 
     ann = ANN(X, num_in, hidden, num_out)
-    cost = T.sum(pow((Y - ann.layers[-1].output), 2))
+    cost = T.sum(pow((Y - np.argmax(ann.layers[-1].output)), 2))
     #cost = T.nnet.categorical_crossentropy(ann.layers[-1].output, Y).mean()
     updates = sgd(cost=cost, params=ann.params, lr=learning_rate)
     Y_pred = T.argmax(ann.layers[-1].output, axis=1)
@@ -79,7 +77,7 @@ def scale(images):
 
 learning_rate = 0.05
 epochs = 400
-hidden = [300, 200]
+hidden = [15]
 minibatch_size = 20
 
 print("Loading training cases...")
@@ -90,5 +88,7 @@ print("Building the model...")
 train, predict = compile_model(28*28, hidden, 10, learning_rate)
 
 print("Training...")
-#for images, labels in zip(train_set_x, train_set_y):
-#    train(images, labels)
+for i in range(10):
+    for image, label in zip(train_set_x, train_set_y):
+        print(train([image], label))
+print(train_set_y[2],"\n",predict([train_set_x[2]]))

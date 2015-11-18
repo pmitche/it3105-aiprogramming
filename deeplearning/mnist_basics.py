@@ -9,7 +9,7 @@ from array import array as pyarray
 import matplotlib.pyplot as pyplot
 import numpy
 import pickle
-import requests
+
 
 # The reduce function was removed in Python 3.0, so just use this handmade version.
 def kd_reduce(func,seq):
@@ -20,7 +20,7 @@ def kd_reduce(func,seq):
 
 # Set this to the complete path to your mnist files.
 ## __mnist_path__ = "path/to/all/your/mnist/files"
-__mnist_path__ = "/Users/paulpm/Documents/h15/it3105-aiprog/it3105-aiprogramming/project3/basics"
+__mnist_path__ = "/Users/sondredyvik/PycharmProjects/AI-PROG/Modul5/basics/"
 
 # The load_mnist function is the main interface between the MNIST files and your machine-learning code.  It fetches
 # subsets of the entire training or test sets, as determined by the 'digits'
