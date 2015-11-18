@@ -47,7 +47,7 @@ class ANN(object):
 def compile_model(num_in, hidden, num_out, learning_rate):
 
     X = T.dmatrix("X")
-    Y = T.dscalar("Y") #vector?
+    Y = T.dmatrix("Y") #vector?
 
     def sgd(cost, params, lr):
         gradients = [T.grad(cost=cost, wrt=param) for param in params]
@@ -59,7 +59,7 @@ def compile_model(num_in, hidden, num_out, learning_rate):
 
 
     ann = ANN(X, num_in, hidden, num_out)
-    cost = T.sum(pow((Y - np.argmax(ann.layers[-1].output)), 2))
+    cost = T.sum(pow((Y -ann.layers[-1].output ), 2))
     #cost = T.nnet.categorical_crossentropy(ann.layers[-1].output, Y).mean()
     updates = sgd(cost=cost, params=ann.params, lr=learning_rate)
     Y_pred = T.argmax(ann.layers[-1].output, axis=1)
@@ -75,7 +75,7 @@ def scale(images):
         for value in range(len(images[image])):
             images[image][value] /= 255.0
 
-learning_rate = 0.05
+learning_rate = 0.01
 epochs = 400
 hidden = [15]
 minibatch_size = 20
@@ -89,6 +89,42 @@ train, predict = compile_model(28*28, hidden, 10, learning_rate)
 
 print("Training...")
 for i in range(10):
+    print ("Epoch: "+ str(i))
+    error = 0
+    no_correct = 0
+    no_false = 0
+    total = 0
     for image, label in zip(train_set_x, train_set_y):
-        print(train([image], label))
-print(train_set_y[2],"\n",predict([train_set_x[2]]))
+        if predict([train_set_x[i]]) == train_set_y[i]:
+            no_correct +=1
+        else:
+            no_false+=1
+        total+=1
+
+
+        desired= [0 for x in range(10)]
+        desired[label] = 1
+        error += train([image], [desired])
+
+
+
+    print (error/len(train_set_x))
+test_set_x, test_set_y = mnist.gen_flat_cases(type="testing")
+scale(test_set_x)
+no_correct=0
+no_false=0
+total=0
+for j in range(len(test_set_x)):
+
+    prediction =predict([test_set_x[j]])
+    if prediction == test_set_y[j]:
+
+        no_correct +=1
+    else:
+        no_false+=1
+    total+=1
+
+print("Correct: "+ str(no_correct))
+print("Wrong:  "+ str(no_false))
+print("Total: "+ str(total))
+print("Percentage: "+ str ((no_correct/total)*100))
