@@ -1,11 +1,10 @@
+import time
+
 import numpy as np
 import theano
-
-
 import theano.tensor as T
+
 from Modul5.deeplearning import mnist_basics as mnist
-import time
-from random import randint
 
 #TODO: Experiment with  different configurations
 #TODO: Add different activation functions
@@ -46,7 +45,7 @@ class HiddenLayer(object):
 
 
 class ANN(object):
-    def __init__(self, input, num_in, hidden_list, num_out):
+    def __init__(self, input, num_in, hidden_list, act_list, num_out):
         self.input = input
         self.layers = []
         self.params = []
@@ -58,7 +57,7 @@ class ANN(object):
                     input=input if i == 0 else self.layers[i-1].output,
                     num_in=num_in if i == 0 else self.layers[i-1].number_of_nodes,
                     number_of_nodes=hidden_list[i],
-                    activation=T.nnet.sigmoid
+                    activation=act_list[i]
                 )
             )
             self.params += self.layers[i].params
@@ -75,7 +74,7 @@ class ANN(object):
         self.params += self.layers[-1].params
 
 
-def compile_model(num_in, hidden, num_out, learning_rate):
+def compile_model(num_in, hidden, activations, num_out, learning_rate):
 
     X = T.dmatrix("X")
     Y = T.dmatrix("Y")
@@ -89,9 +88,9 @@ def compile_model(num_in, hidden, num_out, learning_rate):
         return updates
 
 
-    ann = ANN(X, num_in, hidden, num_out)
+    ann = ANN(X, num_in, hidden, activations, num_out)
     cost = T.sum(pow((Y - ann.layers[-1].output), 2))
-   # cost = T.nnet.categorical_crossentropy(ann.layers[-1].output, Y).mean()
+    # cost = T.nnet.categorical_crossentropy(ann.layers[-1].output, Y).mean()
     updates = sgd(cost=cost, params=ann.params, lr=learning_rate)
     Y_pred = T.argmax(ann.layers[-1].output, axis=1)
 
@@ -107,11 +106,6 @@ def scale(images):
             images[image][value] /= 255.0
 
 
-
-minibatch_size = 20
-
-
-
 def load_train_set():
     print("Loading training cases...")
     global train_set_x
@@ -121,14 +115,14 @@ def load_train_set():
     global total_time
     total_time = 0
 
-def build_model(hidden=[15],learning_rate=0.01):
+def build_model(hidden, activations, learning_rate):
     print("Building the model...")
     global train
     global predict
-    train, predict = compile_model(28*28, hidden, 10, learning_rate)
+    train, predict = compile_model(28*28, hidden, activations, 10, learning_rate)
 
 
-def train_model(epochs=10,bulk =False, bulk_size= 250):
+def train_model(epochs=10, bulk=False, bulk_size=250):
     starttime = time.time()
     for i in range(epochs):
         print("epoch: ", i)
@@ -225,6 +219,13 @@ def test_model():
     print("Percentage: "+ str ((no_correct/total)*100))
     return (no_correct/total)*100
 
+def activation_map(x):
+    return {
+        0: T.tanh,
+        1: T.nnet.sigmoid,
+        2: T.nnet.relu,
+        3: T.nnet.softmax,
+    }.get(x, T.tanh) # T.tanh is default if x is not found
 
 while True:
 
@@ -234,26 +235,28 @@ while True:
           "'tr' to train\n"
           "'te' to test\n")
     command = input("Type an input: \n")
-    if command =='l':
+    if command == 'l':
         load_train_set()
-        print('Done\n')
+        print('Done.\n')
     elif command == 'b':
-        command = int(input("How many hidden layers?: "))
-        hidden = []
-        for i in range(command):
-            hidden.append(int(input(("How many nodes in layer "+str(i)+"?: "))))
-        learning_rate = float(input("What learning rate do you want to use?: "))
-        total_time = 0
-        build_model(hidden,learning_rate)
+        print("Please specify a topology description on the form: 40,20,60")
+        hidden = [x for x in map(int, input("Topology: ").strip().split(","))]
 
+        print("\nPlease specify activation functions for each layer on the form: 0,2,1")
+        print("0: hyperbolic tangent, 1: sigmoid, 2: rectified linear unit, 3: softmax")
+        activations = [activation_map(x) for x in list(map(int, input("Activations: ").strip().split(",")))]
+
+        learning_rate = float(input("\nWhat learning rate do you want to use?: "))
+        total_time = 0
+        build_model(hidden, activations, learning_rate)
         trained = 0
         print('Done\n')
     elif command == 'tr':
-        command = int(input ("How many epochs do you want to train?: "))
+        command = int(input("How many epochs do you want to train?: "))
         trained +=command
         print("Training for "+str(command)+" epochs")
         t = time.time()
-        train_model(command,bulk=True,bulk_size=250)
+        train_model(command, bulk=True, bulk_size=25)
         el = time.time() -t
         total_time +=el
 
