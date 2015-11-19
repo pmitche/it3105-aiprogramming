@@ -44,7 +44,7 @@ class ANN(object):
                     input=input if i == 0 else self.layers[i-1].output,
                     num_in=num_in if i == 0 else self.layers[i-1].number_of_nodes,
                     number_of_nodes=hidden_list[i],
-                    activation= 0
+                    activation= 2
                 )
             )
             self.params += self.layers[i].params
@@ -115,56 +115,77 @@ def build_model(hidden=[15],learning_rate=0.01):
 
 
 def train_model(epochs=10,bulk =False, bulk_size= 250):
-    if bulk:
-        print("Training with bulk size "+ str(bulk_size))
-    else:
-        print("Training...")
-
+    starttime = time.time()
     for i in range(epochs):
-        print ("Epoch: "+ str(i))
+        print("epoch: ", i)
         error = 0
-        no_correct = 0
-        no_false = 0
-        total = 0
-        if bulk:
-            start= 0
-            end = start + bulk_size
-            train_subset_x = train_set_x[start:end]
-            train_subset_y = train_set_y[start:end]
-        else:
-            train_subset_x = train_set_x
-            train_subset_y = train_set_y
+        i = 0
+        j = bulk_size
+        while j < len(train_set_x):
+            image_bulk = train_set_x[i:j]
+            # Creating a result bulk with only zeros
+            result_bulk = [[0 for i in range(10)] for i in range(bulk_size)]
+            for k in range(bulk_size):
+                label_index = train_set_y[i + k]
+                result_bulk[k][label_index] = 1
+            i += bulk_size
+            j += bulk_size
+            # Provide some feedback while processing images
+            if j % (bulk_size * 100) == 0:
+                print("image nr: ", j)
+            error += train(image_bulk, result_bulk)
+        print("avg error pr image: " + str(error/j))
 
-        if bulk:
-            while end < len(train_set_x):
-                for image, label in zip(train_subset_x, train_subset_y):
-                    if predict([image]) == label:
-                        no_correct += 1
-                    else:
-                        no_false += 1
-                    total += 1
-                    desired = [0 for x in range(10)]
-                    desired[label] = 1
-                    error += train([image], [desired])
-                start = end
-                end += bulk_size
-                train_subset_x = train_set_x[start:end]
-                train_subset_y = train_set_y[start:end]
-
-            print (error/len(train_set_x))
-
-        else:
-            for image, label in zip(train_subset_x, train_subset_y):
-                    if predict([image]) == label:
-                        no_correct += 1
-                    else:
-                        no_false += 1
-
-            total += 1
-            desired= [0 for x in range(10)]
-            desired[label] = 1
-            error += train([image], [desired])
-            print (error/len(train_subset_x))
+    # if bulk:
+    #     print("Training with bulk size "+ str(bulk_size))
+    # else:
+    #     print("Training...")
+    #
+    # for i in range(epochs):
+    #     print ("Epoch: "+ str(i))
+    #     error = 0
+    #     no_correct = 0
+    #     no_false = 0
+    #     total = 0
+    #     if bulk:
+    #         start= 0
+    #         end = start + bulk_size
+    #         train_subset_x = train_set_x[start:end]
+    #         train_subset_y = train_set_y[start:end]
+    #     else:
+    #         train_subset_x = train_set_x
+    #         train_subset_y = train_set_y
+    #
+    #     if bulk:
+    #         while end < len(train_set_x):
+    #             for image, label in zip(train_subset_x, train_subset_y):
+    #                 if predict([image]) == label:
+    #                     no_correct += 1
+    #                 else:
+    #                     no_false += 1
+    #                 total += 1
+    #                 desired = [0 for x in range(10)]
+    #                 desired[label] = 1
+    #                 error += train(train_subset_x, train_subset_y)
+    #             start = end
+    #             end += bulk_size
+    #             train_subset_x = train_set_x[start:end]
+    #             train_subset_y = train_set_y[start:end]
+    #
+    #         print (error/len(train_set_x))
+    #
+    #     else:
+    #         for image, label in zip(train_subset_x, train_subset_y):
+    #                 if predict([image]) == label:
+    #                     no_correct += 1
+    #                 else:
+    #                     no_false += 1
+    #
+    #         total += 1
+    #         desired= [0 for x in range(10)]
+    #         desired[label] = 1
+    #         error += train([image], [desired])
+    #         print (error/len(train_subset_x))
 
 
 
@@ -194,7 +215,7 @@ def test_model():
 while True:
 
     print("Commands:\n"
-          "'ltr' to load training cases\n"
+          "'l' to load training cases\n"
           "'b' to build model\n"
           "'tr' to train\n"
           "'te' to test\n")
