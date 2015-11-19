@@ -20,7 +20,8 @@ def kd_reduce(func,seq):
 
 # Set this to the complete path to your mnist files.
 ## __mnist_path__ = "path/to/all/your/mnist/files"
-__mnist_path__ = "/Users/sondredyvik/PycharmProjects/AI-PROG/Modul5/basics/"
+#__mnist_path__ = "/Users/sondredyvik/PycharmProjects/AI-PROG/Modul5/basics/"
+__mnist_path__ = "/Users/paulpm/Documents/h15/it3105-aiprog/AI-PROG/Modul5/basics"
 
 # The load_mnist function is the main interface between the MNIST files and your machine-learning code.  It fetches
 # subsets of the entire training or test sets, as determined by the 'digits'
