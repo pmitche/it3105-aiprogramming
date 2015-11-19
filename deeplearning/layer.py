@@ -18,17 +18,31 @@ class HiddenLayer(object):
     def __init__(self, input, num_in, number_of_nodes, activation):
         self.num_in = num_in
         self.number_of_nodes = number_of_nodes
-        self.weights = theano.shared(value=np.random.randn(num_in, number_of_nodes), name='weights') # Different initialization based on activation fn
-        self.output = None
-        if activation == 0:
-            self.output = T.tanh(T.dot(input, self.weights))
-        elif activation == 1:
-            self.output = T.maximum(0,T.dot(input, self.weights))
-        elif activation == 2:
-            self.output = T.nnet.sigmoid(T.dot(input,self.weights))
-        elif activation == 3:
-            self.output = T.nnet.softmax(T.dot(input,self.weights))
+
+        self.weights = self.init_weights(activation)
+        self.output = activation(T.dot(input, self.weights))
         self.params = [self.weights]
+
+    def init_weights(self, activation):
+        rng = np.random.RandomState(1234)
+
+        # Default for activation function tanh
+        weights = np.asarray(
+            rng.uniform(
+                low=-np.sqrt(6. / (self.num_in + self.number_of_nodes)),
+                high=np.sqrt(6. / (self.num_in + self.number_of_nodes)),
+                size=(self.num_in, self.number_of_nodes)
+            ),
+            dtype=theano.config.floatX
+        )
+
+        if activation == T.nnet.sigmoid:
+            weights *= 4
+        elif activation == T.nnet.softmax:
+            weights = np.zeros((self.num_in, self.number_of_nodes), dtype=theano.config.floatX)
+        #TODO: elif activation == T.nnet.relu - find optimal weight initialization for relus
+
+        return theano.shared(value=weights, name='weights', borrow=True)
 
 
 class ANN(object):
@@ -44,7 +58,7 @@ class ANN(object):
                     input=input if i == 0 else self.layers[i-1].output,
                     num_in=num_in if i == 0 else self.layers[i-1].number_of_nodes,
                     number_of_nodes=hidden_list[i],
-                    activation= 2
+                    activation=T.nnet.sigmoid
                 )
             )
             self.params += self.layers[i].params
@@ -55,7 +69,7 @@ class ANN(object):
                 input=self.layers[-1].output,
                 num_in=self.layers[-1].number_of_nodes,
                 number_of_nodes=num_out,
-                activation= 3
+                activation=T.nnet.softmax
             )
         )
         self.params += self.layers[-1].params
@@ -76,7 +90,7 @@ def compile_model(num_in, hidden, num_out, learning_rate):
 
 
     ann = ANN(X, num_in, hidden, num_out)
-    cost = T.sum(pow((Y -ann.layers[-1].output ), 2))
+    cost = T.sum(pow((Y - ann.layers[-1].output), 2))
    # cost = T.nnet.categorical_crossentropy(ann.layers[-1].output, Y).mean()
     updates = sgd(cost=cost, params=ann.params, lr=learning_rate)
     Y_pred = T.argmax(ann.layers[-1].output, axis=1)
