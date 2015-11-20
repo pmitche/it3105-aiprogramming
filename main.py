@@ -3,6 +3,7 @@ import theano
 import theano.tensor as T
 import numpy as np
 from Modul6.gui_from_instructor import *
+import heapq
 
 
 
@@ -12,18 +13,35 @@ class aiwindow(GameWindow):
         super(aiwindow, self).__init__()
         self.player = NNplayer()
         self.player.load_test_cases()
-        self.player.train_model(10,1)
+
         self.movedict ={}
         self.movedict[0] = 'up'
         self.movedict[1] = 'down'
         self.movedict[2] = 'left'
         self.movedict[3] = 'right'
 
-    def play(self):
-        Direction = self.player.net.predict([self.convertBoard()])[0]
-        print(Direction)
-        self.onKeyPress(self.movedict[Direction])
+    def onKeyPress(self,direction):
+        if self.board.move(direction, self.board.state):
+            self.update_view(self.board.state.board)
+            self.board.place_tile(self.board.state)
+            self.update_view(self.board.state.board)
+            return True
+        return False
 
+
+    def play(self):
+        directions = list(self.player.net.predict([self.convertBoard()])[0])
+        self.playBestMove(directions)
+
+    def playBestMove(self,directions):
+        dir = directions
+        dir_val_tups=[]
+        for i in range(len(directions)):
+            dir_val_tups.append((dir[i],i))
+        dir_val_tups.sort()
+        for elem in dir_val_tups:
+            if self.onKeyPress(self.movedict[elem[1]]):
+               break
 
     def convertBoard(self):
         returnboard = []
@@ -31,6 +49,7 @@ class aiwindow(GameWindow):
             for elem in listelem:
                 returnboard.append(elem)
         return np.array(returnboard)
+
 
 
 class NNplayer(object):
@@ -71,16 +90,14 @@ class NNplayer(object):
                 result_bulk = self.train_moves[i:j]
                 i += minibatch_size
                 j += minibatch_size
+                self.net.train(image_bulk,result_bulk)
 
-
-
-            print("Average error per image in epoch {}: {:.3%}".format(epoch, error / j))
 
     def test_model(self):
         correct =0
         wrong = 0
         for i in range(len(self.train_moves)):
-            if(self.net.predict(player.train_boards)[i] == np.argmax(self.train_moves[i])):
+            if(self.net.predict(self.train_boards)[i] == np.argmax(self.train_moves[i])):
                 correct += 1
             else:
                 wrong +=1
@@ -100,6 +117,7 @@ root.bind('<Up>', lambda x : game.onKeyPress("up") )
 root.bind('<Right>', lambda x : game.onKeyPress("right"))
 root.bind('<Down>', lambda x : game.onKeyPress("down"))
 root.bind('<a>', lambda x: game.play())
+root.bind('<n>', lambda x: game.restart())
 
 root.mainloop()
 

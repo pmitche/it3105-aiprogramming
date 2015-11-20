@@ -51,7 +51,7 @@ class ANN(object):
         # cost = T.nnet.categorical_crossentropy(ann.layers[-1].output, Y).mean()
         updates = sgd(cost=cost, params=params, lr=learning_rate)
 
-        Y_pred = T.argmax(self.layers[-1].output,axis=1)
+        Y_pred = self.layers[-1].output
 
         train = theano.function(inputs=[X, Y], outputs=cost, updates=updates, allow_input_downcast=True)
         predict = theano.function(inputs=[X], outputs=Y_pred, allow_input_downcast=True)
