@@ -15,7 +15,7 @@ def activation_map(x):
     return {
         0: T.tanh,
         1: T.nnet.sigmoid,
-        2: T.nnet.relu,
+        2: lambda k: T.switch(k > 0, k, 0),  # Equivalent to T.nnet.relu (rectified linear unit)
         3: T.nnet.softmax,
     }.get(x, T.tanh)  # T.tanh is default if x is not found
 
