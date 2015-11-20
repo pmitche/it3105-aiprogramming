@@ -23,18 +23,16 @@ def activation_map(x):
 def train_model(epochs, minibatch_size):
     for epoch in range(epochs):
         print("Training epoch number {}...".format(epoch))
-        error = 0
-        j = minibatch_size
+        cost = 0
 
         for i in range(0, len(train_set_x), minibatch_size):
-            image_batch = train_set_x[i:j]
+            image_batch = train_set_x[i:i+minibatch_size]
             label_batch = np.zeros((minibatch_size, 10), dtype=np.int)
             for k in range(minibatch_size):
                 label_batch[k][train_set_y[i + k]] = 1
-            j += minibatch_size
-            error += ann.train(image_batch, label_batch)
+            cost = ann.train(image_batch, label_batch)
 
-        print("Average error per image in epoch {}: {:.3%}".format(epoch, error / j))
+        print("Cost after epoch {}: {}".format(epoch, cost))
 
 
 def test_model():
@@ -49,7 +47,7 @@ def test_model():
     print("Correct: {}".format(correct))
     print("Wrong: {}".format(total - correct))
     print("Total: {}".format(total))
-    print("Percentage: {:.2%}".format(correct / total))
+    print("Percentage: {:.2%}\n".format(correct / total))
 
     f = open('statistics', 'a')
     f.write("Configuration:\n"
@@ -80,19 +78,24 @@ ann = ANN(28*28, hidden, activations, 10, lr)
 print("Finished building model!\n")
 
 
-epochs = int(input("How many epochs to you want to train?: "))
-minibatch_size = int(input("And what minibatch size do you want to use?: \n"))
-print("Training for {} epochs with minibatch size {}...".format(epochs, minibatch_size))
-start = time.time()
-train_model(epochs, minibatch_size)
-total_time = time.time() - start
-print("Finished training! Total time used: {:.2f} seconds. \n".format(total_time))
+while True:
 
-if input("Blind test? y/n: ") == "y":
-    mnist.minor_demo(ann)
-else:
-    print("Loading test set...")
-    test_set_x, test_set_y = mnist.gen_flat_cases(type="testing")
-    scale(test_set_x)
-    print("Finished! Statistics:")
-    test_model()
+    epochs = int(input("How many epochs to you want to train?: "))
+    minibatch_size = int(input("And what minibatch size do you want to use?: \n"))
+    print("Training for {} epochs with minibatch size {}...".format(epochs, minibatch_size))
+    start = time.time()
+    train_model(epochs, minibatch_size)
+    total_time = time.time() - start
+    print("Finished training! Total time used: {:.2f} seconds. \n".format(total_time))
+
+    if input("Blind test? y/n: ") == "y":
+        mnist.minor_demo(ann)
+    else:
+        print("Loading test set...")
+        test_set_x, test_set_y = mnist.gen_flat_cases(type="testing")
+        scale(test_set_x)
+        print("Finished! Statistics:")
+        test_model()
+        if input("Train more or blind test? t/b") == "b":
+            mnist.minor_demo(ann)
+            break
