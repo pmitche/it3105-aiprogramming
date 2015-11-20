@@ -9,11 +9,10 @@ import heapq
 
 class aiwindow(GameWindow):
 
-    def __init__(self):
+    def __init__(self,player,control):
         super(aiwindow, self).__init__()
-        self.player = NNplayer()
-        self.player.load_test_cases()
-        self.player.train_model(10,1)
+        self.control = control
+        self.player = player
         self.movedict ={}
         self.movedict[0] = 'up'
         self.movedict[1] = 'down'
@@ -49,7 +48,8 @@ class aiwindow(GameWindow):
             for elem in listelem:
                 returnboard.append(elem)
         return np.array(returnboard)
-
+    def restart(self):
+        self.control.new_game()
 
 
 class NNplayer(object):
@@ -57,7 +57,7 @@ class NNplayer(object):
     def __init__(self):
         self.train_boards= None
         self.train_moves = None
-        self.net = ann.ANN(16,[10],[T.tanh],4,0.1)
+        self.net = ann.ANN(16,[10],[T.nnet.sigmoid],4,0.01)
 
     def load_test_cases(self):
         f = open('myfile1.txt','r' )
@@ -72,7 +72,6 @@ class NNplayer(object):
             move = move.strip('\n').split(',')
             boards.append(board)
             moves.append(move)
-
         boards = np.array(boards)
         moves = np.array(moves)
         self.train_boards = boards
@@ -85,9 +84,9 @@ class NNplayer(object):
             for i in range(0, len(self.train_boards), minibatch_size):
                 image_batch = self.train_boards[i:i+minibatch_size]
                 label_batch = self.train_moves[i:i+minibatch_size]
-                cost = self.net.train(image_batch, label_batch)
+                cost += self.net.train(image_batch, label_batch)
 
-            print("Cost after epoch {}: {}".format(epoch, cost))
+            print("Cost after epoch {}: {}".format(epoch, cost/len(self.train_boards)))
 
 
     def test_model(self):
@@ -99,23 +98,37 @@ class NNplayer(object):
             else:
                 wrong +=1
         print (correct)
+global root
 
 
+class main:
 
+    def __init__(self):
+        self.player = NNplayer()
+        self.player.load_test_cases()
+        self.player.train_model(10,10)
+        self.root = Tk()
+        game = aiwindow(self.player,self)
+        game.pack()
+        self.root.bind('<Left>', lambda x : game.onKeyPress("left") )
+        self.root.bind('<Up>', lambda x : game.onKeyPress("up") )
+        self.root.bind('<Right>', lambda x : game.onKeyPress("right"))
+        self.root.bind('<Down>', lambda x : game.onKeyPress("down"))
+        self.root.bind('<a>', lambda x: game.play())
+        self.root.bind('<n>', lambda x: game.restart())
+        self.root.mainloop()
 
-root = Tk()
+    def new_game(self):
+        self.root.destroy()
+        self.root = Tk()
+        game = aiwindow(self.player,self)
+        game.pack()
+        self.root.bind('<Left>', lambda x : game.onKeyPress("left") )
+        self.root.bind('<Up>', lambda x : game.onKeyPress("up") )
+        self.root.bind('<Right>', lambda x : game.onKeyPress("right"))
+        self.root.bind('<Down>', lambda x : game.onKeyPress("down"))
+        self.root.bind('<a>', lambda x: game.play())
+        self.root.bind('<n>', lambda x: game.restart())
 
-game = aiwindow()
-game.pack()
-
-
-root.bind('<Left>', lambda x : game.onKeyPress("left") )
-root.bind('<Up>', lambda x : game.onKeyPress("up") )
-root.bind('<Right>', lambda x : game.onKeyPress("right"))
-root.bind('<Down>', lambda x : game.onKeyPress("down"))
-root.bind('<a>', lambda x: game.play())
-root.bind('<n>', lambda x: game.restart())
-
-root.mainloop()
-
-
+if __name__ == '__main__':
+    main()
