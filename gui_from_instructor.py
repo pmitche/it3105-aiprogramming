@@ -116,17 +116,7 @@ class GameWindow(Frame):
         self.update_idletasks()
 
 
-root = Tk()
-
-game = GameWindow()
-game.pack()
-root.bind('<Left>', lambda x : game.onKeyPress("left") )
-root.bind('<Up>', lambda x : game.onKeyPress("up") )
-root.bind('<Right>', lambda x : game.onKeyPress("right"))
-root.bind('<Down>', lambda x : game.onKeyPress("down"))
 
 
-
-root.mainloop()
 
 

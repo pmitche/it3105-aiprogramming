@@ -2,6 +2,13 @@ from Modul6 import ann
 import theano
 import theano.tensor as T
 import numpy as np
+from Modul6.gui_from_instructor import *
+
+
+
+class aiwindow(GameWindow):
+
+    def __init__(self):
 
 
 class NNplayer(object):
@@ -9,7 +16,7 @@ class NNplayer(object):
     def __init__(self):
         self.train_boards= None
         self.train_moves = None
-        self.net = ann.ANN(16,[10],[T.tanh],4,0.05)
+        self.net = ann.ANN(16,[10],[T.tanh],4,0.1)
 
     def load_test_cases(self):
         f = open('myfile1.txt','r' )
@@ -42,17 +49,36 @@ class NNplayer(object):
                 result_bulk = self.train_moves[i:j]
                 i += minibatch_size
                 j += minibatch_size
-                self.net.train(image_bulk, result_bulk)
+                print(self.net.train(image_bulk, result_bulk))
 
 
             print("Average error per image in epoch {}: {:.3%}".format(epoch, error / j))
     def test_model(self):
-        for i in range(len(self.train_boards)):
-            print (self.net.predict(self.train_boards[i]))
+        correct =0
+        wrong = 0
+        for i in range(len(self.train_moves)):
+            if(self.net.predict(player.train_boards)[i] == np.argmax(self.train_moves[i])):
+                correct += 1
+            else:
+                wrong +=1
+        print (correct)
 
 
 player = NNplayer()
 player.load_test_cases()
-player.train_model(10,100)
-for i in range(len(player.train_moves)):
-    print (player.net.predict(player.train_boards)[i])
+player.train_model(100,100)
+
+root = Tk()
+
+game = GameWindow()
+game.pack()
+
+
+root.bind('<Left>', lambda x : game.onKeyPress("left") )
+root.bind('<Up>', lambda x : game.onKeyPress("up") )
+root.bind('<Right>', lambda x : game.onKeyPress("right"))
+root.bind('<Down>', lambda x : game.onKeyPress("down"))
+
+root.mainloop()
+
+
