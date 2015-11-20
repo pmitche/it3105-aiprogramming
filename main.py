@@ -13,7 +13,7 @@ class aiwindow(GameWindow):
         super(aiwindow, self).__init__()
         self.player = NNplayer()
         self.player.load_test_cases()
-
+        self.player.train_model(10,1)
         self.movedict ={}
         self.movedict[0] = 'up'
         self.movedict[1] = 'down'
@@ -81,16 +81,13 @@ class NNplayer(object):
     def train_model(self,epochs, minibatch_size):
         for epoch in range(epochs):
             print("Training epoch number {}...".format(epoch))
-            error = 0
-            i = 0
-            j = minibatch_size
-            while j < len(self.train_boards):
-                image_bulk = self.train_boards[i:j]
-                # Creating a result bulk with only zeros
-                result_bulk = self.train_moves[i:j]
-                i += minibatch_size
-                j += minibatch_size
-                self.net.train(image_bulk,result_bulk)
+            cost = 0
+            for i in range(0, len(self.train_boards), minibatch_size):
+                image_batch = self.train_boards[i:i+minibatch_size]
+                label_batch = self.train_moves[i:i+minibatch_size]
+                cost = self.net.train(image_batch, label_batch)
+
+            print("Cost after epoch {}: {}".format(epoch, cost))
 
 
     def test_model(self):
