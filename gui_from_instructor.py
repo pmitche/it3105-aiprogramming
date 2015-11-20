@@ -1,7 +1,7 @@
 from tkinter import *
 
 from Modul6.board import Board
-from Modul6.ExpectimaxChooser import ExpectimaxChooser
+
 GRID_LEN              = 4
 GRID_PADDING          = 10
 SIZE                  = 500
@@ -38,7 +38,7 @@ class GameWindow(Frame):
         self.grid()
         self.master.title('2048')
         self.board = Board()
-        self.expectimax = ExpectimaxChooser(self.board)
+
         self.board.place_tile(self.board.state)
         self.grid_cells = []
         self.init_grid()
@@ -124,7 +124,7 @@ root.bind('<Left>', lambda x : game.onKeyPress("left") )
 root.bind('<Up>', lambda x : game.onKeyPress("up") )
 root.bind('<Right>', lambda x : game.onKeyPress("right"))
 root.bind('<Down>', lambda x : game.onKeyPress("down"))
-root.bind('<a>', lambda x : game.do_one_move())
+
 
 
 root.mainloop()
