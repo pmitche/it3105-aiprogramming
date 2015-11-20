@@ -50,9 +50,7 @@ class GameWindow(Frame):
 
     #end
     def onKeyPress(self,direction):
-        print( self.board.state, "here ")
         if self.board.move(direction, self.board.state):
-            print (self.board.state, "but then")
             self.update_view(self.board.state.board)
             self.board.place_tile(self.board.state)
             self.update_view(self.board.state.board)

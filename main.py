@@ -9,6 +9,28 @@ from Modul6.gui_from_instructor import *
 class aiwindow(GameWindow):
 
     def __init__(self):
+        super(aiwindow, self).__init__()
+        self.player = NNplayer()
+        self.player.load_test_cases()
+        self.player.train_model(10,1)
+        self.movedict ={}
+        self.movedict[0] = 'up'
+        self.movedict[1] = 'down'
+        self.movedict[2] = 'left'
+        self.movedict[3] = 'right'
+
+    def play(self):
+        Direction = self.player.net.predict([self.convertBoard()])[0]
+        print(Direction)
+        self.onKeyPress(self.movedict[Direction])
+
+
+    def convertBoard(self):
+        returnboard = []
+        for listelem in self.board.board:
+            for elem in listelem:
+                returnboard.append(elem)
+        return np.array(returnboard)
 
 
 class NNplayer(object):
@@ -49,10 +71,11 @@ class NNplayer(object):
                 result_bulk = self.train_moves[i:j]
                 i += minibatch_size
                 j += minibatch_size
-                print(self.net.train(image_bulk, result_bulk))
+
 
 
             print("Average error per image in epoch {}: {:.3%}".format(epoch, error / j))
+
     def test_model(self):
         correct =0
         wrong = 0
@@ -64,13 +87,11 @@ class NNplayer(object):
         print (correct)
 
 
-player = NNplayer()
-player.load_test_cases()
-player.train_model(100,100)
+
 
 root = Tk()
 
-game = GameWindow()
+game = aiwindow()
 game.pack()
 
 
@@ -78,6 +99,7 @@ root.bind('<Left>', lambda x : game.onKeyPress("left") )
 root.bind('<Up>', lambda x : game.onKeyPress("up") )
 root.bind('<Right>', lambda x : game.onKeyPress("right"))
 root.bind('<Down>', lambda x : game.onKeyPress("down"))
+root.bind('<a>', lambda x: game.play())
 
 root.mainloop()
 
