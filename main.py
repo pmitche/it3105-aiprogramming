@@ -1,3 +1,5 @@
+import math
+
 from Modul6 import ann
 import theano
 import theano.tensor as T
@@ -57,7 +59,7 @@ class NNplayer(object):
     def __init__(self):
         self.train_boards= None
         self.train_moves = None
-        self.net = ann.ANN(16,[10],[T.nnet.sigmoid],4,0.01)
+        self.net = ann.ANN(16,[10],[T.nnet.sigmoid],4, 0.05)
 
     def load_test_cases(self):
         f = open('myfile1.txt','r' )
@@ -72,10 +74,30 @@ class NNplayer(object):
             move = move.strip('\n').split(',')
             boards.append(board)
             moves.append(move)
-        boards = np.array(boards)
+        boards = np.asarray(boards, dtype=np.float)
+        self.scale(boards)
         moves = np.array(moves)
         self.train_boards = boards
         self.train_moves = moves
+
+    def scale(self, seq):
+        """
+        Scales a list of board states by first getting the log2 value of every cell,
+        and then dividing every cell by the log2 value of the maximum cell in that board state.
+
+        Example:
+            Input   = [[0, 2, 4, 8, 2, 16, 256], [4, 8, 512]]
+            Log2    = [[0, 1, 2, 3, 1, 4, 8], [2, 3, 9]
+            Scaled  = [[0, 0.125, 0.25, 0.375, 0.125, 0.5, 1], [0.222, 0.333, 1]] (by dividing by max(Log2))
+
+        :param seq: A list of board states, formatted as float (important!)
+        :return: A scaled list of board states, ranging from 0 to 1
+        """
+        for i in range(len(seq)):
+            for j in range(len(seq[i])):
+                if seq[i][j] != 0:
+                    seq[i][j] = np.log2(seq[i][j])
+            seq[i] = seq[i] / max(seq[i])
 
     def train_model(self,epochs, minibatch_size):
         for epoch in range(epochs):
@@ -106,7 +128,7 @@ class main:
     def __init__(self):
         self.player = NNplayer()
         self.player.load_test_cases()
-        self.player.train_model(10,10)
+        self.player.train_model(50,5)
         self.root = Tk()
         game = aiwindow(self.player,self)
         game.pack()

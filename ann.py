@@ -47,8 +47,8 @@ class ANN(object):
             ]
             return updates
 
-        cost = T.sum(pow((Y - layers[-1].output), 2))
-        # cost = T.nnet.categorical_crossentropy(ann.layers[-1].output, Y).mean()
+        #cost = T.sum(pow((Y - layers[-1].output), 2))
+        cost = T.nnet.categorical_crossentropy(layers[-1].output, Y).mean()
         updates = sgd(cost=cost, params=params, lr=learning_rate)
 
         Y_pred = self.layers[-1].output
