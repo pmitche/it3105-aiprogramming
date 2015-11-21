@@ -1,11 +1,13 @@
 import math
 
 from Modul6 import ann
-import theano
 import theano.tensor as T
 import numpy as np
 from Modul6.gui_from_instructor import *
-import heapq
+import copy
+import random
+import requests
+
 
 
 
@@ -20,6 +22,10 @@ class aiwindow(GameWindow):
         self.movedict[1] = 'down'
         self.movedict[2] = 'left'
         self.movedict[3] = 'right'
+        self.weight_matrix = [[0,1,2,3],
+            [6,5,5,4],
+            [7,9,12,15],
+            [55,35,25,20]]
 
     def onKeyPress(self,direction):
         if self.board.move(direction, self.board.state):
@@ -31,8 +37,10 @@ class aiwindow(GameWindow):
 
 
     def play(self):
-        directions = list(self.player.net.predict([self.convertBoard()])[0])
-        self.playBestMove(directions)
+        boolean_var = True
+        while (boolean_var):
+            directions = list(self.player.net.predict([self.convertBoard()])[0])
+            boolean_var = self.playBestMove(directions)
 
     def playBestMove(self,directions):
         dir = directions
@@ -42,16 +50,61 @@ class aiwindow(GameWindow):
         dir_val_tups.sort()
         for elem in dir_val_tups:
             if self.onKeyPress(self.movedict[elem[1]]):
-               break
+               return True
+        self.restart(self.board.get_highest_tile())
+        return False
 
+    def play_random(self):
+        boolean_var = True
+        while (boolean_var):
+
+            boolean_var = self.play_random_move()
+    def play_random_move(self):
+        directions = [0,1,2,3]
+        moves = []
+        for i in directions:
+            rand = random.randint(0,len(directions)-1)
+            moves.append(directions[rand])
+        for num in directions:
+            if self.onKeyPress(self.movedict[num]):
+                return True
+        self.restart(self.board.get_highest_tile())
+        return False
+
+
+
+    def calculate_heuristic(self,node):
+        value =0
+        for i in range(len(node.board)):
+            for j in range(len(node.board[i])):
+                value += self.weight_matrix[i][j]
+        return value
+
+    #ConvertBoard for expectimax cases
     def convertBoard(self):
-        returnboard = []
-        for listelem in self.board.board:
-            for elem in listelem:
-                returnboard.append(elem)
+        returnboard =[]
+        boards= []
+        for i in range(4):
+            boards.append(copy.deepcopy(self.board.state))
+
+
+        self.board.move('up',boards[0])
+        self.board.move('down',boards[1])
+        self.board.move('left',boards[2])
+        self.board.move('right',boards[3])
+        for i in range(4):
+            returnboard.append(self.calculate_heuristic(boards[i]))
         return np.array(returnboard)
-    def restart(self):
-        self.control.new_game()
+
+    #
+    # def convertBoard(self):
+    #     returnboard = []
+    #     for listelem in self.board.board:
+    #         for elem in listelem:
+    #             returnboard.append(elem)
+    #     return np.array(returnboard)
+    def restart(self,result):
+        self.control.new_game(result)
 
 
 class NNplayer(object):
@@ -59,10 +112,11 @@ class NNplayer(object):
     def __init__(self):
         self.train_boards= None
         self.train_moves = None
-        self.net = ann.ANN(16,[10],[T.nnet.sigmoid],4, 0.05)
+        #Different number of in nodes because of different test set
+        self.net = ann.ANN(4,[10],[T.nnet.sigmoid],4, 0.01)
 
     def load_test_cases(self):
-        f = open('myfile1.txt','r' )
+        f = open('myfile3.txt','r' )
         boards=[]
         moves =[]
         lines = f.readlines()
@@ -126,31 +180,61 @@ global root
 class main:
 
     def __init__(self):
+        self.net_result=[]
+        self.rand_result=[]
+        self.count = 1
         self.player = NNplayer()
         self.player.load_test_cases()
         self.player.train_model(50,5)
         self.root = Tk()
         game = aiwindow(self.player,self)
         game.pack()
-        self.root.bind('<Left>', lambda x : game.onKeyPress("left") )
-        self.root.bind('<Up>', lambda x : game.onKeyPress("up") )
-        self.root.bind('<Right>', lambda x : game.onKeyPress("right"))
-        self.root.bind('<Down>', lambda x : game.onKeyPress("down"))
-        self.root.bind('<a>', lambda x: game.play())
-        self.root.bind('<n>', lambda x: game.restart())
+
+        self.root.bind('<a>', lambda x : game.play())
         self.root.mainloop()
 
-    def new_game(self):
-        self.root.destroy()
-        self.root = Tk()
-        game = aiwindow(self.player,self)
-        game.pack()
-        self.root.bind('<Left>', lambda x : game.onKeyPress("left") )
-        self.root.bind('<Up>', lambda x : game.onKeyPress("up") )
-        self.root.bind('<Right>', lambda x : game.onKeyPress("right"))
-        self.root.bind('<Down>', lambda x : game.onKeyPress("down"))
-        self.root.bind('<a>', lambda x: game.play())
-        self.root.bind('<n>', lambda x: game.restart())
+
+
+    def new_game(self,result):
+
+        if self.count<50:
+            self.net_result.append(result)
+            self.count+=1
+            self.root.destroy()
+            self.root = Tk()
+            game = aiwindow(self.player,self)
+            game.pack()
+            game.play()
+        elif self.count==50:
+            self.net_result.append(result)
+            self.count+=1
+            self.root.destroy()
+            self.root = Tk()
+            game = aiwindow(self.player,self)
+            game.pack()
+            game.play_random()
+
+        elif 50<self.count<101:
+            self.rand_result.append(result)
+            self.count+=1
+            self.root.destroy()
+            self.root = Tk()
+            game = aiwindow(self.player,self)
+            game.pack()
+            game.play_random()
+        elif self.count==102:
+            self.rand_result.append(result)
+            self.root.destroy()
+
+        print(len(self.rand_result))
+        print(len(self.net_result))
+        print (self.welch(self.rand_result,self.net_result))
+
+
+    def welch(self,list1, list2):
+        params = {"results": str(list1) + " " + str(list2), "raw": "1"}
+        resp = requests.post('http://folk.ntnu.no/valerijf/6/', data=params)
+        return resp.text
 
 if __name__ == '__main__':
-    main()
+    main = main()
