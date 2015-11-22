@@ -7,7 +7,7 @@ from Modul6.gui_from_instructor import *
 import copy
 import random
 import requests
-import board
+
 
 
 
@@ -195,6 +195,7 @@ class main:
 
 
     def __init__(self):
+        self.gui_bool = str(input("Gui? y/n: \n"))
         self.training_set = str(input("What training set do you want to use?\n1: 16 dim vector, 2: 4 dim vector: \n"))
         self.lr = float(input("Specify learningrate: \n"))
         self.epochs = int(input('How many epochs do you want to train?:\n'))
@@ -210,9 +211,14 @@ class main:
         self.root = Tk()
         print('NNET playing round: '+ str(self.count))
         self.game = aiwindow(self.player,self)
-        self.game.pack()
-        self.root.bind('<a>', lambda x: self.game.play())
-        self.root.mainloop()
+        if self.gui_bool =='y':
+            self.game.pack()
+            self.root.bind('<a>', lambda x: self.game.play())
+            self.root.mainloop()
+        if self.gui_bool =='n':
+            self.game.play()
+
+
         self.net_result=[]
         self.rand_result=[]
         self.count = 1
@@ -238,7 +244,8 @@ class main:
             self.count +=1
             print('NNET playing round: '+ str(self.count))
             self.game = aiwindow(self.player,self)
-            self.game.pack()
+            if self.gui_bool =='y':
+                self.game.pack()
             self.game.play()
 
         elif self.count==50 :
@@ -247,21 +254,25 @@ class main:
             self.count +=1
             print('NNET playing round: '+ str(self.count))
             self.game = aiwindow(self.player,self)
-            self.game.pack()
+            if self.gui_bool =='y':
+                self.game.pack()
             self.game.play_random()
 
 
         elif 50< self.count<100:
             print('Highest tile: ' + str(result))
             self.rand_result.append(result)
+            self.count+=1
 
             print('Random playing round: '+ str(self.count-50))
             self.game = aiwindow(self.player,self)
-            self.game.pack()
+            if self.gui_bool =='y':
+                self.game.pack()
             self.game.play_random()
 
-        elif self.count == 101:
-            self.count+=1
+
+        elif self.count == 100:
+           # self.count+=1
             self.rand_result.append(result)
             print(len(self.rand_result))
             print(len(self.net_result))
