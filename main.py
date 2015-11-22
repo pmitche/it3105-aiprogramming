@@ -26,11 +26,7 @@ class aiwindow(GameWindow):
             [6,5,5,4],
             [7,9,12,15],
             [55,35,25,20]]
-    def reset_game(self):
-        self.board = board.Board()
-        self.board.place_tile(self.board.state)
-        self.grid_cells = []
-        self.update_view(self.board.state.board)
+
 
     def onKeyPress(self,direction):
         if self.board.move(direction, self.board.state):
@@ -192,7 +188,7 @@ class NNplayer(object):
             else:
                 wrong +=1
         print (correct)
-global root
+
 
 
 class main:
@@ -212,14 +208,15 @@ class main:
         self.player.load_test_cases()
         self.player.train_model(self.epochs,self.minibatch)
         self.root = Tk()
-        game = aiwindow(self.player,self)
-        game.pack()
-
-        self.root.bind('<a>', lambda x : game.play())
+        print('NNET playing round: '+ str(self.count))
+        self.game = aiwindow(self.player,self)
+        self.game.pack()
+        self.root.bind('<a>', lambda x: self.game.play())
         self.root.mainloop()
         self.net_result=[]
         self.rand_result=[]
         self.count = 1
+
 
 
 
@@ -234,39 +231,44 @@ class main:
 
 
     def new_game(self,result):
-
-        if self.count<50:
+        self.game.pack_forget()
+        if self.count < 50:
             self.net_result.append(result)
-            self.count+=1
-            self.root.destroy()
-            self.root = Tk()
-            game = aiwindow(self.player,self)
-            game.pack()
-            game.play()
-        elif self.count==50:
+            print('Highest tile: ' + str(result))
+            self.count +=1
+            print('NNET playing round: '+ str(self.count))
+            self.game = aiwindow(self.player,self)
+            self.game.pack()
+            self.game.play()
+
+        elif self.count==50 :
+            print('Highest tile: ' + str(result))
             self.net_result.append(result)
-            self.count+=1
-            self.root.destroy()
-            self.root = Tk()
-            game = aiwindow(self.player,self)
-            game.pack()
-            game.play_random()
+            self.count +=1
+            print('NNET playing round: '+ str(self.count))
+            self.game = aiwindow(self.player,self)
+            self.game.pack()
+            self.game.play_random()
 
-        elif 50<self.count<101:
-            self.rand_result.append(result)
-            self.count+=1
-            self.root.destroy()
-            self.root = Tk()
-            game = aiwindow(self.player,self)
-            game.pack()
-            game.play_random()
-        elif self.count==102:
-            self.rand_result.append(result)
-            self.root.destroy()
 
-        print(len(self.rand_result))
-        print(len(self.net_result))
-        print (self.welch(self.rand_result,self.net_result))
+        elif 50< self.count<100:
+            print('Highest tile: ' + str(result))
+            self.rand_result.append(result)
+
+            print('Random playing round: '+ str(self.count-50))
+            self.game = aiwindow(self.player,self)
+            self.game.pack()
+            self.game.play_random()
+
+        elif self.count == 101:
+            self.count+=1
+            self.rand_result.append(result)
+            print(len(self.rand_result))
+            print(len(self.net_result))
+            print(self.welch(self.rand_result,self.net_result))
+
+
+
 
 
     def welch(self,list1, list2):
