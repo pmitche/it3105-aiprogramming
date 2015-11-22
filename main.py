@@ -7,7 +7,7 @@ from Modul6.gui_from_instructor import *
 import copy
 import random
 import requests
-
+import board
 
 
 
@@ -26,6 +26,11 @@ class aiwindow(GameWindow):
             [6,5,5,4],
             [7,9,12,15],
             [55,35,25,20]]
+    def reset_game(self):
+        self.board = board.Board()
+        self.board.place_tile(self.board.state)
+        self.grid_cells = []
+        self.update_view(self.board.state.board)
 
     def onKeyPress(self,direction):
         if self.board.move(direction, self.board.state):
@@ -109,14 +114,27 @@ class aiwindow(GameWindow):
 
 class NNplayer(object):
 
-    def __init__(self):
+    def __init__(self,training_set,topology,lr,epochs,batch_size,activation_functions):
+        self.training_set = training_set
+        self.topology = topology
+        self.lr = lr
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.activation_functions =activation_functions
         self.train_boards= None
         self.train_moves = None
         #Different number of in nodes because of different test set
-        self.net = ann.ANN(4,[10],[T.nnet.sigmoid],4, 0.01)
+        if self.training_set ==1:
+            self.input = 16
+        else:
+            self.input=4
+        self.net = ann.ANN(self.input,self.topology,activation_functions,4, lr)
 
     def load_test_cases(self):
-        f = open('myfile3.txt','r' )
+        if self.training_set ==1:
+            f = open('myfile1.txt','r' )
+        else:
+            f = open('myfile3.txt','r' )
         boards=[]
         moves =[]
         lines = f.readlines()
@@ -179,19 +197,39 @@ global root
 
 class main:
 
+
     def __init__(self):
+        self.training_set = str(input("What training set do you want to use?\n1: 16 dim vector, 2: 4 dim vector: \n"))
+        self.lr = float(input("Specify learningrate: \n"))
+        self.epochs = int(input('How many epochs do you want to train?:\n'))
+        self.hidden = [x for x in map(int, input("Please specify a topology description on the form 40,20,60: ").strip().split(","))]
+        self.minibatch = int(input('What batch size do you want to use?:\n'))
+        self.activations = [self.activation_map(x) for x in list(map(int, input("Please specify activation functions for each layer on the form 0,2,1: ").strip().split(",")))]
         self.net_result=[]
         self.rand_result=[]
         self.count = 1
-        self.player = NNplayer()
+        self.player = NNplayer(self.training_set,self.hidden,self.lr,self.epochs,self.minibatch,self.activations)
         self.player.load_test_cases()
-        self.player.train_model(50,5)
+        self.player.train_model(self.epochs,self.minibatch)
         self.root = Tk()
         game = aiwindow(self.player,self)
         game.pack()
 
         self.root.bind('<a>', lambda x : game.play())
         self.root.mainloop()
+        self.net_result=[]
+        self.rand_result=[]
+        self.count = 1
+
+
+
+    def activation_map(self,x):
+        return {
+            0: T.tanh,
+            1: T.nnet.sigmoid,
+            2: lambda k: T.switch(k > 0, k, 0),  # Equivalent to T.nnet.relu (rectified linear unit)
+            3: T.nnet.softmax,
+        }.get(x, T.tanh)  # T.tanh is default if x is not found
 
 
 
@@ -237,4 +275,4 @@ class main:
         return resp.text
 
 if __name__ == '__main__':
-    main = main()
+    main()

@@ -93,7 +93,7 @@ class GameWindow(Frame):
             self.grid_cells.append(grid_row)
     #end
     
-    def update_view(self, board ):
+    def update_view(self, board):
         for i in range( GRID_LEN ):
             for j in range( GRID_LEN ):
                 digit = board[i][j]
