@@ -81,8 +81,8 @@ print("Finished building model!\n")
 while True:
 
     epochs = int(input("How many epochs to you want to train?: "))
-    minibatch_size = int(input("And what minibatch size do you want to use?: \n"))
-    print("Training for {} epochs with minibatch size {}...".format(epochs, minibatch_size))
+    minibatch_size = int(input("And what minibatch size do you want to use?: "))
+    print("\nTraining for {} epochs with minibatch size {}...".format(epochs, minibatch_size))
     start = time.time()
     train_model(epochs, minibatch_size)
     total_time = time.time() - start
