@@ -10,3 +10,119 @@ Average ANN tile: 147
 P-value: 0.0000341910
 Number of demo points: 5/7
 
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [<theano.tensor.elemwise.Elemwise object at 0x105110668>]
+Batchsize: 10
+Epochs: 10
+Dataset: 3
+ANN results worse than random
+Make sure you send random results is the first argument
+Number of demo points: 0
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [<theano.tensor.elemwise.Elemwise object at 0x11072e668>]
+Batchsize: 20
+Epochs: 10
+Dataset: 3
+ANN results worse than random
+Make sure you send random results is the first argument
+Number of demo points: 0
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [<theano.tensor.elemwise.Elemwise object at 0x103b935f8>]
+Batchsize: 100
+Epochs: 1
+Dataset: 3
+ANN results worse than random
+Make sure you send random results is the first argument
+Number of demo points: 0
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [<theano.tensor.elemwise.Elemwise object at 0x10d7d2630>]
+Batchsize: 10
+Epochs: 10
+Dataset: 1
+Average random tile: 106.88
+Average ANN tile: 200
+P-value: 0.0000000072
+Number of demo points: 7/7
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [<theano.tensor.elemwise.Elemwise object at 0x110b8d5f8>]
+Batchsize: 10
+Epochs: 1
+Dataset: 3
+Average random tile: 112.32
+Average ANN tile: 202
+P-value: 0.0000018757
+Number of demo points: 6/7
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [<theano.tensor.elemwise.Elemwise object at 0x10a2ea630>]
+Batchsize: 10
+Epochs: 10
+Dataset: 3
+Average random tile: 124.16
+Average ANN tile: 130
+P-value: 0.6313763510
+Number of demo points: 1/7
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [<theano.tensor.elemwise.Elemwise object at 0x10b66b5f8>]
+Batchsize: 10
+Epochs: 20
+Dataset: 2
+Average random tile: 108.16
+Average ANN tile: 224
+P-value: 0.0000015963
+Number of demo points: 6/7
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [<theano.tensor.nnet.nnet.Softmax object at 0x10ceed278>]
+Batchsize: 10
+Epochs: 10
+Dataset: 3
+Average random tile: 99.2
+Average ANN tile: 210
+P-value: 0.0000000098
+Number of demo points: 7/7
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [0]
+Batchsize: 10
+Epochs: 40
+Dataset: 3
+Average random tile: 96.96
+Average ANN tile: 188
+P-value: 0.0000000050
+Number of demo points: 7/7
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [0]
+Batchsize: 10
+Epochs: 10
+Dataset: 3
+ANN results worse than random
+Make sure you send random results is the first argument
+Number of demo points: 0
+
