@@ -13,11 +13,10 @@ class HiddenLayer(object):
         self.params = [self.weights]
 
     def init_weights(self, activation):
-        rng = np.random.RandomState(1234)
 
         # Default for activation function tanh
         weights = np.asarray(
-            rng.uniform(
+            np.random.uniform(
                 low=-np.sqrt(6. / (self.num_in + self.number_of_nodes)),
                 high=np.sqrt(6. / (self.num_in + self.number_of_nodes)),
                 size=(self.num_in, self.number_of_nodes)
@@ -29,7 +28,8 @@ class HiddenLayer(object):
             weights *= 4
         elif activation == T.nnet.softmax:
             weights = np.zeros((self.num_in, self.number_of_nodes), dtype=theano.config.floatX)
-        #TODO: elif activation == T.nnet.relu - find optimal weight initialization for relus
+        elif activation == T.nnet.relu:
+            weights = np.random.uniform(low=0.0, high=0.1, size=(self.num_in, self.number_of_nodes))
 
         return theano.shared(value=weights, name='weights', borrow=True)
 
