@@ -46,7 +46,7 @@ class AiWindow(GameWindow):
 
     def play_best_move(self, directions):
         dir = directions
-        print(directions)
+
         dir_val_tups = []
         for i in range(len(directions)):
             dir_val_tups.append((dir[i], i))
@@ -164,8 +164,9 @@ class NNplayer(object):
             moves.append(move)
         boards = np.asarray(boards, dtype=np.double)
 
+        if self.training_set !=3:
+            scale(boards)
 
-        scale(boards)
         moves = np.array(moves)
 
 

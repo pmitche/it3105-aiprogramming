@@ -370,3 +370,14 @@ Average ANN tile: 186
 P-value: 0.0000000208
 Number of demo points: 7/7
 
+Statistics:
+Topology:[10, 8]
+Learning rate: 0.01
+Activation functions: [0, 0]
+Batchsize: 10
+Epochs: 40
+Dataset: 3
+ANN results worse than random
+Make sure you send random results is the first argument
+Number of demo points: 0
+
