@@ -233,7 +233,18 @@ class main:
             self.rand_result.append(result)
             print(self.rand_result)
             print(len(self.net_result))
-            print(welch(self.rand_result, self.net_result))
+
+            welch_result = welch(self.rand_result, self.net_result)
+            print(welch_result)
+            f = open('statistics.txt','a')
+            f.write('Statistics:\n'
+                   'Topology:'+ str(self.hidden)+'\n'+
+                    'Learning rate: '+ str(self.lr)+'\n'+
+                    'Activation functions: '+ str(self.activations)+'\n'+
+                    'Batchsize: '+ str(self.minibatch)+'\n'+
+                    'Epochs: '+ str(self.epochs)+'\n'+
+                    'Dataset: '+ str(self.training_set)+'\n'+
+                    welch_result+'\n')
 
 
 def scale(seq):

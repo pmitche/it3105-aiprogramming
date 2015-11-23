@@ -1,0 +1,12 @@
+Statistics:
+Topology:[10]
+Learning rate: 0.05
+Activation functions: [<theano.tensor.elemwise.Elemwise object at 0x10eb9b588>]
+Batchsize: 10
+Epochs: 10
+Dataset: 1
+Average random tile: 90.24
+Average ANN tile: 147
+P-value: 0.0000341910
+Number of demo points: 5/7
+
