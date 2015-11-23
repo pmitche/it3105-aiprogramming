@@ -126,3 +126,63 @@ ANN results worse than random
 Make sure you send random results is the first argument
 Number of demo points: 0
 
+Statistics:
+Topology:[10]
+Learning rate: 0.05
+Activation functions: [0]
+Batchsize: 10
+Epochs: 40
+Dataset: 3
+Average random tile: 102.4
+Average ANN tile: 220
+P-value: 0.0000000026
+Number of demo points: 7/7
+
+Statistics:
+Topology:[10, 4]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 5
+Epochs: 20
+Dataset: 1
+Average random tile: 120.32
+Average ANN tile: 181
+P-value: 0.0019168984
+Number of demo points: 3/7
+
+Statistics:
+Topology:[10, 4]
+Learning rate: 0.05
+Activation functions: [0, 0]
+Batchsize: 20
+Epochs: 40
+Dataset: 1
+Average random tile: 118.4
+Average ANN tile: 167
+P-value: 0.0069087586
+Number of demo points: 3/7
+
+Statistics:
+Topology:[10, 4]
+Learning rate: 0.05
+Activation functions: [0, 0]
+Batchsize: 20
+Epochs: 100
+Dataset: 1
+Average random tile: 106.24
+Average ANN tile: 163
+P-value: 0.0015193229
+Number of demo points: 3/7
+
+Statistics:
+Topology:[10]
+Learning rate: 0.01
+Activation functions: [0]
+Batchsize: 5
+Epochs: 50
+Dataset: 3
+Average random tile: 112.96
+Average ANN tile: 200
+P-value: 0.0000002773
+Number of demo points: 7/7
+

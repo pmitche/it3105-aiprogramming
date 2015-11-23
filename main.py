@@ -190,7 +190,7 @@ class NNplayer(object):
                 move_batch = self.train_moves[i:i+minibatch_size]
                 cost += self.net.train(board_batch, move_batch)
 
-            print("Cost after epoch {}: {}".format(epoch, cost/len(self.train_boards)))
+            print("Cost after epoch {}: {}".format(epoch, cost/minibatch_size))
 
     def test_model(self):
         correct = 0
