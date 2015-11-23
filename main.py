@@ -78,7 +78,7 @@ class AiWindow(GameWindow):
             for listelem in self.board.state.board:
                 for elem in listelem:
                     returnboard.append(elem)
-                    scale(returnboard)
+            #scale(returnboard)
         #19 dim vecotr. board + 3 bits to say if highest tile in upper left corner,
         #and if top row and left column are full
         elif self.control.training_set == 3:
@@ -104,10 +104,8 @@ class AiWindow(GameWindow):
             else:
                 returnboard.append(0)
 
-
-
-
         return np.array(returnboard)
+
     #To be called when game is done
     def restart(self, result):
         self.control.new_game(result)
@@ -154,7 +152,7 @@ class NNplayer(object):
             moves.append(move)
         boards = np.asarray(boards, dtype=np.double)
 
-        if self.training_set <3:
+        if self.training_set < 3:
             scale(boards)
 
         moves = np.array(moves)
@@ -292,7 +290,8 @@ def scale(seq):
                     seq[i][j] = np.log2(seq[i][j])
             seq[i] = seq[i] / max(seq[i])
 
-#Maps input from user to a real function
+
+# Maps input from user to a real function
 def activation_map(x):
         return {
             0: T.tanh,
@@ -300,6 +299,7 @@ def activation_map(x):
             2: lambda k: T.switch(k > 0, k, 0),  # Equivalent to T.nnet.relu (rectified linear unit)
             3: T.nnet.softmax,
         }.get(x, T.tanh)  # T.tanh is default if x is not found
+
 
 #Function to determine score
 def welch(list1, list2):
