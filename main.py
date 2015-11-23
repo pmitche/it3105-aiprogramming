@@ -46,6 +46,7 @@ class AiWindow(GameWindow):
 
     def play_best_move(self, directions):
         dir = directions
+        print(directions)
         dir_val_tups = []
         for i in range(len(directions)):
             dir_val_tups.append((dir[i], i))
@@ -75,55 +76,43 @@ class AiWindow(GameWindow):
         self.restart(self.board.get_highest_tile())
         return False
 
-    def calculate_heuristic(self, node,heuristic):
-        value = 0
-        if heuristic ==2:
-            for i in range(len(node.board)):
-                for j in range(len(node.board[i])):
-                    value += node.board[i][j]*self.weight_matrix[i][j]
-        if heuristic ==3:
-            for i in range(len(node.board)):
-                for j in range(len(node.board[i])):
-                    value += node.board[i][j]*self.weight_matrix2[i][j]
-
-
-        return value
 
     # ConvertBoard for expectimax cases
     def convert_board(self):
         returnboard = []
 
-        if self.control.training_set ==2:
-            boards = []
-            for i in range(4):
-                boards.append(copy.deepcopy(self.board.state))
-
-            self.board.move('up', boards[0])
-            self.board.move('down', boards[1])
-            self.board.move('left', boards[2])
-            self.board.move('right', boards[3])
-            for i in range(4):
-                returnboard.append(self.calculate_heuristic(boards[i],self.control.training_set))
-
-        elif self.control.training_set ==1:
+        if self.control.training_set ==1:
+            for listelem in self.board.state.board:
+                for elem in listelem:
+                    returnboard.append(elem)
+        elif self.control.training_set ==2:
             for listelem in self.board.state.board:
                 for elem in listelem:
                     returnboard.append(elem)
         elif self.control.training_set == 3:
-            boards = []
-            for i in range(4):
-                boards.append(copy.deepcopy(self.board.state))
-
-            self.board.move('up', boards[0])
-            self.board.move('down', boards[1])
-            self.board.move('left', boards[2])
-            self.board.move('right', boards[3])
-            for i in range(4):
-                returnboard.append(self.calculate_heuristic(boards[i], self.control.training_set))
-
+            highest = self.board.get_highest_tile()
             for listelem in self.board.state.board:
                 for elem in listelem:
-                    returnboard.append(elem)
+                    returnboard.append(elem/highest)
+            if self.board.state.board[0][0] ==highest:
+                returnboard.append(1)
+            else:
+                returnboard.append(0)
+
+            if 0 in list(self.board.state.board[0]):
+                returnboard.append(1)
+            else:
+                returnboard.append(0)
+            full = True
+            for i in range(4):
+                if self.board.state.board[i][0] == 0:
+                    full = False
+            if full:
+                returnboard.append(1)
+            else:
+                returnboard.append(0)
+
+
 
 
         return np.array(returnboard)
@@ -149,18 +138,19 @@ class NNplayer(object):
         if self.training_set == 1:
             self.input = 16
         elif self.training_set ==2:
-            self.input = 4
+            self.input = 16
         elif self.training_set ==3:
-            self.input = 20
+            self.input =19
+
         self.net = ANN(self.input, self.topology, activation_functions, 4, lr)
 
     def load_test_cases(self):
         if self.training_set == 1:
             f = open('myfile1.txt', 'r')
         elif self.training_set ==2:
-            f = open('myfile3.txt', 'r')
+            f = open('Gradient16dim.txt', 'r')
         elif self.training_set ==3:
-            f = open('GradientAndBoard.txt', 'r')
+            f= open('Gradient19dim.txt', 'r')
         boards = []
         moves = []
         lines = f.readlines()
@@ -174,9 +164,10 @@ class NNplayer(object):
             moves.append(move)
         boards = np.asarray(boards, dtype=np.double)
 
-        if self.training_set!=3:
-            scale(boards)
+
+        scale(boards)
         moves = np.array(moves)
+
 
         self.train_boards = boards
         self.train_moves = moves
