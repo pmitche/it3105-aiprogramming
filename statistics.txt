@@ -857,3 +857,255 @@ Average ANN tile: 201
 P-value: 0.0000000154
 Number of demo points: 7/7
 
+Statistics:
+Topology:[20]
+Learning rate: 0.01
+Activation functions: [0]
+Batchsize: 1
+Epochs: 50
+Dataset: 5
+Average random tile: 97.92
+Average ANN tile: 176
+P-value: 0.0000005102
+Number of demo points: 7/7
+
+Statistics:
+Topology:[15]
+Learning rate: 0.01
+Activation functions: [0]
+Batchsize: 10
+Epochs: 10
+Dataset: 5
+Average random tile: 101.44
+Average ANN tile: 173
+P-value: 0.0000201153
+Number of demo points: 5/7
+
+Statistics:
+Topology:[15, 10]
+Learning rate: 0.001
+Activation functions: [0, 0]
+Batchsize: 40
+Epochs: 100
+Dataset: 5
+Average random tile: 107.52
+Average ANN tile: 215
+P-value: 0.0000003469
+Number of demo points: 7/7
+
+Statistics:
+Topology:[15, 10]
+Learning rate: 0.001
+Activation functions: [0, 0]
+Batchsize: 10
+Epochs: 100
+Dataset: 5
+Average random tile: 96.32
+Average ANN tile: 179
+P-value: 0.0000003766
+Number of demo points: 7/7
+
+Statistics:
+Topology:[800]
+Learning rate: 0.01
+Activation functions: [0]
+Batchsize: 35
+Epochs: 15
+Dataset: 1
+Average random tile: 116.48
+Average ANN tile: 157
+P-value: 0.0082101341
+Number of demo points: 3/7
+
+Statistics:
+Topology:[800, 400]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 35
+Epochs: 15
+Dataset: 1
+Average random tile: 107.52
+Average ANN tile: 188
+P-value: 0.0000047088
+Number of demo points: 6/7
+
+Statistics:
+Topology:[15, 10]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 10
+Epochs: 10
+Dataset: 5
+Average random tile: 101.76
+Average ANN tile: 200
+P-value: 0.0000001070
+Number of demo points: 7/7
+
+Statistics:
+Topology:[1]
+Learning rate: 1.0
+Activation functions: [0]
+Batchsize: 1
+Epochs: 1
+Dataset: 1
+Average random tile: 102.4
+Average ANN tile: 199
+P-value: 0.0000000171
+Number of demo points: 7/7
+
+Statistics:
+Topology:[1]
+Learning rate: 1.0
+Activation functions: [0]
+Batchsize: 1
+Epochs: 1
+Dataset: 1
+Average random tile: 96
+Average ANN tile: 179
+P-value: 0.0000003654
+Number of demo points: 7/7
+
+Statistics:
+Topology:[1]
+Learning rate: 1.0
+Activation functions: [0]
+Batchsize: 1
+Epochs: 1
+Dataset: 1
+Average random tile: 95.36
+Average ANN tile: 183
+P-value: 0.0000000053
+Number of demo points: 7/7
+
+Statistics:
+Topology:[1]
+Learning rate: 1.0
+Activation functions: [0]
+Batchsize: 1
+Epochs: 1
+Dataset: 1
+Average random tile: 104.96
+Average ANN tile: 224
+P-value: 0.0000000673
+Number of demo points: 7/7
+
+Statistics:
+Topology:[1]
+Learning rate: 1.0
+Activation functions: [0]
+Batchsize: 1
+Epochs: 1
+Dataset: 1
+Average random tile: 103.68
+Average ANN tile: 172
+P-value: 0.0000060437
+Number of demo points: 6/7
+
+Statistics:
+Topology:[1]
+Learning rate: 1.0
+Activation functions: [0]
+Batchsize: 1
+Epochs: 1
+Dataset: 1
+Average random tile: 113.28
+Average ANN tile: 189
+P-value: 0.0000603315
+Number of demo points: 5/7
+
+Statistics:
+Topology:[1]
+Learning rate: 1.0
+Activation functions: [0]
+Batchsize: 1
+Epochs: 1
+Dataset: 1
+Average random tile: 104.32
+Average ANN tile: 204
+P-value: 0.0000006443
+Number of demo points: 7/7
+
+Statistics:
+Topology:[1]
+Learning rate: 1.0
+Activation functions: [0]
+Batchsize: 1
+Epochs: 1
+Dataset: 1
+Average random tile: 102.4
+Average ANN tile: 184
+P-value: 0.0000000951
+Number of demo points: 7/7
+
+Statistics:
+Topology:[200, 100]
+Learning rate: 0.01
+Activation functions: [0, 0]
+Batchsize: 10
+Epochs: 10
+Dataset: 5
+Average random tile: 115.84
+Average ANN tile: 179
+P-value: 0.0006386890
+Number of demo points: 4/7
+
+Statistics:
+Topology:[800, 400]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 35
+Epochs: 15
+Dataset: 1
+Average random tile: 104.32
+Average ANN tile: 183
+P-value: 0.0000000062
+Number of demo points: 7/7
+
+Statistics:
+Topology:[800, 400]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 10
+Epochs: 40
+Dataset: 5
+Average random tile: 109.44
+Average ANN tile: 241
+P-value: 0.0000000009
+Number of demo points: 7/7
+
+Statistics:
+Topology:[800, 400]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 35
+Epochs: 15
+Dataset: 1
+Average random tile: 103.04
+Average ANN tile: 190
+P-value: 0.0000002797
+Number of demo points: 7/7
+
+Statistics:
+Topology:[800, 400]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 35
+Epochs: 15
+Dataset: 1
+Average random tile: 117.76
+Average ANN tile: 170
+P-value: 0.0011998192
+Number of demo points: 3/7
+
+Statistics:
+Topology:[800, 400]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 20
+Epochs: 100
+Dataset: 5
+Average random tile: 105.6
+Average ANN tile: 198
+P-value: 0.0000000366
+Number of demo points: 7/7
+

@@ -236,7 +236,8 @@ class main:
     #Creates a GUI window
     #Initializes statistic variables
 
-    def __init__(self):
+    def __init__(self,welch_parent):
+        self.welch_parent = welch_parent
         self.gui_bool = str(input("Gui? y/n: \n"))
         self.training_set = int(input("What training set do you want to use?\n1: 16 dim snake, 2: 16 dim gradient,3: 19 dim : "
                                       "4: 22 dim, 5: 29 dim"))
@@ -264,6 +265,7 @@ class main:
         self.net_result = []
         self.rand_result = []
         self.count = 1
+
 #This method handles the logic of starting a new game (to play 50 runs with AI and 50 random)
 #Also calculates score
     def new_game(self, result):
@@ -304,6 +306,9 @@ class main:
             # self.count+=1
             self.rand_result.append(result)
 
+            self.somelist =[]
+            self.somelist.append(self.net_result)
+            self.welch_parent.results.append(self.net_result)
             welch_result = welch(self.rand_result, self.net_result)
             print(welch_result)
             f = open('statistics.txt','a')
@@ -340,6 +345,7 @@ def scale(seq):
 
 
 
+
 #Maps input from user to a real function
 def activation_map(x):
         return {
@@ -355,5 +361,16 @@ def welch(list1, list2):
         resp = requests.post('http://folk.ntnu.no/valerijf/6/', data=params)
         return resp.text
 
+class boss:
+    def __init__(self):
+        self.results =[]
+        main1 = main(self)
+        main2 = main(self)
+        print(self.results)
+        print(welch(self.results[0],self.results[1]))
+
+
 if __name__ == '__main__':
-    main()
+    boss = boss()
+
+
