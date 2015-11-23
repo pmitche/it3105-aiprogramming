@@ -10,25 +10,15 @@ import requests
 
 
 class AiWindow(GameWindow):
+    #Initializes gui and board class
 
     def __init__(self, player, control):
         super(AiWindow, self).__init__()
         self.control = control
         self.player = player
         self.movedict = {0: 'up', 1: 'down', 2: 'left', 3: 'right'}
-        self.weight_matrix = [
-            [0, 1, 2, 3],
-            [6, 5, 5, 4],
-            [7, 9, 12, 15],
-            [55, 35, 25, 20]
-        ]
-        self.weight_matrix2= [
-            [20, 10, 5, 0],
-            [10, 5, 0, -5],
-            [5, 0, -5, -10],
-            [0, -5, -10, -20]
-        ]
 
+    #Handles game and gui logic, returns true if move was legal,false if not
     def onKeyPress(self, direction):
         if self.board.move(direction, self.board.state):
             self.update_view(self.board.state.board)
@@ -37,6 +27,7 @@ class AiWindow(GameWindow):
             return True
         return False
 
+    #As plays until play_best_move returns false, at wich point there are no legal moves
     def play(self):
         boolean_var = True
         while boolean_var:
@@ -44,9 +35,10 @@ class AiWindow(GameWindow):
             directions = list(self.player.net.predict([self.convert_board()])[0])
             boolean_var = self.play_best_move(directions)
 
+    #Goes through a list of direction values from the nnet.predict function
+    #Returns false if no moves are legal
     def play_best_move(self, directions):
         dir = directions
-
         dir_val_tups = []
         for i in range(len(directions)):
             dir_val_tups.append((dir[i], i))
@@ -56,12 +48,13 @@ class AiWindow(GameWindow):
                 return True
         self.restart(self.board.get_highest_tile())
         return False
-
+    #Plays a random move, until there are no legal moves
     def play_random(self):
         boolean_var = True
         while boolean_var:
             boolean_var = self.play_random_move()
 
+    #Randomly chooses a move and tries to perform it. If no moves are legal, return false
     def play_random_move(self):
         directions = [0, 1, 2, 3]
         moves = []
@@ -77,18 +70,17 @@ class AiWindow(GameWindow):
         return False
 
 
-    # ConvertBoard for expectimax cases
+    #Converts boards to match cases from their respective training cases
     def convert_board(self):
         returnboard = []
-
-        if self.control.training_set ==1:
+        #16 dim vector scaled
+        if self.control.training_set ==1 or self.control.training_set ==2:
             for listelem in self.board.state.board:
                 for elem in listelem:
                     returnboard.append(elem)
-        elif self.control.training_set ==2:
-            for listelem in self.board.state.board:
-                for elem in listelem:
-                    returnboard.append(elem)
+                    scale(returnboard)
+        #19 dim vecotr. board + 3 bits to say if highest tile in upper left corner,
+        #and if top row and left column are full
         elif self.control.training_set == 3:
             highest = self.board.get_highest_tile()
             for listelem in self.board.state.board:
@@ -116,15 +108,13 @@ class AiWindow(GameWindow):
 
 
         return np.array(returnboard)
-
-
-
+    #To be called when game is done
     def restart(self, result):
         self.control.new_game(result)
 
 
 class NNplayer(object):
-
+    #Initialises values and takes parameters from user
     def __init__(self, training_set, topology, lr, epochs, batch_size, activation_functions):
         self.training_set = training_set
         self.topology = topology
@@ -143,7 +133,7 @@ class NNplayer(object):
             self.input =19
 
         self.net = ANN(self.input, self.topology, activation_functions, 4, lr)
-
+    #Loads the different test cases and scales the ones that have not been scaled when they were made
     def load_test_cases(self):
         if self.training_set == 1:
             f = open('myfile1.txt', 'r')
@@ -164,15 +154,16 @@ class NNplayer(object):
             moves.append(move)
         boards = np.asarray(boards, dtype=np.double)
 
-        if self.training_set !=3:
+        if self.training_set <3:
             scale(boards)
 
         moves = np.array(moves)
 
-
+        # Sets assignes the set to the objects variables
         self.train_boards = boards
         self.train_moves = moves
 
+    #Trains batches of size "minibatch_size" for x epochs".
     def train_model(self, epochs, minibatch_size):
         for epoch in range(epochs):
             print("Training epoch number {}...".format(epoch))
@@ -182,17 +173,22 @@ class NNplayer(object):
                 move_batch = self.train_moves[i:i+minibatch_size]
                 cost += self.net.train(board_batch, move_batch)
 
-            print("Cost after epoch {}: {}".format(epoch, cost/minibatch_size))
+            print("Cost after epoch {}: {}".format(epoch, cost/len(self.train_boards)))
 
-    def test_model(self):
-        correct = 0
-        for i in range(len(self.train_moves)):
-            if self.net.predict(self.train_boards)[i] == np.argmax(self.train_moves[i]):
-                correct += 1
-        print(correct)
+    #
+    # def test_model(self):
+    #     correct = 0
+    #     for i in range(len(self.train_moves)):
+    #         if self.net.predict(self.train_boards)[i] == np.argmax(self.train_moves[i]):
+    #             correct += 1
+    #     print(correct)
 
 
 class main:
+    #Takes input from user
+    #Creates an NNplayer
+    #Creates a GUI window
+    #Initializes statistic variables
 
     def __init__(self):
         self.gui_bool = str(input("Gui? y/n: \n"))
@@ -221,8 +217,10 @@ class main:
         self.net_result = []
         self.rand_result = []
         self.count = 1
-
+#This method handles the logic of starting a new game (to play 50 runs with AI and 50 random)
+#Also calculates score
     def new_game(self, result):
+
         self.game.pack_forget()
         if self.count < 50:
             self.net_result.append(result)
@@ -287,13 +285,14 @@ def scale(seq):
         :param seq: A list of board states, formatted as float (important!)
         :return: A scaled list of board states, ranging from 0 to 1
         """
+
         for i in range(len(seq)):
             for j in range(len(seq[i])):
                 if seq[i][j] != 0:
                     seq[i][j] = np.log2(seq[i][j])
             seq[i] = seq[i] / max(seq[i])
 
-
+#Maps input from user to a real function
 def activation_map(x):
         return {
             0: T.tanh,
@@ -302,7 +301,7 @@ def activation_map(x):
             3: T.nnet.softmax,
         }.get(x, T.tanh)  # T.tanh is default if x is not found
 
-
+#Function to determine score
 def welch(list1, list2):
         params = {"results": str(list1) + " " + str(list2), "raw": "1"}
         resp = requests.post('http://folk.ntnu.no/valerijf/6/', data=params)

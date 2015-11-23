@@ -143,9 +143,11 @@ class Board(object):
                             moved = True
                             break
         return moved
+
+
     def get_highest_tile(self):
         biggest = 0
-        for tiles in self.board:
+        for tiles in self.state.board:
             for tile in tiles:
                 biggest= max(biggest,tile)
         return biggest
