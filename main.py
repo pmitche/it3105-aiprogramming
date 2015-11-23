@@ -34,6 +34,7 @@ class AiWindow(GameWindow):
     def play(self):
         boolean_var = True
         while boolean_var:
+
             directions = list(self.player.net.predict([self.convert_board()])[0])
             boolean_var = self.play_best_move(directions)
 
@@ -57,10 +58,12 @@ class AiWindow(GameWindow):
     def play_random_move(self):
         directions = [0, 1, 2, 3]
         moves = []
-        for _ in directions:
-            rand = random.randint(0, len(directions)-1)
-            moves.append(directions[rand])
-        for num in directions:
+        for _ in range(4):
+            choice = random.choice(directions)
+            moves.append(choice)
+            directions.remove(choice)
+
+        for num in moves:
             if self.onKeyPress(self.movedict[num]):
                 return True
         self.restart(self.board.get_highest_tile())
@@ -76,25 +79,28 @@ class AiWindow(GameWindow):
     # ConvertBoard for expectimax cases
     def convert_board(self):
         returnboard = []
-        boards = []
-        for i in range(4):
-            boards.append(copy.deepcopy(self.board.state))
 
-        self.board.move('up', boards[0])
-        self.board.move('down', boards[1])
-        self.board.move('left', boards[2])
-        self.board.move('right', boards[3])
-        for i in range(4):
-            returnboard.append(self.calculate_heuristic(boards[i]))
+        if self.control.training_set ==2:
+            boards = []
+            for i in range(4):
+                boards.append(copy.deepcopy(self.board.state))
+
+            self.board.move('up', boards[0])
+            self.board.move('down', boards[1])
+            self.board.move('left', boards[2])
+            self.board.move('right', boards[3])
+            for i in range(4):
+                returnboard.append(self.calculate_heuristic(boards[i]))
+
+        elif self.control.training_set ==1:
+            for listelem in self.board.state.board:
+                for elem in listelem:
+                    returnboard.append(elem)
+
+
         return np.array(returnboard)
 
-    #
-    # def convertBoard(self):
-    #     returnboard = []
-    #     for listelem in self.board.board:
-    #         for elem in listelem:
-    #             returnboard.append(elem)
-    #     return np.array(returnboard)
+
 
     def restart(self, result):
         self.control.new_game(result)
@@ -163,7 +169,7 @@ class main:
 
     def __init__(self):
         self.gui_bool = str(input("Gui? y/n: \n"))
-        self.training_set = str(input("What training set do you want to use?\n1: 16 dim vector, 2: 4 dim vector: \n"))
+        self.training_set = int(input("What training set do you want to use?\n1: 16 dim vector, 2: 4 dim vector: \n"))
         self.hidden = [x for x in map(int, input("Please specify a topology description on the form 40,20,60: ").strip().split(","))]
         self.activations = [activation_map(x) for x in list(map(int, input("Please specify activation functions for each layer on the form 0,2,1: ").strip().split(",")))]
         self.lr = float(input("Specify learning rate: "))
@@ -225,7 +231,7 @@ class main:
         elif self.count == 100:
             # self.count+=1
             self.rand_result.append(result)
-            print(len(self.rand_result))
+            print(self.rand_result)
             print(len(self.net_result))
             print(welch(self.rand_result, self.net_result))
 
