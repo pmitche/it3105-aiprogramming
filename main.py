@@ -17,6 +17,11 @@ class AiWindow(GameWindow):
         self.control = control
         self.player = player
         self.movedict = {0: 'up', 1: 'down', 2: 'left', 3: 'right'}
+        self.weight_matrix = [
+            [200,150,100,50],
+            [150,100,50,30],
+            [100,50,30,20],
+            [50,30,20,10]]
 
     #Handles game and gui logic, returns true if move was legal,false if not
     def onKeyPress(self, direction):
@@ -69,6 +74,13 @@ class AiWindow(GameWindow):
         self.restart(self.board.get_highest_tile())
         return False
 
+    def calculate_heuristic(self,state):
+        value = 0
+        for i in range (len(state.board)):
+            for j in range(len(state.board[i])):
+                value += self.weight_matrix[i][j]* state.board[i][j]
+        return value
+
 
     #Converts boards to match cases from their respective training cases
     def convert_board(self):
@@ -105,12 +117,31 @@ class AiWindow(GameWindow):
                 returnboard.append(1)
             else:
                 returnboard.append(0)
-            if self.control.training_set>3:
-                returnboard.append(len(self.board.get_free_cells(self.board.state))/16)
+            if self.control.training_set==3:
+                returnboard.append(len(self.board.get_free_cells(self.board.state)))
                 returnboard.append(self.board.count_horizontal_moves(self.board.state))
                 returnboard.append(self.board.count_vertical_moves(self.board.state))
 
+            if self.control.training_set>4:
 
+                returnboard.append(self.board.count_horizontal_moves(self.board.state))
+                returnboard.append(self.board.count_vertical_moves(self.board.state))
+                up = copy.deepcopy(self.board.state)
+                down = copy.deepcopy(self.board.state)
+                left = copy.deepcopy(self.board.state)
+                right = copy.deepcopy(self.board.state)
+                states = [self.calculate_heuristic(up),self.calculate_heuristic(down)
+                    ,self.calculate_heuristic(left),self.calculate_heuristic(right)]
+                maxnum = np.max(states)
+                for i in range(len(states)):
+                    states[i] =states[i]/maxnum
+                    returnboard.append(states[i])
+                freecells = [len(self.board.get_free_cells(up)), len(self.board.get_free_cells(down)),
+                             len(self.board.get_free_cells(left)),len(self.board.get_free_cells(right))]
+                maxnum = np.max(freecells)
+                for i in range(len(freecells)):
+                    freecells[i] /=maxnum
+                    returnboard.append(freecells[i])
 
 
         return np.array(returnboard)
@@ -139,6 +170,8 @@ class NNplayer(object):
             self.input =19
         elif self.training_set ==4:
             self.input =22
+        elif self.training_set ==5:
+            self.input=29
 
         self.net = ANN(self.input, self.topology, activation_functions, 4, lr)
     #Loads the different test cases and scales the ones that have not been scaled when they were made
@@ -151,6 +184,8 @@ class NNplayer(object):
             f= open('Gradient19dim.txt', 'r')
         elif self.training_set ==4:
             f= open('Gradient22dim.txt', 'r')
+        elif self.training_set ==5:
+            f= open('Gradient30dim.txt','r')
         boards = []
         moves = []
         lines = f.readlines()
@@ -166,6 +201,7 @@ class NNplayer(object):
 
         if self.training_set <3:
             scale(boards)
+
 
         moves = np.array(moves)
 
@@ -202,7 +238,8 @@ class main:
 
     def __init__(self):
         self.gui_bool = str(input("Gui? y/n: \n"))
-        self.training_set = int(input("What training set do you want to use?\n1: 16 dim snake, 2: 16 dim gradient,3:19 dim : "))
+        self.training_set = int(input("What training set do you want to use?\n1: 16 dim snake, 2: 16 dim gradient,3: 19 dim : "
+                                      "4: 22 dim, 5: 29 dim"))
         self.hidden = [x for x in map(int, input("Please specify a topology description on the form 40,20,60: ").strip().split(","))]
         self.activations = [activation_map(x) for x in list(map(int, input("Please specify activation functions for each layer on the form 0,2,1: ").strip().split(",")))]
         self.lr = float(input("Specify learning rate: "))
