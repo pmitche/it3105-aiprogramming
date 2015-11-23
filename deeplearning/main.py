@@ -6,6 +6,8 @@ from Modul5.deeplearning.ann import ANN
 
 
 def scale(images):
+    # scale the original pixel intensities of the range [0, 255] down to a range
+    # of [0.0, 1.0]
     for image in range(len(images)):
         for value in range(len(images[image])):
             images[image][value] /= 255.0
@@ -21,6 +23,13 @@ def activation_map(x):
 
 
 def train_model(epochs, minibatch_size):
+    """
+    Trains the neural network for x amount of epochs with a specific minibatch size.
+
+    :param epochs:          the number of epochs for which to train the network
+    :param minibatch_size:  the size of each minibatch
+    :return:
+    """
     for epoch in range(epochs):
         print("Training epoch number {}...".format(epoch))
         cost = 0
@@ -36,6 +45,11 @@ def train_model(epochs, minibatch_size):
 
 
 def test_model():
+    """
+    Tests the model on a test set and checks how many cases the network managed to classify correctly.
+    Also writes statistics to file.
+    :return:
+    """
     correct = 0
     total = len(test_set_x)
 
@@ -74,6 +88,7 @@ print("\n0: hyperbolic tangent, 1: sigmoid, 2: rectified linear unit, 3: softmax
 activations = [activation_map(x) for x in list(map(int, input("Please specify activation functions for each layer on the form 0,2,1: ").strip().split(",")))]
 lr = float(input("What learning rate do you want to use?: "))
 print("Building model...")
+# For MNIST, the amount of input neurons is always 784 (28*28), and the amount of output neurons is always 10.
 ann = ANN(28*28, hidden, activations, 10, lr)
 print("Finished building model!\n")
 
