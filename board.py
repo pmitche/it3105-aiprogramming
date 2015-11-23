@@ -1,6 +1,7 @@
 from Modul6.state import State
 import random
 import copy
+import math
 __author__ = 'sondredyvik, paulpm'
 
 
@@ -30,6 +31,35 @@ class Board(object):
             state.board[x][y] = value
         else:
             self.full = True
+
+    def count_vertical_moves(self,state):
+        count =0
+        for y in reversed(range(4)):
+            for x in reversed(range(4)):
+                if state.board[x][y] != 0:
+                    for z in range(x, -1, -1):
+                        if state.board[z][y] != 0 and x != z:
+                            if state.board[x][y] == state.board[z][y]:
+                                count +=1
+                                break
+                            if state.board[z][y] != 0 and state.board[z][y] != state.board[x][y]:
+                                break
+        return math.ceil(count/2)
+
+    def count_horizontal_moves(self,state):
+        count = 0
+
+        for x in range(4):
+            for y in range(4):
+                if state.board[x][y] != 0:
+                    for z in range(y, 4):
+                        if state.board[x][y] == state.board[x][z] and y != z:
+                            count +=1
+
+                        if state.board[x][z] != 0 and state.board[x][z] != state.board[x][y]:
+                            break
+
+        return math.floor(count/2)
 
     def move_all_tiles_right(self, state):
         moved = False

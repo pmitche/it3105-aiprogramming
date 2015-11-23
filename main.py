@@ -74,14 +74,15 @@ class AiWindow(GameWindow):
     def convert_board(self):
         returnboard = []
         #16 dim vector scaled
-        if self.control.training_set ==1 or self.control.training_set ==2:
+        if self.control.training_set <3:
             for listelem in self.board.state.board:
                 for elem in listelem:
-                    returnboard.append(elem)
-            #scale(returnboard)
+                    returnboard.append(elem/np.log2(elem))
+            returnboard = returnboard/max(returnboard)
+
         #19 dim vecotr. board + 3 bits to say if highest tile in upper left corner,
         #and if top row and left column are full
-        elif self.control.training_set == 3:
+        elif self.control.training_set >2:
             highest = self.board.get_highest_tile()
             for listelem in self.board.state.board:
                 for elem in listelem:
@@ -103,6 +104,10 @@ class AiWindow(GameWindow):
                 returnboard.append(1)
             else:
                 returnboard.append(0)
+            if self.control.training_set>3:
+                returnboard.append(len(self.board.get_free_cells(self.board.state))/16)
+                returnboard.append(self.board.count_horizontal_moves(self.board.state))
+                returnboard.append(self.board.count_vertical_moves(self.board.state))
 
         return np.array(returnboard)
 
@@ -129,6 +134,8 @@ class NNplayer(object):
             self.input = 16
         elif self.training_set ==3:
             self.input =19
+        elif self.training_set ==4:
+            self.input =22
 
         self.net = ANN(self.input, self.topology, activation_functions, 4, lr)
     #Loads the different test cases and scales the ones that have not been scaled when they were made
@@ -139,6 +146,8 @@ class NNplayer(object):
             f = open('Gradient16dim.txt', 'r')
         elif self.training_set ==3:
             f= open('Gradient19dim.txt', 'r')
+        elif self.training_set ==4:
+            f= open('Gradient22dim.txt', 'r')
         boards = []
         moves = []
         lines = f.readlines()
@@ -190,7 +199,7 @@ class main:
 
     def __init__(self):
         self.gui_bool = str(input("Gui? y/n: \n"))
-        self.training_set = int(input("What training set do you want to use?\n1: 16 dim vector, 2: 4 dim vector,3: 20 dim: \n"))
+        self.training_set = int(input("What training set do you want to use?\n1: 16 dim snake, 2: 16 dim gradient,3:19 dim : "))
         self.hidden = [x for x in map(int, input("Please specify a topology description on the form 40,20,60: ").strip().split(","))]
         self.activations = [activation_map(x) for x in list(map(int, input("Please specify activation functions for each layer on the form 0,2,1: ").strip().split(",")))]
         self.lr = float(input("Specify learning rate: "))
@@ -254,8 +263,6 @@ class main:
         elif self.count == 100:
             # self.count+=1
             self.rand_result.append(result)
-            print(self.rand_result)
-            print(len(self.net_result))
 
             welch_result = welch(self.rand_result, self.net_result)
             print(welch_result)
@@ -291,7 +298,8 @@ def scale(seq):
             seq[i] = seq[i] / max(seq[i])
 
 
-# Maps input from user to a real function
+
+#Maps input from user to a real function
 def activation_map(x):
         return {
             0: T.tanh,
