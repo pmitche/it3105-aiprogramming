@@ -121,7 +121,6 @@ class AiWindow(GameWindow):
                 returnboard.append(self.board.count_horizontal_moves(self.board.state))
                 returnboard.append(self.board.count_vertical_moves(self.board.state))
 
-<<<<<<< HEAD
             if self.control.training_set>4:
 
                 returnboard.append(self.board.count_horizontal_moves(self.board.state))
@@ -143,9 +142,6 @@ class AiWindow(GameWindow):
                     freecells[i] /=maxnum
                     returnboard.append(freecells[i])
 
-
-=======
->>>>>>> 6936100ec80cd5275875b0801fcbaeb19c1846ff
         return np.array(returnboard)
 
     #To be called when game is done
