@@ -1109,3 +1109,27 @@ Average ANN tile: 198
 P-value: 0.0000000366
 Number of demo points: 7/7
 
+Statistics:
+Topology:[800, 400]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 10
+Epochs: 20
+Dataset: 5
+Average random tile: 98.56
+Average ANN tile: 131
+P-value: 0.0057996356
+Number of demo points: 3/7
+
+Statistics:
+Topology:[20]
+Learning rate: 0.1
+Activation functions: [0]
+Batchsize: 10
+Epochs: 10
+Dataset: 1
+Average random tile: 119.04
+Average ANN tile: 181
+P-value: 0.0000075365
+Number of demo points: 6/7
+
