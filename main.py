@@ -35,25 +35,25 @@ class AiWindow(GameWindow):
     #As plays until play_best_move returns false, at wich point there are no legal moves
     def play(self):
         boolean_var = True
-        #while boolean_var:
-        directions = list(self.player.net.predict([self.convert_board()])[0])
-        boolean_var = self.play_best_move(directions)
+        while boolean_var:
+            directions = list(self.player.net.predict([self.convert_board()])[0])
+            boolean_var = self.play_best_move(directions)
 
     #Goes through a list of direction values from the nnet.predict function
     #Returns false if no moves are legal
     def play_best_move(self, directions):
         dir = directions
         dir_val_tups = []
-        print (dir)
+
         for i in range(len(directions)):
             dir_val_tups.append((dir[i], i))
-        print (dir_val_tups)
+
         dir_val_tups.sort()
-        print (dir_val_tups)
+
         for elem in dir_val_tups:
-            print(elem)
+
             if self.onKeyPress(self.movedict[elem[1]]):
-                print (self.movedict[elem[1]])
+
                 return True
         self.restart(self.board.get_highest_tile())
         return False
@@ -123,20 +123,20 @@ class AiWindow(GameWindow):
 
 
 
-            if self.board.state.board[0][0] ==highest:
+            if self.board.state.board[3][3] ==highest:
                 returnboard.append(1)
             else:
                 returnboard.append(0)
 
 
-            if 0 in list(self.board.state.board[0]):
+            if 0 in list(self.board.state.board[3]):
                 returnboard.append(1)
             else:
                 returnboard.append(0)
 
             full = True
             for i in range(4):
-                if self.board.state.board[i][0] == 0:
+                if self.board.state.board[i][3] == 0:
                     full = False
             if full:
                 returnboard.append(1)
@@ -165,8 +165,11 @@ class AiWindow(GameWindow):
                 freecells = [len(self.board.get_free_cells(up)), len(self.board.get_free_cells(down)),
                              len(self.board.get_free_cells(left)),len(self.board.get_free_cells(right))]
                 maxnum = np.max(freecells)
+
                 for i in range(len(freecells)):
-                    freecells[i] /= maxnum
+                    if maxnum >0:
+                        freecells[i] /= maxnum
+
                     returnboard.append(freecells[i])
         print (returnboard)
 

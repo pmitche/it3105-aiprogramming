@@ -1133,3 +1133,53 @@ Average ANN tile: 181
 P-value: 0.0000075365
 Number of demo points: 6/7
 
+Statistics:
+Topology:[20, 10]
+Learning rate: 0.01
+Activation functions: [0, 0]
+Batchsize: 15
+Epochs: 20
+Dataset: 5
+Average random tile: 110.72
+Average ANN tile: 171
+P-value: 0.0000144728
+Number of demo points: 5/7
+
+Statistics:
+Topology:[20, 10]
+Learning rate: 0.01
+Activation functions: [0, 0]
+Batchsize: 15
+Epochs: 50
+Dataset: 5
+Average random tile: 112
+Average ANN tile: 168
+P-value: 0.0004434083
+Number of demo points: 4/7
+
+Statistics:
+Topology:[800, 400]
+Learning rate: 0.01
+Activation functions: [0, 1]
+Batchsize: 35
+Epochs: 40
+Dataset: 5
+Average random tile: 107.52
+Average ANN tile: 204
+P-value: 0.0000004587
+Number of demo points: 7/7
+
+Statistics:
+Topology:[20, 10]
+Learning rate: 0.05
+Activation functions: [0, 0]
+Batchsize: 10
+Epochs: 100
+Dataset: 5
+Average random tile: 109.44
+Average ANN tile: 183
+Std. random tile: 60.677857979494
+Std. ANN tile: 106.38962662338
+P-value: 0.0000515811
+Number of demo points: 5/7
+
