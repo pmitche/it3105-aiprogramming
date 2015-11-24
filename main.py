@@ -35,10 +35,9 @@ class AiWindow(GameWindow):
     #As plays until play_best_move returns false, at wich point there are no legal moves
     def play(self):
         boolean_var = True
-        while boolean_var:
-
-            directions = list(self.player.net.predict([self.convert_board()])[0])
-            boolean_var = self.play_best_move(directions)
+       # while boolean_var:
+        directions = list(self.player.net.predict([self.convert_board()])[0])
+        boolean_var = self.play_best_move(directions)
 
     #Goes through a list of direction values from the nnet.predict function
     #Returns false if no moves are legal
@@ -87,18 +86,31 @@ class AiWindow(GameWindow):
         returnboard = []
         #16 dim vector scaled
         if self.control.training_set <3:
-            for listelem in self.board.state.board:
-                for elem in listelem:
-                    returnboard.append(elem/np.log2(elem))
-            returnboard = returnboard/max(returnboard)
+            for i in range(len(self.board.state.board)):
+                for j in range(len(self.board.state.board[i])):
+                    if self.board.state.board[i][j]!=0:
+                        returnboard.append(np.log2(self.board.state.board[i][j]))
+                    else:
+                        returnboard.append(0)
+
+            for i in range (len(returnboard)):
+                returnboard[i] = returnboard[i]/np.max(returnboard)
+
+            print (returnboard)
 
         #19 dim vecotr. board + 3 bits to say if highest tile in upper left corner,
         #and if top row and left column are full
         elif self.control.training_set >2:
             highest = self.board.get_highest_tile()
-            for listelem in self.board.state.board:
-                for elem in listelem:
-                    returnboard.append(elem/highest)
+            for i in range(len(self.board.state.board)):
+                for j in range(len(self.board.state.board[i])):
+                    if self.board.state.board[i][j]!=0:
+                        returnboard.append(np.log2(self.board.state.board[i][j]))
+                for i in range (len(returnboard)):
+                    returnboard[i] = returnboard[i]/np.max(returnboard)
+                else:
+                        returnboard.append(0)
+
             if self.board.state.board[0][0] ==highest:
                 returnboard.append(1)
             else:
@@ -146,7 +158,8 @@ class AiWindow(GameWindow):
 
     #To be called when game is done
     def restart(self, result):
-        self.control.new_game(result)
+        pass
+        #self.control.new_game(result)
 
 
 class NNplayer(object):
