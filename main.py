@@ -35,9 +35,9 @@ class AiWindow(GameWindow):
     #As plays until play_best_move returns false, at wich point there are no legal moves
     def play(self):
         boolean_var = True
-       # while boolean_var:
-        directions = list(self.player.net.predict([self.convert_board()])[0])
-        boolean_var = self.play_best_move(directions)
+        while boolean_var:
+            directions = list(self.player.net.predict([self.convert_board()])[0])
+            boolean_var = self.play_best_move(directions)
 
     #Goes through a list of direction values from the nnet.predict function
     #Returns false if no moves are legal
@@ -96,7 +96,7 @@ class AiWindow(GameWindow):
             for i in range (len(returnboard)):
                 returnboard[i] = returnboard[i]/np.max(returnboard)
 
-            print (returnboard)
+
 
         #19 dim vecotr. board + 3 bits to say if highest tile in upper left corner,
         #and if top row and left column are full
@@ -106,35 +106,39 @@ class AiWindow(GameWindow):
                 for j in range(len(self.board.state.board[i])):
                     if self.board.state.board[i][j]!=0:
                         returnboard.append(np.log2(self.board.state.board[i][j]))
+                    else:returnboard.append(0)
                 for i in range (len(returnboard)):
                     returnboard[i] = returnboard[i]/np.max(returnboard)
-                else:
-                        returnboard.append(0)
 
-            if self.board.state.board[0][0] ==highest:
+
+
+            if self.board.state.board[3][3] ==highest:
                 returnboard.append(1)
             else:
                 returnboard.append(0)
 
-            if 0 in list(self.board.state.board[0]):
+
+            if 0 in list(self.board.state.board[3]):
                 returnboard.append(1)
             else:
                 returnboard.append(0)
+
             full = True
             for i in range(4):
-                if self.board.state.board[i][0] == 0:
+                if self.board.state.board[i][3] == 0:
                     full = False
             if full:
                 returnboard.append(1)
             else:
                 returnboard.append(0)
+
             if self.control.training_set==3:
                 returnboard.append(len(self.board.get_free_cells(self.board.state)))
                 returnboard.append(self.board.count_horizontal_moves(self.board.state))
                 returnboard.append(self.board.count_vertical_moves(self.board.state))
 
-            if self.control.training_set>4:
 
+            if self.control.training_set>4:
                 returnboard.append(self.board.count_horizontal_moves(self.board.state))
                 returnboard.append(self.board.count_vertical_moves(self.board.state))
                 up = copy.deepcopy(self.board.state)
@@ -151,9 +155,11 @@ class AiWindow(GameWindow):
                              len(self.board.get_free_cells(left)),len(self.board.get_free_cells(right))]
                 maxnum = np.max(freecells)
                 for i in range(len(freecells)):
-                    freecells[i] /=maxnum
+                    freecells[i] /= maxnum
                     returnboard.append(freecells[i])
 
+
+        print (len(returnboard))
         return np.array(returnboard)
 
     #To be called when game is done
