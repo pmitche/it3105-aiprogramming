@@ -14,7 +14,7 @@ Repository for hosting deliverables in the course IT3105 Artificial Intelligence
 **module4:** Minimax for Playing the 2048 Game.
 
 ## PROJECT 3
-###### TBC
+###### Implemented in Python 3.5 using [Theano](http://deeplearning.net/software/theano/)
 **module5:** Neural Networks for Image Classification
 
 **module6:** Neural Networks for Game Playing
