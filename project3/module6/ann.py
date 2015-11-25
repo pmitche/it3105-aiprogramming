@@ -2,7 +2,7 @@ import theano
 import theano.tensor as T
 import numpy as np
 
-from Modul6.layer import HiddenLayer
+from project3.module6.layer import HiddenLayer
 
 
 class ANN(object):

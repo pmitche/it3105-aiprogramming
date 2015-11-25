@@ -1,8 +1,9 @@
-from Modul6.state import State
+__author__ = 'sondredyvik, paulpm'
+
+from project3.module6.state import State
 import random
 import copy
 import math
-__author__ = 'sondredyvik, paulpm'
 
 
 class Board(object):
@@ -112,12 +113,15 @@ class Board(object):
                             moved = True
                             break
         return moved
+
     def has_available_moves(self):
         #We only need one
         copyboard = copy.deepcopy(self.state)
 
-        return  self.move("up",copyboard) or self.move("down",copyboard)\
-                or self.move("left",copyboard) or self.move("right",copyboard)
+        return self.move("up", copyboard) \
+               or self.move("down", copyboard) \
+               or self.move("left", copyboard) \
+               or self.move("right", copyboard)
 
 
     def move_all_tiles_down(self, state):
@@ -174,14 +178,12 @@ class Board(object):
                             break
         return moved
 
-
     def get_highest_tile(self):
         biggest = 0
         for tiles in self.state.board:
             for tile in tiles:
-                biggest= max(biggest,tile)
+                biggest = max(biggest, tile)
         return biggest
-
 
     def move(self, direction, state):
 

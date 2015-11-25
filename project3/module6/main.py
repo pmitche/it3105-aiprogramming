@@ -1,5 +1,5 @@
-from Modul6.ann import ANN
-from Modul6.gui_from_instructor import *
+from project3.module6.ann import ANN
+from project3.module6.gui import *
 
 import theano.tensor as T
 import numpy as np
@@ -10,8 +10,7 @@ import requests
 
 
 class AiWindow(GameWindow):
-    #Initializes gui and board class
-
+    # Initializes gui and board class
     def __init__(self, player, control):
         super(AiWindow, self).__init__()
         self.control = control
@@ -23,7 +22,7 @@ class AiWindow(GameWindow):
             [100,50,30,20],
             [50,30,20,10]]
 
-    #Handles game and gui logic, returns true if move was legal,false if not
+    # Handles game and gui logic, returns true if move was legal, false if not
     def onKeyPress(self, direction):
         if self.board.move(direction, self.board.state):
             self.update_view(self.board.state.board)
@@ -32,15 +31,15 @@ class AiWindow(GameWindow):
             return True
         return False
 
-    #As plays until play_best_move returns false, at wich point there are no legal moves
+    # AI plays until play_best_move returns false, at which point there are no legal moves
     def play(self):
         boolean_var = True
         while boolean_var:
             directions = list(self.player.net.predict([self.convert_board()])[0])
             boolean_var = self.play_best_move(directions)
 
-    #Goes through a list of direction values from the nnet.predict function
-    #Returns false if no moves are legal
+    # Goes through a list of direction values from the nnet.predict function
+    # Returns false if no moves are legal
     def play_best_move(self, directions):
         dir = directions
         dir_val_tups = []
@@ -51,19 +50,19 @@ class AiWindow(GameWindow):
         dir_val_tups.sort()
 
         for elem in dir_val_tups:
-
             if self.onKeyPress(self.movedict[elem[1]]):
-
                 return True
+
         self.restart(self.board.get_highest_tile())
         return False
-    #Plays a random move, until there are no legal moves
+
+    # Plays a random move, until there are no legal moves
     def play_random(self):
         boolean_var = True
         while boolean_var:
             boolean_var = self.play_random_move()
 
-    #Randomly chooses a move and tries to perform it. If no moves are legal, return false
+    # Randomly chooses a move and tries to perform it. If no moves are legal, return false
     def play_random_move(self):
         directions = [0, 1, 2, 3]
         moves = []
@@ -78,34 +77,31 @@ class AiWindow(GameWindow):
         self.restart(self.board.get_highest_tile())
         return False
 
-    def calculate_heuristic(self,state):
+    def calculate_heuristic(self, state):
         value = 0
-        for i in range (len(state.board)):
+        for i in range(len(state.board)):
             for j in range(len(state.board[i])):
                 value += self.weight_matrix[i][j]* state.board[i][j]
         return value
 
-
-    #Converts boards to match cases from their respective training cases
+    # Converts boards to match cases from their respective training cases
     def convert_board(self):
         returnboard = []
         #16 dim vector scaled
         if self.control.training_set <3:
             for i in range(len(self.board.state.board)):
                 for j in range(len(self.board.state.board[i])):
-                    if self.board.state.board[i][j]!=0:
+                    if self.board.state.board[i][j] != 0:
                         returnboard.append(np.log2(self.board.state.board[i][j]))
                     else:
                         returnboard.append(0)
 
-            for i in range (len(returnboard)):
-                if returnboard[i]!=0:
+            for i in range(len(returnboard)):
+                if returnboard[i] != 0:
                     returnboard[i] = returnboard[i]/np.log2(self.board.get_highest_tile())
 
-
-
-        #19 dim vecotr. board + 3 bits to say if highest tile in upper left corner,
-        #and if top row and left column are full
+        # 19 dim vector. board + 3 bits to say if highest tile in upper left corner,
+        # and if top row and left column are full
         elif self.control.training_set >2:
             highest = self.board.get_highest_tile()
             for i in range(len(self.board.state.board)):
@@ -171,17 +167,17 @@ class AiWindow(GameWindow):
                         freecells[i] /= maxnum
 
                     returnboard.append(freecells[i])
-        print (returnboard)
+        print(returnboard)
 
         return np.array(returnboard)
 
-    #To be called when game is done
+    # To be called when game is done
     def restart(self, result):
         self.control.new_game(result)
 
 
 class NNplayer(object):
-    #Initialises values and takes parameters from user
+    # Initialises values and takes parameters from user
     def __init__(self, training_set, topology, lr, epochs, batch_size, activation_functions):
         self.training_set = training_set
         self.topology = topology
@@ -204,7 +200,8 @@ class NNplayer(object):
             self.input=29
 
         self.net = ANN(self.input, self.topology, activation_functions, 4, lr)
-    #Loads the different test cases and scales the ones that have not been scaled when they were made
+
+    # Loads the different test cases and scales the ones that have not been scaled when they were made
     def load_test_cases(self):
         if self.training_set == 1:
             f = open('myfile1.txt', 'r')
@@ -239,7 +236,7 @@ class NNplayer(object):
         self.train_boards = boards
         self.train_moves = moves
 
-    #Trains batches of size "minibatch_size" for x epochs".
+    # Trains batches of size "minibatch_size" for x epochs.
     def train_model(self, epochs, minibatch_size):
         for epoch in range(epochs):
             print("Training epoch number {}...".format(epoch))
@@ -250,14 +247,6 @@ class NNplayer(object):
                 cost += self.net.train(board_batch, move_batch)
 
             print("Cost after epoch {}: {}".format(epoch, cost/len(self.train_boards)))
-
-    #
-    # def test_model(self):
-    #     correct = 0
-    #     for i in range(len(self.train_moves)):
-    #         if self.net.predict(self.train_boards)[i] == np.argmax(self.train_moves[i]):
-    #             correct += 1
-    #     print(correct)
 
 
 class main:
