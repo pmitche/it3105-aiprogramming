@@ -1,4 +1,4 @@
-## IT3105 Artificial Intelligence Programming - Project 2
+## IT3105 Artificial Intelligence Programming - Project 3
 
 This project focused on the implementation of neural networks using the numerical computation library [Theano](http://deeplearning.net/software/theano/) for Python 3.4.
 
