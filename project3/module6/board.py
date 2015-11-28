@@ -1,13 +1,17 @@
-__author__ = 'sondredyvik, paulpm'
-
-from project3.module6.state import State
 import random
 import copy
 import math
 
+__author__ = 'sondredyvik, paulpm'
+
+
+class State:
+    def __init__(self, board, score):
+        self.board = board
+        self.score = score
+
 
 class Board(object):
-
     def __init__(self):
         self.board = [[0 for _ in range(4)] for _ in range(4)]
         self.free_tiles = []
@@ -41,13 +45,13 @@ class Board(object):
                     for z in range(x, -1, -1):
                         if state.board[z][y] != 0 and x != z:
                             if state.board[x][y] == state.board[z][y]:
-                                count +=1
+                                count += 1
                                 break
                             if state.board[z][y] != 0 and state.board[z][y] != state.board[x][y]:
                                 break
         return math.ceil(count/2)
 
-    def count_horizontal_moves(self,state):
+    def count_horizontal_moves(self, state):
         count = 0
 
         for x in range(4):
@@ -55,7 +59,7 @@ class Board(object):
                 if state.board[x][y] != 0:
                     for z in range(y, 4):
                         if state.board[x][y] == state.board[x][z] and y != z:
-                            count +=1
+                            count += 1
 
                         if state.board[x][z] != 0 and state.board[x][z] != state.board[x][y]:
                             break
@@ -115,7 +119,7 @@ class Board(object):
         return moved
 
     def has_available_moves(self):
-        #We only need one
+        # We only need one
         copyboard = copy.deepcopy(self.state)
 
         return self.move("up", copyboard) \
@@ -206,10 +210,6 @@ class Board(object):
 
     def __repr__(self):
         return str([(str(x), '\n') for x in self.board])
-
-    def print_self(self, state):
-        for x in state.board:
-            print(x)
 
 
 
