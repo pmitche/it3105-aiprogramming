@@ -1,5 +1,5 @@
 # IT3105 Artificial Intelligence Programming
-Repository for hosting deliverables in the course IT3105 Artificial Intelligence Programming at the Norwegian University of Science and Technology, fall 2015.
+Repository for hosting deliverables in the course IT3105 Artificial Intelligence Programming at the Norwegian University of Science and Technology, fall 2015. Entire course completed as a group effort with [Sondre Dyvik](https://github.com/sondrehd).
 
 ## PROJECT 1
 ###### Implemented in Python 2.7
