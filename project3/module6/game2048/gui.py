@@ -1,6 +1,6 @@
 from tkinter import *
 
-from project3.module6.board import Board
+from project3.module6.game2048.board import Board
 
 GRID_LEN = 4
 GRID_PADDING = 10
@@ -29,7 +29,7 @@ BACKGROUND_COLOR_DICT = {
 class GameWindow(Frame):
     def __init__(self):
         Frame.__init__(self)
-        self.master.title('2048')
+        self.master.title('game2048')
         self.board = Board()
 
         self.board.place_tile(self.board.state)

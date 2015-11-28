@@ -1,12 +1,12 @@
-from project3.module6.ann import ANN
-from project3.module6.gui import *
-
-import theano.tensor as T
-import numpy as np
-
 import copy
 import random
+
+import numpy as np
 import requests
+import theano.tensor as T
+
+from project3.module6.game2048.gui import *
+from project3.module6.deeplearning.ann import ANN
 
 
 class AiWindow(GameWindow):
@@ -17,10 +17,11 @@ class AiWindow(GameWindow):
         self.player = player
         self.movedict = {0: 'up', 1: 'down', 2: 'left', 3: 'right'}
         self.weight_matrix = [
-            [200,150,100,50],
-            [150,100,50,30],
-            [100,50,30,20],
-            [50,30,20,10]]
+            [200, 150, 100, 50],
+            [150, 100, 50, 30],
+            [100, 50, 30, 20],
+            [50, 30, 20, 10]
+        ]
 
     # Handles game and gui logic, returns true if move was legal, false if not
     def onKeyPress(self, direction):
@@ -33,23 +34,18 @@ class AiWindow(GameWindow):
 
     # AI plays until play_best_move returns false, at which point there are no legal moves
     def play(self):
-        boolean_var = True
-        while boolean_var:
+        legal_moves = True
+        while legal_moves:
             directions = list(self.player.net.predict([self.convert_board()])[0])
-            boolean_var = self.play_best_move(directions)
+            legal_moves = self.play_best_move(directions)
 
     # Goes through a list of direction values from the nnet.predict function
     # Returns false if no moves are legal
     def play_best_move(self, directions):
-        dir = directions
-        dir_val_tups = []
+        dir_val_tuples = [(directions[i], i) for i in range(len(directions))]
+        dir_val_tuples.sort()
 
-        for i in range(len(directions)):
-            dir_val_tups.append((dir[i], i))
-
-        dir_val_tups.sort()
-
-        for elem in dir_val_tups:
+        for elem in dir_val_tuples:
             if self.onKeyPress(self.movedict[elem[1]]):
                 return True
 
@@ -58,9 +54,9 @@ class AiWindow(GameWindow):
 
     # Plays a random move, until there are no legal moves
     def play_random(self):
-        boolean_var = True
-        while boolean_var:
-            boolean_var = self.play_random_move()
+        legal_moves = True
+        while legal_moves:
+            legal_moves = self.play_random_move()
 
     # Randomly chooses a move and tries to perform it. If no moves are legal, return false
     def play_random_move(self):
@@ -81,7 +77,7 @@ class AiWindow(GameWindow):
         value = 0
         for i in range(len(state.board)):
             for j in range(len(state.board[i])):
-                value += self.weight_matrix[i][j]* state.board[i][j]
+                value += self.weight_matrix[i][j] * state.board[i][j]
         return value
 
     # Converts boards to match cases from their respective training cases

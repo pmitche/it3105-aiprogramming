@@ -1,7 +1,7 @@
 import theano
 import theano.tensor as T
 
-from project3.module6.layer import HiddenLayer
+from project3.module6.deeplearning.layer import HiddenLayer
 
 
 class ANN(object):
