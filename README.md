@@ -1,7 +1,9 @@
 # IT3105 Artificial Intelligence Programming
 Repository for hosting deliverables in the course IT3105 Artificial Intelligence Programming at the Norwegian University of Science and Technology, fall 2015. Entire course completed as a group effort with [Sondre Dyvik](https://github.com/sondrehd).
 
-###### Project 1 - Implemented in Python 2.7
+---
+
+#### Project 1 - Implemented in Python 2.7
 **module1:** Using A* to solve Navigation Problems.
 
 **module2:** A*-GAC, A General Constraint-Satisfaction Problem Solver.
@@ -11,7 +13,7 @@ Repository for hosting deliverables in the course IT3105 Artificial Intelligence
 ---
 
 
-###### Project 2 - Implemented in Java using the [course-provided GUI](https://github.com/jorgenkg/IT3105)
+#### Project 2 - Implemented in Java using the [course-provided GUI](https://github.com/jorgenkg/IT3105)
 **module4:** Minimax for Playing the 2048 Game.
 
 Out of ten runs per heuristic, we achieved the following results:
@@ -25,7 +27,7 @@ Out of ten runs per heuristic, we achieved the following results:
 ---
 
 
-###### Project 3 - Implemented in Python 3.4 using [Theano](http://deeplearning.net/software/theano/)
+#### Project 3 - Implemented in Python 3.4 using [Theano](http://deeplearning.net/software/theano/)
 **module5:** Neural Networks for Image Classification
 
 Five different neural networks were tested on the MNIST dataset, and we achieved the following results:
